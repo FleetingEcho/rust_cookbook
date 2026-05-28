@@ -20,21 +20,15 @@
 // | 变量遮蔽 | ✅ 同一作用域可重复 `let` | ❌ 不能重复声明 |
 ```
 
-### 2️⃣ 综合对照指南
+### 2️⃣ 对照指南 & 专题文档
 
-[`main/src/rust_vs_typescript.md`](main/src/rust_vs_typescript.md) — 27 个主题的系统对照，
+所有文档统一放在 [`main/src/markdown/`](main/src/markdown/)。
 
-### 📘 专题深度文档
-
-| 文档 | 定位 | 适合读者 |
-|------|------|----------|
-| [`main/src/markdown/lifetimes_from_ts_basics.md`](main/src/markdown/lifetimes_from_ts_basics.md) | 从 TS 视角理解生命周期基础——为什么需要、三大场景拆解、消除规则、TS 泛型类比、读懂编译错误、实战演练 | 熟悉 TS、刚开始接触 Rust 生命周期的开发者 |
-| [`main/src/markdown/lifetimes_advanced.md`](main/src/markdown/lifetimes_advanced.md) | 生命周期进阶——Variance / HRTB / trait 对象 / async / closure / GAT / Pin 自引用（TS 完全无法对应的 10 个概念） | 已掌握基础、想真正理解 Rust 所有权设计的开发者 |
-每个主题包含代码对比、对照表、关键差异分析和关联文件索引。
-
-涵盖：变量、类型系统、字符串、复合类型、枚举、所有权/借用、生命周期、泛型、
-Trait、错误处理、集合、迭代器、闭包、智能指针、Drop/Deref、Pin/Unpin、并发、
-async/await、宏、unsafe、模块系统、测试、派生宏、const 泛型等。
+| 文档 | 定位 | 使用频率 | 建议 |
+|------|------|----------|------|
+| [`rust_vs_typescript.md`](main/src/markdown/rust_vs_typescript.md) | 27 个主题的全景对照（变量/类型/所有权/错误处理/async…） | 🟢 **随时查阅** | 通读一遍知道有什么，之后当字典查 |
+| [`lifetimes_from_ts_basics.md`](main/src/markdown/lifetimes_from_ts_basics.md) | 生命周期基础：为什么需要、三大场景、消除规则、读懂编译错误、实战 | 🟢 **每天用** | **必读**，日常写 Rust 至少 50% 时间在跟这些打交道 |
+| [`lifetimes_advanced.md`](main/src/markdown/lifetimes_advanced.md) | 生命周期进阶：Variance / HRTB / GAT / Pin / async 等 10 个 TS 没有的概念 | 🟡 **偶尔查阅** | 遇到相关编译错误时翻，不需要背 |
 
 ### 3️⃣ 运行式对照示例
 
