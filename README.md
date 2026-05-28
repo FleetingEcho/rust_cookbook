@@ -22,7 +22,7 @@
 
 ### 2️⃣ 对照指南 & 专题文档
 
-所有文档统一放在 [`main/src/markdown/`](main/src/markdown/)。
+所有文档统一放在 [`main/src/markdown/`](main/src/markdown/)（[目录索引](main/src/markdown/README.md)）。
 
 | 文件 | 定位 | 掌握程度 |
 |------|------|----------|
