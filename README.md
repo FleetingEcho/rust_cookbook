@@ -22,13 +22,13 @@
 
 ### 2️⃣ 对照指南 & 专题文档
 
-所有文档统一放在 [`main/src/markdown/`](main/src/markdown/)（[目录索引](main/src/markdown/README.md)）。
+所有文档统一放在 [`markdown/`](markdown/)（[完整索引](markdown/src/README.md)）。
 
 | 文件 | 定位 | 掌握程度 |
 |------|------|----------|
-| [`rust_vs_typescript.md`](main/src/markdown/rust_vs_typescript.md) | 27 个主题全景对照，熟悉 TS 对应什么 Rust 概念 | `████████░░░░░░░░░░░░` 知道有什么、在哪查即可 |
-| [`lifetimes_from_ts_basics.md`](main/src/markdown/lifetimes_from_ts_basics.md) | 生命周期核心：为什么需要、三大场景、消除规则、编译错误解读、实战 | `████████████████████` **必须掌握**，写 Rust 天天打交道 |
-| [`lifetimes_advanced.md`](main/src/markdown/lifetimes_advanced.md) | 生命周期进阶：Variance / HRTB / GAT / Pin / async 等 | `████░░░░░░░░░░░░░░░░` 理解概念，遇到时回来翻 |
+| [`rust_vs_typescript.md`](markdown/src/rust_vs_typescript.md) | 27 个主题全景对照，熟悉 TS 对应什么 Rust 概念 | `████████░░░░░░░░░░░░` 知道有什么、在哪查即可 |
+| [`lifetimes_from_ts_basics.md`](markdown/src/lifetimes_from_ts_basics.md) | 生命周期核心：为什么需要、三大场景、消除规则、编译错误解读、实战 | `████████████████████` **必须掌握**，写 Rust 天天打交道 |
+| [`lifetimes_advanced.md`](markdown/src/lifetimes_advanced.md) | 生命周期进阶：Variance / HRTB / GAT / Pin / async 等 | `████░░░░░░░░░░░░░░░░` 理解概念，遇到时回来翻 |
 
 ### 3️⃣ 运行式对照示例
 

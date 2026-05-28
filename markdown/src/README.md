@@ -54,6 +54,8 @@ Rust 最重要也最独特的概念，必须掌握。
 | [learning_additions/ownership_borrowing.md](./learning_additions/ownership_borrowing.md) | 借用、可变借用规则、字符串切片 |
 | [advanced/lifetime.md](./advanced/lifetime.md) | 生命周期深入：省略规则、`'static`、结构体中的引用 |
 | [learning_additions/lifetimes.md](./learning_additions/lifetimes.md) | 生命周期补充练习 |
+| [lifetimes_from_ts_basics.md](./lifetimes_from_ts_basics.md) | 🔥 **生命周期基础（TS 视角）**：为什么需要、三大场景、消除规则、编译错误解读、实战 | `████████████████████` **必读** |
+| [lifetimes_advanced.md](./lifetimes_advanced.md) | 🔼 **生命周期进阶**：Variance / HRTB / GAT / Pin / async 等 10 个 TS 没有的概念 | `████░░░░░░░░░░░░░░░░` 偶尔查 |
 
 ---
 
