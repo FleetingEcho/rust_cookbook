@@ -24,11 +24,11 @@
 
 所有文档统一放在 [`main/src/markdown/`](main/src/markdown/)。
 
-| 文档 | 定位 | 使用频率 |
+| 文件 | 定位 | 掌握程度 |
 |------|------|----------|
-| [`rust_vs_typescript.md`](main/src/markdown/rust_vs_typescript.md) | 27 个主题全景对照，当字典查 | `████████████████████` 随时查阅 |
-| [`lifetimes_from_ts_basics.md`](main/src/markdown/lifetimes_from_ts_basics.md) | 生命周期基础：为什么需要、三大场景、消除规则、读懂编译错误、实战 | `██████████████████░░` 每天用，**必读** |
-| [`lifetimes_advanced.md`](main/src/markdown/lifetimes_advanced.md) | 进阶：Variance / HRTB / GAT / Pin / async 等 10 个主题 | `████░░░░░░░░░░░░░░░░` 偶尔查，遇到相关错误时翻 |
+| [`rust_vs_typescript.md`](main/src/markdown/rust_vs_typescript.md) | 27 个主题全景对照，熟悉 TS 对应什么 Rust 概念 | `████████░░░░░░░░░░░░` 知道有什么、在哪查即可 |
+| [`lifetimes_from_ts_basics.md`](main/src/markdown/lifetimes_from_ts_basics.md) | 生命周期核心：为什么需要、三大场景、消除规则、编译错误解读、实战 | `████████████████████` **必须掌握**，写 Rust 天天打交道 |
+| [`lifetimes_advanced.md`](main/src/markdown/lifetimes_advanced.md) | 生命周期进阶：Variance / HRTB / GAT / Pin / async 等 | `████░░░░░░░░░░░░░░░░` 理解概念，遇到时回来翻 |
 
 ### 3️⃣ 运行式对照示例
 
