@@ -267,7 +267,7 @@ fn main() {
     println!("identity(42): {}", identity(42));
     println!("identity('hi'): {}", identity("hi"));
     println!("first(&[1,2,3]): {:?}", first(&[1, 2, 3]));
-    println!("first(&[] as &[i32]): {:?}", first(&[]));
+    println!("first(&[] as &[i32]): {:?}", first(&[] as &[i32]));
 
     let mut x = 1_i32;
     let mut y = 2_i32;
@@ -400,7 +400,7 @@ fn main() {
     println!("┌──────────────────────────┬──────────────────────────────────┐");
     println!("│ TypeScript               │ Rust                             │");
     println!("├──────────────────────────┼──────────────────────────────────┤");
-    println!("│ function add(a,b) {...}  │ fn add(a: i32, b: i32) -> i32   │");
+    println!("│ function add(a,b) {{...}} │ fn add(a: i32, b: i32) -> i32   │");
     println!("│ return x + y            │ x + y  (无分号，表达式返回)      │");
     println!("│ (参数不强制写类型)       │ 每个参数必须有类型注解           │");
     println!("│ void                     │ () 单元类型/省略返回             │");

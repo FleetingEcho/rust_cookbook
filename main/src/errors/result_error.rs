@@ -92,7 +92,7 @@ fn main() {
 use std::fs::File;
 use std::io::{self, Read};
 
-fn read_username_from_file() -> Result<String, io::Error> {
+fn read_username_v1() -> Result<String, io::Error> {
     // 打开文件，f是`Result<文件句柄,io::Error>`
     let f = File::open("hello.txt");
 
@@ -121,9 +121,8 @@ fn open_file() -> Result<File, Box<dyn std::error::Error>> {
 }
 
 use std::fs;
-use std::io;
 
-fn read_username_from_file() -> Result<String, io::Error> {
+fn read_username_v2() -> Result<String, io::Error> {
     // read_to_string是定义在std::io中的方法，因此需要在上面进行引用
     fs::read_to_string("hello.txt")
 }
@@ -135,8 +134,8 @@ fn read_username_from_file() -> Result<String, io::Error> {
 fn first(arr: &[i32]) -> Option<&i32> {
    arr.get(0)
 }
+/*  
 
-/*
 会编译错误
 fn first(arr: &[i32]) -> Option<&i32> {
    arr.get(0)?
@@ -164,3 +163,4 @@ xxx()?.yyy()?;
 // - 处理 Option/Result 是常态，编译器强制你考虑"None 情况"
 //
 // 详细对照 → rust_vs_typescript.rs §12 "错误处理"
+*/

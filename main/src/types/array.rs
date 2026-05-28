@@ -21,19 +21,24 @@ let array = [value; n];
 
 */
 
-fn main(){
-  let array = [String::from("rust is good!"); 8];//报错！因为String不是 Copy 类型
+fn example_string_array(){
+  // ⛔ [String::from("rust is good!"); 8] 无法编译，String 不是 Copy 类型
+  // let array = [String::from("rust is good!"); 8];
+
   // ✅ 方案 1：用 vec![]
   let array = vec![String::from("rust is good!"); 8];
   println!("{:#?}", array);
 
-  let array2 = [String::from("rust is good!"); 8].map(|s| s.clone());
+  // ⛔ [expr; N] 同样需要 Copy — 下面写法无法编译:
+  // let array2 = [String::from("rust is good!"); 8].map(|s| s.clone());
+  // ✅ 方案 2：用 from_fn 构造数组再 map
+  let array2 = std::array::from_fn::<String, 8, _>(|_| String::from("rust is good!"));
   println!("{:#?}", array2);
 
 }
 
 
-fn main() {
+fn example_array_2d() {
   // 编译器自动推导出one的类型
   let one             = [1, 2, 3];
   // 显式类型标注
@@ -79,7 +84,7 @@ for a in arrays { // Vec<T> 默认会借用，除非 `into_iter()`
 }
 
 
-fn main() {
+fn example_array_iter() {
     let a = [1, 2, 3];
 
     for n in &a {  // ✅ 这里 `&a` 让 `n` 变成 `&i32`
@@ -89,7 +94,7 @@ fn main() {
     println!("{:?}", a); // ✅ `a` 仍然可用
 }
 
-fn main() {
+fn example_array_ref() {
     let a = [1, 2, 3];
 
     let ref_a = &a; // `&a` 获取 `a` 的地址
@@ -107,7 +112,7 @@ fn main() {
 🚀 可以把 &a 理解为一个“安全指针”，不仅仅是地址，还保证了数据安全！
 */
 
-fn main() {
+fn example_array_vec_ops() {
     // 📌 1️⃣ 数组 `[T; N]` 操作
     let mut arr = [1, 2, 3, 4, 5];
 

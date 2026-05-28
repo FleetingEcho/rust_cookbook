@@ -129,7 +129,7 @@ fn returns_summarizable() -> impl Summary {//说明一个函数返回了一个�
 
 use std::convert::TryInto;
 
-fn main() {
+fn example_type_conversion() {
   let a: i32 = 10;
   let b: u16 = 100;
 //b.try_into() 试图将 u16 转换为 i32，返回 Result<i32, _>。
@@ -167,7 +167,7 @@ fn add<T: Add<T, Output=T>>(a:T, b:T) -> T {
     a + b
 }
 
-fn main() {
+fn example_point_add() {
     let p1 = Point{x: 1.1f32, y: 1.1f32};
     let p2 = Point{x: 2.1f32, y: 2.1f32};
     println!("{:?}", add(p1, p2));

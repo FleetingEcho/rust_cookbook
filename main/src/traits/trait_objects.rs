@@ -144,3 +144,4 @@ trait ObjectSafe {
 //    Rust 默认走静态——性能更好，但需要理解两种模式的区别。
 //
 // 详细对照 → rust_vs_typescript.rs §11 "Trait 对象"
+ */

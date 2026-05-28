@@ -33,11 +33,11 @@ pub async fn test_app() -> (Router, SqlitePool) {
 }
 
 /// 发送请求并返回响应的 JSON body（作为字节）
-pub async fn send_request(
+pub async fn send_request<B: Serialize>(
     router: &mut Router,
     method: http::Method,
     path: &str,
-    body: Option<impl Serialize>,
+    body: Option<B>,
 ) -> (http::StatusCode, Vec<u8>) {
     let req_builder = Request::builder()
         .method(method)
@@ -81,7 +81,7 @@ mod tests {
 
     #[tokio::test]
     async fn health_check_requires_no_auth() {
-        let (mut router, _pool) = test_app().await;
+        let (router, _pool) = test_app().await;
         let req = Request::builder()
             .uri("/health")
             .body(Body::empty())
@@ -92,7 +92,7 @@ mod tests {
 
     #[tokio::test]
     async fn api_requires_api_key() {
-        let (mut router, _pool) = test_app().await;
+        let (router, _pool) = test_app().await;
         let req = Request::builder()
             .uri("/api/issues")
             .header("content-type", "application/json")

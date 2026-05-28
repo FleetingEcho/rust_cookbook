@@ -62,7 +62,7 @@ fn first_word(s: &String) -> &str {
 
 
 
-fn main() {
+fn example_string_say_hello() {
   // String 与 &str 的转换
     let s = String::from("hello,world!");
     say_hello(&s);
@@ -84,7 +84,7 @@ let s = &hello[0..2];
 
 */
 
-fn main() {
+fn example_string_mutate() {
     let mut s = String::from("Hello "); // 必须可变
 
     s.push_str("rust");// 可以 push字面量
@@ -116,7 +116,7 @@ fn main() {
     dbg!(string_replace_range);//该方法是直接操作原来的字符串，不会返回新的字符串。该方法需要使用 mut 关键字修饰。
 }
 
-fn main() {
+fn example_string_pop() {
     let mut string_pop = String::from("rust pop 中文!");
     let p1 = string_pop.pop();
     let p2 = string_pop.pop();
@@ -136,7 +136,7 @@ fn main() {
 
 // 因为中文占3 个字节，所以会报错，不在边界上
 
-fn main() {
+fn example_string_remove() {
     let mut string_remove = String::from("测试remove方法");
     println!(
         "string_remove 占 {} 个字节",
@@ -151,14 +151,14 @@ fn main() {
     dbg!(string_remove);
 }
 
-fn main() {
+fn example_string_truncate() {
     let mut string_truncate = String::from("测试truncate");
     string_truncate.truncate(3);// 因为一个汉字 3 字节
     dbg!(string_truncate);//string_truncate = "测"
 
 }
 
-fn main() {
+fn example_string_clear() {
     let mut string_clear = String::from("string clear");
     string_clear.clear();
     dbg!(string_clear);
@@ -166,7 +166,7 @@ fn main() {
 
 
 
-fn main() {
+fn example_string_concat() {
     let string_append = String::from("hello ");
     let string_rust = String::from("rust");
     // &string_rust会自动解引用为&str， 这里+也就是 add() 方法的第二个参数是一个引用的类型。
@@ -178,7 +178,7 @@ fn main() {
 
 }
 
-fn main() {
+fn example_string_add_ownership() {
     let s1 = String::from("hello,");
     let s2 = String::from("world!");
     // 在下句中，s1的所有权被转移走了，因此后面不能再使用s1
@@ -188,7 +188,7 @@ fn main() {
     // println!("{}",s1);
 }
 
-fn main() {
+fn example_string_format() {
     let s1 = "hello";
     let s2 = String::from("rust");
     let s = format!("{} {}!", s1, s2);
@@ -197,7 +197,7 @@ fn main() {
 }
 
 
-fn main(){
+fn example_string_chars(){
 
 for c in "中国人".chars() {
     println!("{}", c);

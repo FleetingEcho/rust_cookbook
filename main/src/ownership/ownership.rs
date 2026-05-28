@@ -60,7 +60,7 @@ fn takes_and_gives_back(a_string: String) -> String { // a_string 进入作用�
 
 
 
-fn main() {
+fn example_references() {
     let x = 5;
     let y = &x;//引用
 
@@ -69,7 +69,7 @@ fn main() {
 }
 
 
-fn main() {
+fn example_mut_ref() {
     let mut s = String::from("hello"); // 可变
 
     change(&mut s); // 同一作用域，特定数据只能有一个可变引用：
@@ -97,7 +97,9 @@ println!("{}, {}", r1, r2);
 */
 
 // 可变引用与不可变引用不能同时存在！！！！
-fn main(){
+// ⛔ 下面代码无法编译，用于演示 Rust borrow 规则：
+/*
+fn example_borrow_conflict(){
   let mut s = String::from("hello");
 
   let r1 = &s; // 没问题
@@ -106,6 +108,7 @@ fn main(){
 
   println!("{}, {}, and {}", r1, r2, r3);
 }
+*/
 
 /*
 注意，引用的作用域 s 从创建开始，一直持续到它最后一次使用的地方，这个跟变量的作用域有所不同，变量的作用域从创建持续到某一个花括号 }

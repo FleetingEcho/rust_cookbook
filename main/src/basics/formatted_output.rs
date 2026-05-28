@@ -173,7 +173,7 @@ fn main() {
 // 字符串填充
 // 字符串格式化默认使用空格进行填充，并且进行左对齐。
 
-fn main() {
+fn example_string_fill() {
     //-----------------------------------
     // 以下全部输出 "Hello x    !"
     // 为"x"后面填充空格，补齐宽度5
@@ -194,7 +194,7 @@ fn main() {
 // 数字填充:符号和 0
 // 数字格式化默认也是使用空格进行填充，但与字符串左对齐不同的是，数字是右对齐。
 
-fn main() {
+fn example_number_fill() {
     // 宽度是5 => Hello     5!
     println!("Hello {:5}!", 5);
     // 显式的输出正号 => Hello +5!
@@ -292,7 +292,7 @@ fn main() {
 */
 
 // 指针地址
-fn main(){
+fn example_pointer_addr(){
   let v= vec![1, 2, 3];
   println!("{:p}", v.as_ptr()) // => 0x600002324050
 }

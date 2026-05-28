@@ -107,7 +107,7 @@ struct Square {
     side: u32,
 }
 
-fn main() {
+fn example_rectangle_methods() {
     // 创建一个矩形实例
     let mut rect = Rectangle::new(30, 50);
 

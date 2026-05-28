@@ -202,12 +202,12 @@ fn main() {
     println!("│ 只有一种 string 类型        │ &str（借用）和 String（自有）两种    │");
     println!("│ s.length = UTF-16 单元数    │ .len() = 字节数，chars().count() 字符│");
     println!("│ 字符串不可变               │ String 可增长，&str 不可变          │");
-    println!("│ 拼接 \"a\" + \"b\"          │ format!(\"{}{}\", a, b) 或 a + &b    │");
+    println!("│ 拼接 \"a\" + \"b\"          │ format!(\"{{}}{{}}\" a, b) 或 a + &b  │");
     println!("│ s.slice(1, 3)              │ &s[1..3] 但按字节索引！危险！       │");
     println!("│ replace/replaceAll         │ .replace() / .replacen() 前 N 个    │");
     println!("│ trim/trimStart/trimEnd     │ .trim() / .trim_start() / .trim_end()│");
-    println!("│ .repeat(3)                  \"ab\".repeat(3)                   │");
-    println!("│ .padStart(10)              │ format!(\"{:>10}\", s)               │");
+    println!("│ .repeat(3)                 │ \"ab\".repeat(3)                      │");
+    println!("│ .padStart(10)              │ format!(\"{{:>10}}\" s)                │");
     println!("│ split(\",\")                 │ .split(',') 返回惰性迭代器          │");
     println!("│ s.includes(\"x\")            │ s.contains(\"x\")                   │");
     println!("│ 参数推荐用 string           │ 函数参数推荐 &str（更灵活）         │");

@@ -12,7 +12,7 @@ fn main() {
     }
 }
 
-fn main() {
+fn example_for_range() {
     for i in 1..=5 {
         println!("{}", i);
     }
@@ -26,7 +26,7 @@ for item in &mut collection	for item in collection.iter_mut()	可变借用
 */
 
 
-fn main() {
+fn example_while() {
     let mut n = 0;
 
     while n <= 5  {
@@ -38,7 +38,7 @@ fn main() {
     println!("我出来了！");
 }
 
-fn main() {
+fn example_while_array() {
     let a = [10, 20, 30, 40, 50];
     let mut index = 0;
 
@@ -50,7 +50,7 @@ fn main() {
 }
 
 
-fn main() {
+fn example_loop_return() {
     let mut counter = 0;
 
     let result = loop { //loop 是一个表达式，因此可以返回一个值

@@ -57,20 +57,20 @@ impl Container for NumberContainer {
     }
 }
 
-fn main() {
+fn example_associated_types() {
     let container = NumberContainer { item1: 10, item2: 20 };
     println!("{}", container.contains(&10, &20)); // true
 }
 
 //默认泛型类型
 
-struct Container<T = String> {
+struct DefaultContainer<T = String> {
     value: T,
 }
 
-fn main() {
-    let a = Container { value: "Hello".to_string() }; // 默认是 String
-    let b = Container::<i32> { value: 42 }; // 显式指定为 i32
+fn example_default_generic() {
+    let a = DefaultContainer { value: "Hello".to_string() }; // 默认是 String
+    let b = DefaultContainer::<i32> { value: 42 }; // 显式指定为 i32
 
     println!("{}", a.value); // 输出: Hello
     println!("{}", b.value); // 输出: 42
@@ -109,7 +109,7 @@ impl Human {
     }
 }
 
-fn main() {
+fn example_trait_ambiguity() {
     let person = Human;
     Pilot::fly(&person); // 调用Pilot特征上的方法
     Wizard::fly(&person); // 调用Wizard特征上的方法
@@ -150,7 +150,7 @@ impl B for MyStruct {
     }
 }
 
-fn main() {
+fn example_full_qualified_syntax() {
     let obj = MyStruct;
 
     // obj.hello(); // ❌ 编译错误：方法调用存在歧义
@@ -182,7 +182,7 @@ impl Greet for Person {
     }
 }
 
-fn main() {
+fn example_struct_trait_method() {
     let p = Person;
 
     p.hello(); // ✅ 默认调用结构体的方法，输出：Hello from struct!
@@ -225,7 +225,7 @@ fn make_noise<T: Speak + Shout>() {
     <T as Shout>::talk(); // ✅ 调用 Shout 版本
 }
 
-fn main() {
+fn example_generic_trait_disambiguation() {
     make_noise::<Dog>(); // ✅ 输出 Woof! 和 WOOF!
 }
 
@@ -254,7 +254,7 @@ impl fmt::Display for MyString {
     }
 }
 
-fn main() {
+fn example_newtype() {
     let s = MyString("Hello, world!".to_string());
     println!("{}", s); // ✅ 输出：Custom String: Hello, world!
 }

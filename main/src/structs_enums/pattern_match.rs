@@ -54,14 +54,9 @@ fn get_count_item(s: &str) -> (u64, &str) {
 }
 
 
-enum Result<T, E> {
-    Ok(T),  // 表示成功，包含成功的值
-    Err(E), // 表示失败，包含错误信息
-}
+// 使用标准库的 Result<T, E>（std::result::Result 已通过 prelude 自动引入）
 
-
-
-fn main() {
+fn example_divide() {
     match divide(10.0, 2.0) {
         Ok(result) => println!("结果: {}", result),
         Err(error) => println!("错误: {}", error),
@@ -78,8 +73,7 @@ fn main() {
     if let Ok(value) = divide(10.0, 2.0) {
         println!("运算成功，值为 {}", value);
     }
-
-  }
+}
 
 
 
@@ -97,7 +91,7 @@ fn divide_and_print(x: f64, y: f64) -> Result<(), String> {
     Ok(())
 }
 
-fn main() {
+fn example_divide_and_print() {
     let _ = divide_and_print(10.0, 2.0);
     let _ = divide_and_print(10.0, 0.0);
 }
@@ -105,7 +99,7 @@ fn main() {
 
 
 // OR use map
-fn main() {
+fn example_divide_map() {
   let result = divide(10.0, 2.0);
   result.map(|val| println!("成功的值: {}", val));
 }

@@ -1,7 +1,7 @@
 fn main() {
     let tup: (i32, f64, u8) = (500, 6.4, 1);
 }
-fn main() {
+fn example_tuple_destructure() {
     let tup = (500, 6.4, 1);
 
     let (x, y, z) = tup;
@@ -10,7 +10,7 @@ fn main() {
 }
 
 
-fn main() {
+fn example_tuple_access() {
     let x: (i32, f64, u8) = (500, 6.4, 1);
 
     let five_hundred = x.0;
@@ -22,7 +22,7 @@ fn main() {
 
 //使用元组返回多个数值
 
-fn main() {
+fn example_tuple_return() {
     let s1 = String::from("hello");
 
     let (s2, len) = calculate_length(s1);

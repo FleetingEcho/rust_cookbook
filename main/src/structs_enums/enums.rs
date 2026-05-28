@@ -23,7 +23,7 @@ fn get_username(id: u32) -> Option<String> {
     }
 }
 
-fn main() {
+fn example_option() {
     let user = get_username(1);
     match user {
         Some(name) => println!("Username: {}", name),
