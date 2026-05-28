@@ -24,11 +24,12 @@
 
 [`main/src/rust_vs_typescript.md`](main/src/rust_vs_typescript.md) — 27 个主题的系统对照，
 
-### 📘 专题深度文档（新增）
+### 📘 专题深度文档
 
 | 文档 | 定位 | 适合读者 |
 |------|------|----------|
-| [`main/src/markdown/lifetimes_deep_dive.md`](main/src/markdown/lifetimes_deep_dive.md) | 从 TS 视角深度理解 Rust 生命周期——含"为什么需要"、三大场景拆解、消除规则、NLL、常见误区等 12 个章节 | 熟悉 TS 但被 Rust 生命周期困扰的开发者 |
+| [`main/src/markdown/lifetimes_from_ts_basics.md`](main/src/markdown/lifetimes_from_ts_basics.md) | 从 TS 视角理解生命周期基础——为什么需要、三大场景拆解、消除规则、TS 泛型类比、读懂编译错误、实战演练 | 熟悉 TS、刚开始接触 Rust 生命周期的开发者 |
+| [`main/src/markdown/lifetimes_advanced.md`](main/src/markdown/lifetimes_advanced.md) | 生命周期进阶——Variance / HRTB / trait 对象 / async / closure / GAT / Pin 自引用（TS 完全无法对应的 10 个概念） | 已掌握基础、想真正理解 Rust 所有权设计的开发者 |
 每个主题包含代码对比、对照表、关键差异分析和关联文件索引。
 
 涵盖：变量、类型系统、字符串、复合类型、枚举、所有权/借用、生命周期、泛型、
