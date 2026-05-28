@@ -23,6 +23,12 @@
 ### 2️⃣ 综合对照指南
 
 [`main/src/rust_vs_typescript.md`](main/src/rust_vs_typescript.md) — 27 个主题的系统对照，
+
+### 📘 专题深度文档（新增）
+
+| 文档 | 定位 | 适合读者 |
+|------|------|----------|
+| [`main/src/lifetimes_deep_dive.md`](main/src/lifetimes_deep_dive.md) | 从 TS 视角深度理解 Rust 生命周期——含"为什么需要"、三大场景拆解、消除规则、NLL、常见误区等 12 个章节 | 熟悉 TS 但被 Rust 生命周期困扰的开发者 |
 每个主题包含代码对比、对照表、关键差异分析和关联文件索引。
 
 涵盖：变量、类型系统、字符串、复合类型、枚举、所有权/借用、生命周期、泛型、
