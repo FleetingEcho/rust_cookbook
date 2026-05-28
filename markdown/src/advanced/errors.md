@@ -1,0 +1,282 @@
+# Rust 错误处理详解
+
+Rust 提供了一种安全、健壮的错误处理机制。本文深入探讨：基本错误处理概念、组合器 (Combinators)、自定义错误类型、错误转换 (From Trait)、错误归一化、错误处理库 (thiserror、anyhow)。
+
+## 1. Rust 基本错误处理概念
+
+Rust 使用 `Result<T, E>` 和 `Option<T>` 进行错误和可选值的处理：
+
+- **Option\<T\>**：用于表示可能为空的情况，常见于 `Some(value)` 或 `None`。
+- **Result\<T, E\>**：用于表示可能发生错误的情况，常见于 `Ok(value)` 或 `Err(error)`。
+
+```rust
+fn may_return_none(flag: bool) -> Option<i32> {
+    if flag {
+        Some(42)
+    } else {
+        None
+    }
+}
+
+fn may_fail(flag: bool) -> Result<i32, String> {
+    if flag {
+        Ok(42)
+    } else {
+        Err("Something went wrong!".to_string())
+    }
+}
+```
+
+## 2. 组合器（Combinators）
+
+组合器是用于简化 `Option` 和 `Result` 处理的高阶函数。
+
+### or() 和 and()
+
+- `or()`：如果 self 是 Some 或 Ok，直接返回 self，否则返回 other。
+- `and()`：如果 self 和 other 都是 Some 或 Ok，则返回 other。
+
+```rust
+fn main() {
+    let s1 = Some("Rust");
+    let s2 = Some("Language");
+    let n: Option<&str> = None;
+
+    assert_eq!(s1.or(s2), s1);  // Some("Rust") or Some("Language") -> Some("Rust")
+    assert_eq!(n.or(s1), s1);    // None or Some("Rust") -> Some("Rust")
+
+    assert_eq!(s1.and(s2), s2);  // Some("Rust") and Some("Language") -> Some("Language")
+    assert_eq!(n.and(s1), n);    // None and Some("Rust") -> None
+}
+```
+
+### or_else() 和 and_then()
+
+- `or_else()`：接受一个闭包，若 self 是 None 或 Err，则调用闭包返回 Some 或 Ok。
+- `and_then()`：接受一个闭包，若 self 是 Some 或 Ok，则调用闭包并返回其结果。
+
+```rust
+fn main() {
+    let some_val = Some(5);
+    let none_val: Option<i32> = None;
+
+    // or_else 示例
+    let result = none_val.or_else(|| Some(10));
+    assert_eq!(result, Some(10));
+
+    // and_then 示例
+    let squared = some_val.and_then(|x| Some(x * x));
+    assert_eq!(squared, Some(25));
+}
+```
+
+### map() 和 map_err()
+
+- `map()`：对 Some 或 Ok 内部的值进行映射转换。
+- `map_err()`：对 Err 内部的错误值进行映射转换。
+
+```rust
+fn main() {
+    let number: Option<&str> = Some("123");
+
+    let parsed_number = number.map(|s| s.parse::<i32>().unwrap_or(0));
+    assert_eq!(parsed_number, Some(123));
+
+    let error_result: Result<i32, &str> = Err("404");
+
+    let mapped_error = error_result.map_err(|e| format!("Error code: {}", e));
+    assert_eq!(mapped_error, Err("Error code: 404".to_string()));
+}
+```
+
+## 3. 自定义错误类型
+
+在 Rust 中，可以使用 `enum` 定义错误类型，并实现 `Display` 和 `Debug` 以提供更友好的错误信息。
+
+```rust
+use std::fmt;
+
+#[derive(Debug)]
+struct AppError {
+    code: usize,
+    message: String,
+}
+
+impl fmt::Display for AppError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "[Error {}] {}", self.code, self.message)
+    }
+}
+
+fn produce_error() -> Result<(), AppError> {
+    Err(AppError {
+        code: 404,
+        message: "Resource Not Found".to_string(),
+    })
+}
+
+fn main() {
+    match produce_error() {
+        Err(e) => eprintln!("{}", e),
+        _ => println!("No error"),
+    }
+}
+```
+
+## 4. 错误转换 (From Trait)
+
+`From<T>` 允许自动转换错误类型，结合 `?` 操作符进行隐式转换。
+
+```rust
+use std::fs::File;
+use std::io;
+
+#[derive(Debug)]
+struct AppError {
+    message: String,
+}
+
+// 允许从 io::Error 转换成 AppError
+impl From<io::Error> for AppError {
+    fn from(error: io::Error) -> Self {
+        AppError {
+            message: error.to_string(),
+        }
+    }
+}
+
+fn open_file() -> Result<File, AppError> {
+    let file = File::open("non_existent.txt")?;
+    Ok(file)
+}
+
+fn main() {
+    match open_file() {
+        Err(e) => eprintln!("Error: {}", e.message),
+        _ => println!("File opened successfully"),
+    }
+}
+```
+
+## 5. 错误归一化
+
+如果函数涉及多个错误来源，可以用**特征对象** (`Box<dyn Error>`) 或**自定义枚举**统一错误类型。
+
+### 使用 Box\<dyn Error\>
+
+```rust
+// use std::fs::read_to_string;
+// use std::error::Error;
+// fn read_config() -> Result<String, Box<dyn Error>> {
+//     let filename = std::env::var("CONFIG_FILE")?;
+//     let content = read_to_string(filename)?;
+//     Ok(content)
+// }
+```
+
+### 使用自定义错误枚举
+
+```rust
+use std::fs::read_to_string;
+use std::env;
+
+#[derive(Debug)]
+enum MyError {
+    EnvError(env::VarError),
+    IOError(std::io::Error),
+}
+
+impl From<env::VarError> for MyError {
+    fn from(e: env::VarError) -> Self {
+        MyError::EnvError(e)
+    }
+}
+
+impl From<std::io::Error> for MyError {
+    fn from(e: std::io::Error) -> Self {
+        MyError::IOError(e)
+    }
+}
+
+fn read_config() -> Result<String, MyError> {
+    let filename = env::var("CONFIG_FILE")?;
+    let content = read_to_string(filename)?;
+    Ok(content)
+}
+```
+
+## 6. 错误处理库
+
+### 使用 thiserror
+
+`thiserror` 提供了一种简洁的方式定义错误：
+
+```rust
+use thiserror::Error;
+use std::fs::read_to_string;
+
+#[derive(Error, Debug)]
+enum MyError {
+    #[error("Environment variable not found")]
+    EnvError(#[from] std::env::VarError),
+
+    #[error(transparent)]
+    IOError(#[from] std::io::Error),
+}
+```
+
+### 使用 anyhow
+
+`anyhow` 适用于快速构建错误处理：
+
+```rust
+use anyhow::Result;
+use std::fs::read_to_string;
+
+fn read_config() -> Result<String> {
+    let filename = std::env::var("CONFIG_FILE")?;
+    let content = read_to_string(filename)?;
+    Ok(content)
+}
+```
+
+## 总结
+
+- `Option<T>` 适用于可选值，`Result<T, E>` 适用于错误处理。
+- 组合器 (`map`、`or_else`、`and_then`) 提供高阶操作。
+- 自定义错误类型让错误信息更清晰。
+- 错误归一化统一不同类型的错误处理。
+- 使用 `thiserror` 和 `anyhow` 简化错误处理。
+
+> Rust 的错误处理机制虽然稍显复杂，但其安全性和灵活性让代码更加健壮！🚀
+
+---
+
+## 📘 TypeScript 对比
+
+Rust 的 `thiserror` / `anyhow` ≈ TS 的自定义 Error 类
+
+```rust
+use anyhow::Result;
+fn do_stuff() -> Result<()> { Ok(()) } // anyhow: 任何错误
+```
+
+```ts
+// TS 没有直接等价，通常手动 catch
+function doStuff(): void { ... }
+```
+
+| Rust 方式 | 用途 | TS 对应 |
+|-----------|------|---------|
+| `thiserror` | 库作者定义具体错误类型 | 自定义 Error 子类 |
+| `anyhow` | 应用作者简化错误处理 | `try/catch` + 统一处理 |
+| `.map_err()` | 转换错误类型 | `.catch()` 重新 throw |
+| `From trait` | 自动错误转换 | ❌ 无自动转换 |
+
+> ⚠️ Rust 对错误的控制比 TS 精细得多：
+>
+> - 每个函数签名明确标注可能返回的错误类型
+> - 编译器保证你不会"忘记处理错误"
+> - 但代价是需要写更多类型代码（除非用 anyhow）
+
+详细对照 → [rust_vs_typescript.rs §12 "错误处理"](../rust_vs_typescript.rs)

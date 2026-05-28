@@ -1,0 +1,187 @@
+# Rust vs TypeScript：生命周期
+
+> **运行命令**：`cargo run -p learning_notes --example rts_lifetimes`
+
+---
+
+## TypeScript 参考版本
+
+```ts
+// TS/JS 没有生命周期概念，GC 自动管理
+// 函数可以随意返回引用/对象，不需要考虑指向是否有效
+
+function longest(a: string, b: string): string {
+    return a.length >= b.length ? a : b;  // 直接返回，无需标注
+}
+
+class TextHighlighter {
+    private text: string;   // 存储字符串，GC 保证不会悬空
+    constructor(text: string) { this.text = text; }
+    firstWord(): string { return this.text.split(" ")[0]; }
+}
+
+// TS 不需要考虑悬垂引用（dangling reference）
+// 因为 GC 会在所有引用消失后才释放对象
+```
+
+---
+
+## 为什么 Rust 需要生命周期？
+
+Rust 没有 GC，编译器需要知道"这个引用指向的数据能活多久"。生命周期标注 `'a` 不改变生命周期的长短，只是告诉编译器"这些引用之间的生存期关系是什么"。
+
+**类比**：TS 中 GC 在运行时跟踪引用；Rust 让编译器在编译时验证。
+
+---
+
+## 一、为什么需要生命周期标注（函数返回引用时）
+
+```rust
+// 这个函数返回两个字符串中较长的那个的引用
+// 编译器需要知道：返回的引用与哪个参数的生命周期相关？
+// 'a 标注说明："返回值的生命周期至少和 a、b 中较短的那个一样长"
+fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
+    // TS: function longest(a: string, b: string): string — 无需标注
+    if x.len() >= y.len() { x } else { y }
+}
+
+// 如果不加 'a，编译器不知道返回的引用指向 x 还是 y，无法验证安全性
+// fn longest_broken(x: &str, y: &str) -> &str { // ❌ 缺少生命周期标注
+//     if x.len() >= y.len() { x } else { y }
+// }
+
+// 只有一个参数时，编译器可以自动推断，不需要手动标注（生命周期省略规则）
+fn first_word(s: &str) -> &str {
+    match s.find(' ') {
+        Some(i) => &s[..i],
+        None    => s,
+    }
+}
+```
+
+---
+
+## 二、结构体中保存引用（必须标注生命周期）
+
+```rust
+// 结构体保存引用时，必须保证引用不会比结构体活得更短
+// TS: class 存储 string 不需要考虑这个，GC 负责
+struct TextExtract<'a> {
+    // 'a 说明：这个结构体实例的生命周期不能超过 part 引用的数据
+    part: &'a str,
+}
+
+impl<'a> TextExtract<'a> {
+    fn announce(&self, announcement: &str) -> &str {
+        println!("公告: {announcement}");
+        self.part   // 返回 part，生命周期与 'a 绑定
+    }
+}
+```
+
+---
+
+## 三、基本生命周期演示
+
+```rust
+let string1 = String::from("long string is long");
+let result;
+{
+    let string2 = String::from("xyz");
+    result = longest(string1.as_str(), string2.as_str());
+    println!("最长的字符串: {result}");
+    // result 必须在 string2 的作用域内使用
+}
+// println!("{result}"); // ❌ string2 已被释放，result 引用失效
+// TS 不会有这个问题，GC 会保持 string2 存活
+```
+
+---
+
+## 四、不需要标注的情况（生命周期省略规则）
+
+```
+规则1：每个引用参数都有自己的生命周期
+规则2：只有一个输入引用参数时，输出生命周期=输入生命周期
+规则3：有 &self 或 &mut self 时，输出生命周期=self 的生命周期
+```
+
+```rust
+fn first(s: &str) -> &str { &s[..1] }         // 规则2：单参数
+fn identity(x: &i32) -> &i32 { x }             // 规则2：单参数
+
+let s = String::from("hello");
+println!("first: {}", first(&s));
+println!("identity: {}", identity(&42));
+```
+
+---
+
+## 五、结构体中的生命周期
+
+```rust
+let novel = String::from("从前有座山。山里有座庙。");
+let first_sentence;
+{
+    let i = novel.find('。').unwrap_or(novel.len());
+    first_sentence = &novel[..i];
+}
+
+let excerpt = TextExtract { part: first_sentence };
+let displayed = excerpt.announce("精彩片段：");
+println!("摘录: {displayed}");
+```
+
+---
+
+## 六、'static 生命周期
+
+**TS**: 字符串字面量永远存在，不需要考虑。
+
+**Rust**: `'static` 表示整个程序运行期间都有效。
+
+```rust
+let s: &'static str = "我会一直存在";  // 字符串字面量都是 'static
+
+fn always_valid() -> &'static str {
+    "永远有效的字符串"   // 字面量是 'static
+}
+```
+
+---
+
+## 七、生命周期 + 泛型 + trait bound 组合
+
+**TS**: 无需这么复杂，直接写泛型。
+
+```rust
+fn longest_with_announce<'a, T>(
+    x: &'a str,
+    y: &'a str,
+    ann: T,
+) -> &'a str
+where
+    T: std::fmt::Display,
+{
+    println!("公告: {ann}");
+    if x.len() >= y.len() { x } else { y }
+}
+
+let s1 = String::from("long string");
+let s2 = String::from("xy");
+let result = longest_with_announce(s1.as_str(), s2.as_str(), "比较结果");
+```
+
+---
+
+## 总结对照表
+
+| TypeScript | Rust |
+|---|---|
+| 无生命周期概念（GC 处理） | `'a` 标注引用之间的存活关系 |
+| 函数可随意返回引用 | 返回引用必须依赖输入参数的生命周期 |
+| 类存储引用无需标注 | 结构体存储引用必须标注生命周期 `'a` |
+| 字符串字面量永远有效 | `'static` 生命周期（程序全程有效） |
+| 大多数情况下自动处理 | 生命周期省略规则自动推断 |
+| 运行时 GC 暂停（STW） | 编译期验证，零运行时开销 |
+| 悬垂引用 = undefined 行为 | 悬垂引用 = 编译错误（根本过不了） |

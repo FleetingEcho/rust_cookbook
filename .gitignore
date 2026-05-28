@@ -1,0 +1,8 @@
+**/.vscode/**
+**/target/**
+**/ferris.txt
+**/node_modules/**
+**/dist/**
+main/projects/.traces/
+main/projects/issue_tracker_api/data/*.db
+main/projects/issue_tracker_api/storage/uploads/**

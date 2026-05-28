@@ -1,0 +1,9 @@
+[workspace]
+members = [
+    "main",
+    "main/projects/hacker_news",
+    "main/projects/issue_tracker_api",
+    "main/projects/minigrep",
+    "main/projects/mini_web_server",
+]
+resolver = "2"

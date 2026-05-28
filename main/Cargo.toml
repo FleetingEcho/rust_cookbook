@@ -1,0 +1,110 @@
+[package]
+name = "learning_notes"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+# 演示用的虚构 feature，让 cargo_features.rs 里的 cfg 示例可以合法编译
+logging = []
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+
+# rust_vs_typescript 系列示例
+[[example]]
+name = "rts_primitives"
+path = "examples/rust_vs_typescript/primitives.rs"
+
+[[example]]
+name = "rts_strings"
+path = "examples/rust_vs_typescript/strings.rs"
+
+[[example]]
+name = "rts_arrays"
+path = "examples/rust_vs_typescript/arrays.rs"
+
+[[example]]
+name = "rts_tuples"
+path = "examples/rust_vs_typescript/tuples.rs"
+
+[[example]]
+name = "rts_structs"
+path = "examples/rust_vs_typescript/structs.rs"
+
+[[example]]
+name = "rts_hashmaps"
+path = "examples/rust_vs_typescript/hashmaps.rs"
+
+[[example]]
+name = "rts_enums"
+path = "examples/rust_vs_typescript/enums.rs"
+
+[[example]]
+name = "rts_option_result"
+path = "examples/rust_vs_typescript/option_result.rs"
+
+[[example]]
+name = "rts_closures_iter"
+path = "examples/rust_vs_typescript/closures_iter.rs"
+
+[[example]]
+name = "rts_traits"
+path = "examples/rust_vs_typescript/traits.rs"
+
+[[example]]
+name = "rts_variables"
+path = "examples/rust_vs_typescript/variables.rs"
+
+[[example]]
+name = "rts_control_flow"
+path = "examples/rust_vs_typescript/control_flow.rs"
+
+[[example]]
+name = "rts_ownership_borrowing"
+path = "examples/rust_vs_typescript/ownership_borrowing.rs"
+
+[[example]]
+name = "rts_lifetimes"
+path = "examples/rust_vs_typescript/lifetimes.rs"
+
+[[example]]
+name = "rts_pattern_matching"
+path = "examples/rust_vs_typescript/pattern_matching.rs"
+
+[[example]]
+name = "rts_generics"
+path = "examples/rust_vs_typescript/generics.rs"
+
+[[example]]
+name = "rts_modules"
+path = "examples/rust_vs_typescript/modules.rs"
+
+[[example]]
+name = "rts_smart_pointers"
+path = "examples/rust_vs_typescript/smart_pointers.rs"
+
+[[example]]
+name = "rts_error_handling_advanced"
+path = "examples/rust_vs_typescript/error_handling_advanced.rs"
+
+[[example]]
+name = "rts_macros"
+path = "examples/rust_vs_typescript/macros.rs"
+
+[[example]]
+name = "rts_async_await"
+path = "examples/rust_vs_typescript/async_await.rs"
+
+[[example]]
+name = "rts_functions"
+path = "examples/rust_vs_typescript/functions.rs"
+
+[[example]]
+name = "rts_raii_drop"
+path = "examples/rust_vs_typescript/raii_drop.rs"
+
+[[example]]
+name = "rts_testing"
+path = "examples/rust_vs_typescript/testing.rs"
