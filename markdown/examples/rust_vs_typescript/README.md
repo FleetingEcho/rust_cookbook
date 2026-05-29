@@ -21,6 +21,7 @@
 | 5 | [数组与 Vec](./arrays.md) | `[T;N]`、`Vec<T>`、切片、迭代器方法 | 固定数组 + Vec vs `Array<T>` |
 | 6 | [HashMap 与集合](./hashmaps.md) | `HashMap`、`HashSet`、`BTreeMap`、entry API | entry API 无 TS 对应；集合运算内置 |
 | 7 | [函数](./functions.md) | `fn`、表达式体、高阶函数、发散函数 `!` | 无 `return` 的表达式返回；方法用 `&self` |
+| 8 | [踩坑指南](./newbie_guide.md) | 返回值类型判断、`Option`/`Result` 处理、Iterator 惰性求值、`iter`/`into_iter` 区别、类型推导规则 | `collect()` 需手动触发；`map`/`filter` 不在 Vec 上而在迭代器上 |
 
 ### 🟡 第二阶段：Rust 核心特性（认知飞跃区）
 

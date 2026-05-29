@@ -29,6 +29,9 @@ TOPICS=(
     "smart_pointers      Box/Rc/RefCell/Arc/Mutex（对应JS GC）"
     "async_await         async/await、tokio、join!/spawn、Future惰性"
     "macros              println!/format!/vec!/dbg!/assert!/macro_rules!"
+    "functions           函数、闭包、高阶函数、impl Trait 返回值"
+    "raii_drop           RAII / Drop、资源释放时机（对比 JS GC）"
+    "testing             单元测试、集成测试、文档测试"
 )
 
 # 无参数：显示菜单

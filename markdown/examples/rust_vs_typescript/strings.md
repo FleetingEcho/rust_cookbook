@@ -136,7 +136,7 @@ let first_two: String = chinese.chars().take(2).collect();
 
 ```rust
 let text = "hello rust";
-println!("{}", text.replace("l", "L"));       // TS: replace()
+println!("{}", text.replace("l", "L"));       // TS: replaceAll()
 println!("{}", text.replacen("l", "L", 1));   // TS: replace() 只替换第一个
 ```
 
