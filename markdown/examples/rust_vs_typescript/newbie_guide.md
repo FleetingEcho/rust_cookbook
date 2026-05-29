@@ -115,9 +115,9 @@ vec![1,2,3].iter().map(|x| x * 2).collect::<Vec<_>>()
 collect 本身不固定返回某种类型，**你指定什么类型它就收集成什么**：
 
 ```rust
-let v: Vec<&str>          = "a,b,c".split(',').collect();  // Vec
-let s: String             = ['h','i'].into_iter().collect(); // String
-let set: HashSet<i32>     = vec![1,1,2,3].into_iter().collect(); // HashSet，自动去重
+let v: Vec<&str>           = "a,b,c".split(',').collect();          // Vec
+let s: String              = ['h','i'].into_iter().collect();        // String
+let set: HashSet<i32>      = vec![1,1,2,3].into_iter().collect();   // HashSet，自动去重
 let map: HashMap<&str,i32> = vec![("a",1),("b",2)].into_iter().collect(); // HashMap
 ```
 
@@ -194,6 +194,49 @@ let result: Vec<i32> = v.iter()
 
 固定套路：**`vec` → `.iter()` → 链式操作 → `.collect()`**
 
+### 为什么 filter 是 `&&x`，map 是 `&x`？
+
+`v.iter()` 给出的元素是 `&i32`（一层借用）。但 filter 闭包接收的是"对元素的引用"，所以再加一层，变成 `&&i32`：
+
+```
+v.iter()  →  元素是 &i32
+filter    →  闭包拿到的是 &&i32（对 &i32 再借用一次）
+map       →  闭包拿到的是 &i32（直接给元素）
+```
+
+规律：**`&` 的数量 = iter 给的层数 + filter 额外的一层**，每个 `&` 和类型里的 `&` 一一对消，剩下的就是 x。
+
+### iter / into_iter / iter_mut 闭包参数完整对比
+
+| | 元素类型 | map 写法 | filter 写法 |
+|--|---------|---------|------------|
+| `.iter()` | `&i32` | `\|&x\|` | `\|&&x\|` |
+| `.into_iter()` | `i32` | `\|x\|` | `\|&x\|` |
+| `.iter_mut()` | `&mut i32` | `\|x\|` | `\|x\|`（很少和 filter 组合）|
+
+完整示例：
+
+```rust
+let v = vec![1, 2, 3, 4, 5];
+
+// iter()：原 vec 保留，filter 两个 &&，map 一个 &
+let r: Vec<i32> = v.iter()
+    .filter(|&&x| x > 2)
+    .map(|&x| x * 10)
+    .collect();  // v 之后还能用
+
+// into_iter()：消耗 vec，filter 一个 &，map 不用写 &
+let r: Vec<i32> = v.into_iter()
+    .filter(|&x| x > 2)
+    .map(|x| x * 10)
+    .collect();  // v 之后不能用
+
+// iter_mut()：原地修改，直接 *x 改值
+v.iter_mut().for_each(|x| *x *= 10);
+```
+
+**新手建议：先统一用 `into_iter()`，filter 写 `|&x|`，map 写 `|x|`，是最简单的组合。**
+
 ### iter() 的三种形式
 
 | 方法 | 元素类型 | 用途 |
@@ -201,16 +244,6 @@ let result: Vec<i32> = v.iter()
 | `.iter()` | `&T` | 只读借用，原 vec 之后还能用 |
 | `.iter_mut()` | `&mut T` | 原地修改 |
 | `.into_iter()` | `T` | 消耗 vec，拿到所有权 |
-
-```rust
-// iter()：v 之后还能用，但闭包参数要写 &x
-let doubled: Vec<i32> = v.iter().map(|&x| x * 2).collect();
-
-// into_iter()：v 之后不能用，但闭包参数直接写 x，更简洁
-let doubled: Vec<i32> = v.into_iter().map(|x| x * 2).collect();
-```
-
-**新手建议：先统一用 `into_iter()`，闭包参数不用加 `&`，少一个心智负担。**
 
 ---
 
@@ -326,6 +359,74 @@ let map: HashMap<_, _> = ...   // 只告诉编译器是 HashMap，具体类型�
 .collect::<Vec<_>>()           // turbofish 写法，内部类型推导
 ```
 
+### Vec 想放任意类型？
+
+Rust 的 Vec 要求所有元素同类型，想放混合类型有两种办法：
+
+**方式一：枚举（推荐，类型安全）**
+
+```rust
+enum Value {
+    Int(i32),
+    Str(String),
+    Bool(bool),
+}
+
+let v = vec![
+    Value::Int(1),
+    Value::Str("hi".to_string()),
+    Value::Bool(true),
+];
+
+// 取出来用 match
+for item in &v {
+    match item {
+        Value::Int(n)  => println!("int: {n}"),
+        Value::Str(s)  => println!("str: {s}"),
+        Value::Bool(b) => println!("bool: {b}"),
+    }
+}
+```
+
+**方式二：`Box<dyn Any>`（真的啥都放，但类型信息丢失）**
+
+```rust
+use std::any::Any;
+
+let v: Vec<Box<dyn Any>> = vec![
+    Box::new(1_i32),
+    Box::new("hello"),
+    Box::new(true),
+];
+
+// 取出来要 downcast，返回 Option
+if let Some(n) = v[0].downcast_ref::<i32>() {
+    println!("{n}");
+}
+```
+
+实际开发中 99% 用枚举，`dyn Any` 类型信息丢失了很难维护，只有极少数通用库才用。
+
+**枚举 Vec 的扩容**
+
+Vec 是动态数组，和 TS 一样满了自动扩容，不需要手动管。直接 `push` 或 `extend`：
+
+```rust
+let mut v = vec![Value::Int(1), Value::Str("hi".to_string())];
+
+// 单个追加
+v.push(Value::Bool(true));
+v.push(Value::Int(42));
+
+// 批量追加
+v.extend([
+    Value::Int(10),
+    Value::Str("world".to_string()),
+]);
+```
+
+只限制是 push 的必须是 `Value` 的某个变体，不能直接 push 裸的 `1` 或 `"hello"`。
+
 ---
 
 ## 八、总结速查
@@ -347,4 +448,7 @@ let map: HashMap<_, _> = ...   // 只告诉编译器是 HashMap，具体类型�
 
 5. Vec 想 map/filter？
    → 先 .iter() 或 .into_iter()，最后 .collect()
+
+6. filter 里为什么是 &&x？
+   → iter() 元素是 &T，filter 再借用一次变 &&T，用 into_iter() 可以避免
 ```
