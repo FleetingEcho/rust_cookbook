@@ -63,6 +63,28 @@ fn parse() -> Result<i32, _> {
 }
 ```
 
+### Option 和 Result 互转
+
+```rust
+// Option → Result
+let opt: Option<i32> = Some(1);
+opt.ok_or("没有值")          // Result<i32, &str>，None 变成 Err
+opt.ok_or_else(|| "没有值")  // 同上，错误值懒求值
+
+// Result → Option
+let res: Result<i32, &str> = Ok(1);
+res.ok()    // Option<i32>，丢弃错误，Ok → Some，Err → None
+res.err()   // Option<&str>，丢弃正常值，Err → Some，Ok → None
+```
+
+实际场景：在返回 `Option` 的函数里，遇到 `Result` 用 `.ok()?` 处理：
+
+```rust
+fn first_number(s: &str) -> Option<i32> {
+    s.split(',').next()?.parse().ok()  // 找不到或解析失败都返回 None
+}
+```
+
 ---
 
 ## 三、需要 collect() 的情况
@@ -87,6 +109,72 @@ vec![1,2,3].iter().map(|x| x * 2).collect::<Vec<_>>()
 ```
 
 **为什么是懒的？** 因为链式操作中间不需要创建临时数组，性能更好，最后一次性 collect。
+
+### collect() 返回什么？
+
+collect 本身不固定返回某种类型，**你指定什么类型它就收集成什么**：
+
+```rust
+let v: Vec<&str>          = "a,b,c".split(',').collect();  // Vec
+let s: String             = ['h','i'].into_iter().collect(); // String
+let set: HashSet<i32>     = vec![1,1,2,3].into_iter().collect(); // HashSet，自动去重
+let map: HashMap<&str,i32> = vec![("a",1),("b",2)].into_iter().collect(); // HashMap
+```
+
+所以 collect 必须有类型提示，否则编译器不知道收集成哪种容器。
+
+### 迭代器的终结操作（消费迭代器，不需要 collect）
+
+不是所有迭代器操作都要 collect，以下方法直接返回最终值：
+
+```rust
+let v = vec![1, 2, 3, 4, 5];
+
+v.iter().count()                    // usize，元素个数
+v.iter().sum::<i32>()               // i32，求和
+v.iter().product::<i32>()           // i32，求积
+v.iter().max()                      // Option<&i32>，最大值
+v.iter().min()                      // Option<&i32>，最小值
+v.iter().any(|&x| x > 3)           // bool，有没有满足条件的
+v.iter().all(|&x| x > 0)           // bool，是否全部满足
+v.iter().find(|&&x| x > 3)         // Option<&i32>，第一个满足的
+v.iter().position(|&x| x == 3)     // Option<usize>，第一个满足的下标
+v.iter().for_each(|x| println!("{x}")); // 遍历，无返回值
+```
+
+### 链式适配器（中间操作，返回仍是迭代器）
+
+```rust
+let v = vec![1, 2, 3, 4, 5];
+
+// filter_map：filter + map 合一，返回 None 的直接跳过
+let result: Vec<i32> = v.iter()
+    .filter_map(|&x| if x > 2 { Some(x * 10) } else { None })
+    .collect();  // [30, 40, 50]
+
+// enumerate：带下标
+for (i, val) in v.iter().enumerate() {
+    println!("{i}: {val}");
+}
+
+// zip：两个迭代器合并成元组
+let keys = vec!["a", "b", "c"];
+let vals = vec![1, 2, 3];
+let map: HashMap<_,_> = keys.into_iter().zip(vals).collect();
+
+// flatten：嵌套展开
+let nested = vec![vec![1,2], vec![3,4]];
+let flat: Vec<i32> = nested.into_iter().flatten().collect(); // [1,2,3,4]
+
+// take / skip：取前 n 个 / 跳过前 n 个
+let first3: Vec<i32> = v.iter().copied().take(3).collect();  // [1,2,3]
+let after2: Vec<i32> = v.iter().copied().skip(2).collect();  // [3,4,5]
+
+// chain：拼接两个迭代器
+let a = vec![1, 2];
+let b = vec![3, 4];
+let all: Vec<i32> = a.iter().chain(b.iter()).copied().collect(); // [1,2,3,4]
+```
 
 ---
 
