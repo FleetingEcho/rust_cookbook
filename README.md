@@ -127,15 +127,19 @@ cargo run -p learning_notes --example rts_<名称>
 ./rts.sh strings                              # 运行指定对照示例
 
 ./src.sh                                      # 列出 src/ 下所有文件及其状态
-./src.sh basics/variable                      # 运行单文件（有 fn main）
-./src.sh learning_additions/iterators         # 自动跑测试（有 #[test]）
-./src.sh learning_additions/iterators --test  # 强制跑测试
+./src.sh basics/if_else                       # 运行 fn main() + 所有 fn example_*
+./src.sh types/array                          # 自动生成 main 依次调用 fn example_*
+./src.sh learning_additions/iterators --test  # 跑 #[test] 测试
 ```
 
-`src.sh` 会自动判断文件类型：
-- ✅ 单个 `fn main` → `cargo run`
-- 🧪 无 `fn main` + 有 `#[test]` → `cargo test`
-- ⚠️ 多个 `fn main`（笔记风格）→ 提示用 `playground.rs`
+`src.sh` 自动判断运行方式：
+
+| 文件特征 | 模式 |
+|---------|------|
+| `fn main()` | `cargo run`，同时调用同文件的 `fn example_*` |
+| 只有 `fn example_*` | 自动生成 `main` 依次调用所有示例 |
+| 只有 `#[test]` | `cargo test --nocapture` |
+| 都没有（纯模块） | 提示在 `playground.rs` 中调用 |
 
 ## 常用命令
 

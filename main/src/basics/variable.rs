@@ -1,3 +1,7 @@
+fn main() {
+    const_test("hello");
+}
+
 pub fn const_test(name: &str) {
    let mut x = name;// 可变
     println!("The value of x is: {}", x);

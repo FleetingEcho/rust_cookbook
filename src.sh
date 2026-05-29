@@ -24,6 +24,14 @@ count_pattern() {
     grep -c "$1" "$2" 2>/dev/null || true
 }
 
+# 去除 /* */ 块注释后再统计模式出现次数（避免把注释里的 fn main 算进去）
+count_pattern_no_block_comments() {
+    local pattern="$1" file="$2"
+    # 用 perl 去除 /* ... */ 块注释（跨行），再 grep
+    perl -0777 -pe 's|/\*.*?\*/||gs' "$file" 2>/dev/null \
+        | grep -c "$pattern" 2>/dev/null || true
+}
+
 cleanup() { rm -f "$TMP_EXAMPLE"; }
 trap cleanup EXIT
 
@@ -38,9 +46,9 @@ if [ -z "$1" ]; then
     print_file() {
         local f="$1" label="$2"
         local mains tests examples
-        mains=$(count_pattern "^fn main()" "$f")
+        mains=$(count_pattern_no_block_comments "^fn main()" "$f")
         tests=$(count_pattern "#\[test\]" "$f")
-        examples=$(count_pattern "^fn example_" "$f")
+        examples=$(count_pattern_no_block_comments "^fn example_" "$f")
         if   [ "$mains" -gt 1 ]; then
             printf "    %-42s ✅ 可运行（%s 个 main）\n" "$label" "$mains"
         elif [ "$mains" -eq 1 ] && [ "$examples" -gt 0 ]; then
@@ -147,9 +155,9 @@ if [ -z "$FILEPATH" ]; then
     exit 1
 fi
 
-MAIN_COUNT=$(count_pattern "^fn main()" "$FILEPATH")
-TEST_COUNT=$(count_pattern "#\[test\]"  "$FILEPATH")
-EXAMPLE_COUNT=$(count_pattern "^fn example_" "$FILEPATH")
+MAIN_COUNT=$(count_pattern_no_block_comments "^fn main()" "$FILEPATH")
+TEST_COUNT=$(count_pattern "#\[test\]" "$FILEPATH")
+EXAMPLE_COUNT=$(count_pattern_no_block_comments "^fn example_" "$FILEPATH")
 MODULE=$(basename "$TARGET")
 
 echo ""
@@ -208,20 +216,69 @@ if [ "$MAIN_COUNT" -eq 0 ]; then
 fi
 
 # -------------------------------------------------------
-# 单个或多个 fn main → 复制为临时 example 运行
+# 有 fn main → 复制为临时 example 运行
+# 若同时有 fn example_*，在 main 末尾追加调用
 # -------------------------------------------------------
 if [ "$MAIN_COUNT" -gt 1 ]; then
-    echo "  ⚠️  检测到 $MAIN_COUNT 个 fn main()（注释中的不算）"
-    echo "  模式: 取第一个 fn main() 运行"
+    echo "  ℹ️  检测到 $MAIN_COUNT 个 fn main()，运行第一个"
     echo ""
-    # 只保留第一个 fn main 块（截取到第二个 fn main 前）
-    first_main_line=$(grep -n "^fn main()" "$FILEPATH" | head -1 | cut -d: -f1)
-    second_main_line=$(grep -n "^fn main()" "$FILEPATH" | sed -n '2p' | cut -d: -f1)
-    if [ -n "$second_main_line" ]; then
-        head -n $((second_main_line - 1)) "$FILEPATH" > "$TMP_EXAMPLE"
-    else
-        cp "$FILEPATH" "$TMP_EXAMPLE"
-    fi
+fi
+
+if [ "$EXAMPLE_COUNT" -gt 0 ]; then
+    echo "  模式: cargo run（main + $EXAMPLE_COUNT 个 example_* 函数）"
+    echo ""
+    # 找到文件最后一个 } 之前插入 example_* 调用
+    mapfile -t FUNCS < <(
+        perl -0777 -pe 's|/\*.*?\*/||gs' "$FILEPATH" \
+        | grep "^fn example_" | sed 's/fn \([^(]*\).*/\1/'
+    )
+    # 复制文件，把最后一行的 } (closing main) 替换为调用 + }
+    awk '
+      /^fn main\(\)/ { in_main=1 }
+      in_main && /^\}/ { last_brace=NR; last_line=$0 }
+      { lines[NR]=$0 }
+      END {
+        for(i=1;i<=NR;i++) {
+          if(i==last_brace) {
+            for(f in funcs) print "    " funcs[f] "();"
+            print last_brace_content
+          } else {
+            print lines[i]
+          }
+        }
+      }
+    ' "$FILEPATH" > /dev/null  # awk approach is complex; use simpler method below
+
+    # 简单方法：直接追加调用到文件末尾，用 #[allow] 抑制 dead_code 警告
+    {
+        echo "#[allow(dead_code)]"
+        cat "$FILEPATH"
+        echo ""
+        echo "// auto-generated: run example_* functions"
+        echo "#[allow(unused)]"
+        echo "fn _run_examples() {"
+        for fn_name in "${FUNCS[@]}"; do
+            echo "    println!(\"\\n── $fn_name ──\");"
+            echo "    $fn_name();"
+        done
+        echo "}"
+    } > "$TMP_EXAMPLE"
+
+    # 把文件里的 fn main() 改名为 fn _main_orig()，新建 fn main() 调用两者
+    # 但这样太复杂，直接在已有 fn main 末尾无法注入。
+    # 最简单：把原来的 fn main 重命名，新增一个 fn main 依次调用全部
+    sed -i 's/^fn main()/fn _fn_main_orig()/' "$TMP_EXAMPLE"
+    {
+        echo ""
+        echo "fn main() {"
+        echo "    println!(\"── main ──\");"
+        echo "    _fn_main_orig();"
+        for fn_name in "${FUNCS[@]}"; do
+            echo "    println!(\"\\n── $fn_name ──\");"
+            echo "    $fn_name();"
+        done
+        echo "}"
+    } >> "$TMP_EXAMPLE"
 else
     echo "  模式: cargo run（临时 example）"
     echo ""
