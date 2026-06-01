@@ -571,3 +571,5 @@ BASE=http://127.0.0.1:3001 API_KEY=dev-secret ./main/projects/issue_tracker_api/
 | 文件 | 简介 |
 | --- | --- |
 | [`main/tests/file_write_example.rs`](main/tests/file_write_example.rs) | 文件写入集成测试示例，会写入 `ferris.txt`。 |
+
+| [`main/tests/file_write_example.rs`](main/tests/file_write_example.rs) | 文件写入集成测试示例，会写入 `ferris.txt`。 |

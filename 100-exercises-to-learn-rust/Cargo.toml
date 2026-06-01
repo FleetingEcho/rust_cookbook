@@ -1,0 +1,406 @@
+[workspace]
+
+[package]
+name = "rust-100-exercises"
+version = "0.1.0"
+edition = "2021"
+description = "Rust 100 练习题 - 独立单文件版本，含中文注释"
+
+[dependencies]
+tokio = { version = "1", features = ["full"], optional = true }
+anyhow = { version = "1", optional = true }
+
+[features]
+default = []
+ch08 = ["tokio", "anyhow"]
+
+# ───────────────────────────────────────────
+# 第一章: 入门 (01_intro)
+# ───────────────────────────────────────────
+[[test]]
+name = "ch01_00_welcome"
+path = "01_intro/00_welcome.rs"
+
+[[test]]
+name = "ch01_01_syntax"
+path = "01_intro/01_syntax.rs"
+
+# ───────────────────────────────────────────
+# 第二章: 基础计算器 (02_basic_calculator)
+# ───────────────────────────────────────────
+[[test]]
+name = "ch02_00_intro"
+path = "02_basic_calculator/00_intro.rs"
+
+[[test]]
+name = "ch02_01_integers"
+path = "02_basic_calculator/01_integers.rs"
+
+[[test]]
+name = "ch02_02_variables"
+path = "02_basic_calculator/02_variables.rs"
+
+[[test]]
+name = "ch02_03_if_else"
+path = "02_basic_calculator/03_if_else.rs"
+
+[[test]]
+name = "ch02_04_panics"
+path = "02_basic_calculator/04_panics.rs"
+
+[[test]]
+name = "ch02_05_factorial"
+path = "02_basic_calculator/05_factorial.rs"
+
+[[test]]
+name = "ch02_06_while"
+path = "02_basic_calculator/06_while.rs"
+
+[[test]]
+name = "ch02_07_for"
+path = "02_basic_calculator/07_for.rs"
+
+[[test]]
+name = "ch02_08_overflow"
+path = "02_basic_calculator/08_overflow.rs"
+
+[[test]]
+name = "ch02_09_saturating"
+path = "02_basic_calculator/09_saturating.rs"
+
+[[test]]
+name = "ch02_10_as_casting"
+path = "02_basic_calculator/10_as_casting.rs"
+
+# ───────────────────────────────────────────
+# 第三章: 票据V1 (03_ticket_v1)
+# ───────────────────────────────────────────
+[[test]]
+name = "ch03_00_intro"
+path = "03_ticket_v1/00_intro.rs"
+
+[[test]]
+name = "ch03_01_struct"
+path = "03_ticket_v1/01_struct.rs"
+
+[[test]]
+name = "ch03_02_validation"
+path = "03_ticket_v1/02_validation.rs"
+
+[[test]]
+name = "ch03_03_modules"
+path = "03_ticket_v1/03_modules.rs"
+
+[[test]]
+name = "ch03_04_visibility"
+path = "03_ticket_v1/04_visibility.rs"
+
+[[test]]
+name = "ch03_05_encapsulation"
+path = "03_ticket_v1/05_encapsulation.rs"
+
+[[test]]
+name = "ch03_06_ownership"
+path = "03_ticket_v1/06_ownership.rs"
+
+[[test]]
+name = "ch03_07_setters"
+path = "03_ticket_v1/07_setters.rs"
+
+[[test]]
+name = "ch03_08_stack"
+path = "03_ticket_v1/08_stack.rs"
+
+[[test]]
+name = "ch03_09_heap"
+path = "03_ticket_v1/09_heap.rs"
+
+[[test]]
+name = "ch03_10_references"
+path = "03_ticket_v1/10_references_in_memory.rs"
+
+[[test]]
+name = "ch03_11_destructor"
+path = "03_ticket_v1/11_destructor.rs"
+
+[[test]]
+name = "ch03_12_outro"
+path = "03_ticket_v1/12_outro.rs"
+
+# ───────────────────────────────────────────
+# 第四章: Trait (04_traits)
+# ───────────────────────────────────────────
+[[test]]
+name = "ch04_00_intro"
+path = "04_traits/00_intro.rs"
+
+[[test]]
+name = "ch04_01_trait"
+path = "04_traits/01_trait.rs"
+
+[[test]]
+name = "ch04_02_orphan_rule"
+path = "04_traits/02_orphan_rule.rs"
+harness = false
+
+[[test]]
+name = "ch04_03_overloading"
+path = "04_traits/03_operator_overloading.rs"
+
+[[test]]
+name = "ch04_04_derive"
+path = "04_traits/04_derive.rs"
+
+[[test]]
+name = "ch04_05_bounds"
+path = "04_traits/05_trait_bounds.rs"
+
+[[test]]
+name = "ch04_06_str_slice"
+path = "04_traits/06_str_slice.rs"
+
+[[test]]
+name = "ch04_07_deref"
+path = "04_traits/07_deref.rs"
+
+[[test]]
+name = "ch04_09_from"
+path = "04_traits/09_from.rs"
+
+[[test]]
+name = "ch04_10_assoc_vs_generic"
+path = "04_traits/10_assoc_vs_generic.rs"
+
+[[test]]
+name = "ch04_11_clone"
+path = "04_traits/11_clone.rs"
+
+[[test]]
+name = "ch04_12_copy"
+path = "04_traits/12_copy.rs"
+
+[[test]]
+name = "ch04_13_drop"
+path = "04_traits/13_drop.rs"
+
+[[test]]
+name = "ch04_14_outro"
+path = "04_traits/14_outro.rs"
+
+# ───────────────────────────────────────────
+# 第五章: 票据V2 (05_ticket_v2)
+# ───────────────────────────────────────────
+[[test]]
+name = "ch05_00_intro"
+path = "05_ticket_v2/00_intro.rs"
+
+[[test]]
+name = "ch05_01_enum"
+path = "05_ticket_v2/01_enum.rs"
+
+[[test]]
+name = "ch05_02_match"
+path = "05_ticket_v2/02_match.rs"
+
+[[test]]
+name = "ch05_03_variants"
+path = "05_ticket_v2/03_variants_with_data.rs"
+
+[[test]]
+name = "ch05_04_if_let"
+path = "05_ticket_v2/04_if_let.rs"
+
+[[test]]
+name = "ch05_05_nullability"
+path = "05_ticket_v2/05_nullability.rs"
+
+[[test]]
+name = "ch05_06_fallibility"
+path = "05_ticket_v2/06_fallibility.rs"
+
+[[test]]
+name = "ch05_07_unwrap"
+path = "05_ticket_v2/07_unwrap.rs"
+
+[[test]]
+name = "ch05_08_error_enums"
+path = "05_ticket_v2/08_error_enums.rs"
+
+[[test]]
+name = "ch05_09_error_trait"
+path = "05_ticket_v2/09_error_trait.rs"
+
+[[test]]
+name = "ch05_10_packages"
+path = "05_ticket_v2/10_packages.rs"
+harness = false
+
+[[test]]
+name = "ch05_12_thiserror"
+path = "05_ticket_v2/12_thiserror.rs"
+
+[[test]]
+name = "ch05_13_try_from"
+path = "05_ticket_v2/13_try_from.rs"
+
+[[test]]
+name = "ch05_14_source"
+path = "05_ticket_v2/14_source.rs"
+
+[[test]]
+name = "ch05_15_outro"
+path = "05_ticket_v2/15_outro.rs"
+
+# ───────────────────────────────────────────
+# 第六章: 票据管理 (06_ticket_management)
+# ───────────────────────────────────────────
+[[test]]
+name = "ch06_00_intro"
+path = "06_ticket_management/00_intro.rs"
+
+[[test]]
+name = "ch06_01_arrays"
+path = "06_ticket_management/01_arrays.rs"
+
+[[test]]
+name = "ch06_02_vec"
+path = "06_ticket_management/02_vec.rs"
+
+[[test]]
+name = "ch06_03_resizing"
+path = "06_ticket_management/03_resizing.rs"
+
+[[test]]
+name = "ch06_04_iterators"
+path = "06_ticket_management/04_iterators.rs"
+
+[[test]]
+name = "ch06_05_iter"
+path = "06_ticket_management/05_iter.rs"
+
+[[test]]
+name = "ch06_06_lifetimes"
+path = "06_ticket_management/06_lifetimes.rs"
+
+[[test]]
+name = "ch06_07_combinators"
+path = "06_ticket_management/07_combinators.rs"
+
+[[test]]
+name = "ch06_08_impl_trait"
+path = "06_ticket_management/08_impl_trait.rs"
+
+[[test]]
+name = "ch06_09_impl_trait_2"
+path = "06_ticket_management/09_impl_trait_2.rs"
+
+[[test]]
+name = "ch06_10_slices"
+path = "06_ticket_management/10_slices.rs"
+
+[[test]]
+name = "ch06_11_mutable_slices"
+path = "06_ticket_management/11_mutable_slices.rs"
+
+[[test]]
+name = "ch06_12_two_states"
+path = "06_ticket_management/12_two_states.rs"
+
+[[test]]
+name = "ch06_13_index"
+path = "06_ticket_management/13_index.rs"
+
+[[test]]
+name = "ch06_14_index_mut"
+path = "06_ticket_management/14_index_mut.rs"
+
+[[test]]
+name = "ch06_15_hashmap"
+path = "06_ticket_management/15_hashmap.rs"
+
+[[test]]
+name = "ch06_16_btreemap"
+path = "06_ticket_management/16_btreemap.rs"
+
+# ───────────────────────────────────────────
+# 第七章: 线程 (07_threads)
+# ───────────────────────────────────────────
+[[test]]
+name = "ch07_00_intro"
+path = "07_threads/00_intro.rs"
+
+[[test]]
+name = "ch07_01_threads"
+path = "07_threads/01_threads.rs"
+
+[[test]]
+name = "ch07_02_static"
+path = "07_threads/02_static.rs"
+
+[[test]]
+name = "ch07_03_leak"
+path = "07_threads/03_leak.rs"
+
+[[test]]
+name = "ch07_04_scoped"
+path = "07_threads/04_scoped_threads.rs"
+
+[[test]]
+name = "ch07_06_interior_mutability"
+path = "07_threads/06_interior_mutability.rs"
+
+[[test]]
+name = "ch07_14_sync"
+path = "07_threads/14_sync.rs"
+
+# ───────────────────────────────────────────
+# 第八章: 异步编程 (08_futures) — 需要 tokio
+# cargo test --features ch08 --test ch08_*
+# ───────────────────────────────────────────
+[[test]]
+name = "ch08_00_intro"
+path = "08_futures/00_intro.rs"
+
+[[test]]
+name = "ch08_01_async_fn"
+path = "08_futures/01_async_fn.rs"
+required-features = ["ch08"]
+
+[[test]]
+name = "ch08_02_spawn"
+path = "08_futures/02_spawn.rs"
+required-features = ["ch08"]
+
+[[test]]
+name = "ch08_03_runtime"
+path = "08_futures/03_runtime.rs"
+required-features = ["ch08"]
+
+[[test]]
+name = "ch08_04_future"
+path = "08_futures/04_future.rs"
+required-features = ["ch08"]
+
+[[test]]
+name = "ch08_05_blocking"
+path = "08_futures/05_blocking.rs"
+required-features = ["ch08"]
+
+[[test]]
+name = "ch08_06_async_primitives"
+path = "08_futures/06_async_aware_primitives.rs"
+required-features = ["ch08"]
+
+[[test]]
+name = "ch08_07_cancellation"
+path = "08_futures/07_cancellation.rs"
+required-features = ["ch08"]
+
+# ───────────────────────────────────────────
+# 备注: 以下文件为仅参考，无测试/bin目标
+# - 04_traits/08_sized.rs    (概念说明)
+# - 05_ticket_v2/11_dependencies.rs (依赖说明)
+# - 07_threads/05_channels.rs 等 (含裸 #[test], 可直接 rustc --test 编译)
+# - 07_threads/07_ack.rs 到 07_threads/13_without_channels.rs
+# - 08_futures/08_outro.rs  (开放式项目)
+# ───────────────────────────────────────────
