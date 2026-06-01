@@ -6,3 +6,5 @@
 main/projects/.traces/
 main/projects/issue_tracker_api/data/*.db
 main/projects/issue_tracker_api/storage/uploads/**
+
+target/
