@@ -220,6 +220,17 @@ impl Animal for Cat {
 }
 ```
 
+**Trait vs TypeScript interface 对比：**
+
+| | interface（TS） | trait（Rust） |
+|--|----------------|--------------|
+| 可以有默认实现？ | ✅ | ✅ |
+| 可以为已有类型实现？ | ❌ | ✅ |
+| 关联类型？ | ❌ | ✅ |
+| 条件实现？ | ❌ | ✅（`impl<T: Display> Trait for T`） |
+| 编译期静态分发？ | ❌ | ✅（泛型 + trait bound） |
+| 运行时动态分发？ | ✅ | ✅（`dyn Trait`） |
+
 **常用标准库 trait：**
 ```rust
 // Display：用于 {} 格式化（面向用户）
@@ -266,6 +277,20 @@ impl Iterator for Counter {
     type Item = u32;
     fn next(&mut self) -> Option<u32> { ... }
 }
+```
+
+**四大黄金 derive 组合：**
+```rust
+#[derive(Debug, Clone, PartialEq)]
+struct Point { x: i32, y: i32 }          // ① 数据容器标配：可打印 + 可复制 + 可比较
+
+#[derive(PartialEq, Eq, PartialOrd, Ord)]
+struct Priority(u32);                     // ② 排序标配：可 .sort() / .min() / .max()
+
+#[derive(Hash, PartialEq, Eq)]
+struct UserId(u64);                       // ③ 哈希标配：可做 HashMap / HashSet 的 key
+
+// ④ 错误类型标配：Debug + Display + std::error::Error（见三、错误处理）
 ```
 
 ---
@@ -386,10 +411,11 @@ let shapes: Vec<Box<dyn Drawable>> = vec![
 render_all(&shapes);
 ```
 
-**选择原则：**
+**三种多态方式对比：**
 ```
-impl Trait / 泛型   → 性能优先，返回类型单一，编译期已知
-dyn Trait          → 需要运行时多态，存放不同类型的集合，插件架构
+impl Trait / 泛型   → 编译期单态化，零运行时开销，类型编译期确定
+dyn Trait          → 运行时虚表查询，支持异构集合，有间接调用开销
+enum               → 编译期 match 展开，零运行时开销，变体数量固定（替代 dyn 的首选）
 ```
 
 **对象安全（Object Safety）**：并非所有 trait 都能做 trait object：
@@ -399,6 +425,65 @@ trait Clone { fn clone(&self) -> Self; }  // 不能 dyn Clone
 
 // ✅ 对象安全：方法只用 &self / &mut self，参数/返回值不含 Self 或泛型
 trait Drawable { fn draw(&self); }        // 可以 dyn Drawable
+```
+
+---
+
+### 2.4 迭代器管线（Iterator）
+
+**三种迭代方式：**
+
+| 方法 | 元素类型 | 原集合 | 用途 |
+|------|---------|--------|------|
+| `.iter()` | `&T` | 保留 | 只读遍历 |
+| `.iter_mut()` | `&mut T` | 保留 | 原地修改 |
+| `.into_iter()` | `T` | 消耗 | 获取所有权，链式处理 |
+
+```rust
+let v = vec![1, 2, 3, 4, 5];
+
+// iter()：元素是 &i32，filter 闭包再借一次得到 &&i32
+let r: Vec<i32> = v.iter().filter(|&&x| x > 2).map(|&x| x * 10).collect();
+
+// into_iter()：元素是 i32，最简洁（新手推荐）
+let r: Vec<i32> = v.into_iter().filter(|&x| x > 2).map(|x| x * 10).collect();
+
+// iter_mut()：原地修改
+v.iter_mut().for_each(|x| *x *= 10);
+```
+
+**消费者（触发计算，返回最终值）：**
+```rust
+v.iter().count()                        // usize：元素个数
+v.iter().sum::<i32>()                   // 求和
+v.iter().product::<i32>()               // 求积
+v.iter().max() / .min()                 // Option<&T>：最大/最小值
+v.iter().any(|&x| x > 3)               // bool：有无满足条件的
+v.iter().all(|&x| x > 0)               // bool：是否全部满足
+v.iter().find(|&&x| x > 3)             // Option<&T>：第一个满足的元素
+v.iter().position(|&x| x == 3)         // Option<usize>：第一个满足的下标
+v.iter().fold(0, |acc, &x| acc + x)    // 带初始值的归约（最通用）
+```
+
+**适配器（返回新迭代器，惰性不执行）：**
+```rust
+.map(|x| ...)           // 变换每个元素
+.filter(|x| ...)        // 过滤
+.filter_map(|x| ...)    // filter + map 合一，None 直接跳过
+.flat_map(|x| ...)      // 每个元素展开成多个，再拍平
+.flatten()              // 展开嵌套：Vec<Vec<T>> → Vec<T>
+.take(n) / .skip(n)    // 取前 n / 跳过前 n
+.chain(other)           // 拼接两个迭代器
+.enumerate()            // 带下标：(usize, T)
+.zip(other)             // 两迭代器合并为 (T, U)
+```
+
+**collect() 必须有类型提示（同一迭代器可收集成不同容器）：**
+```rust
+let v: Vec<&str>           = "a,b,c".split(',').collect();
+let s: String              = ['h','i'].into_iter().collect();
+let set: HashSet<i32>      = vec![1,1,2,3].into_iter().collect();   // 自动去重
+let map: HashMap<&str,i32> = vec![("a",1),("b",2)].into_iter().collect();
 ```
 
 ---
@@ -703,6 +788,27 @@ for h in handles { h.join().unwrap(); }
 println!("结果: {}", *counter.lock().unwrap()); // 10
 ```
 
+### 4.8 Cow\<T\>（写时复制·按需克隆）
+
+```rust
+use std::borrow::Cow;
+
+// Cow<'a, str> 可以持有 &str（借用）或 String（拥有）
+// 只在真正需要修改时才克隆，避免不必要的分配
+fn ensure_uppercase(s: &str) -> Cow<str> {
+    if s.chars().all(|c| c.is_uppercase()) {
+        Cow::Borrowed(s)        // 无需修改，直接借用
+    } else {
+        Cow::Owned(s.to_uppercase()) // 需要修改，才分配新字符串
+    }
+}
+
+let a = ensure_uppercase("HELLO"); // Borrowed，零分配
+let b = ensure_uppercase("hello"); // Owned，分配一次
+```
+
+---
+
 **智能指针选择速查：**
 ```
 单线程，唯一所有权，栈太大       → Box<T>
@@ -711,6 +817,7 @@ println!("结果: {}", *counter.lock().unwrap()); // 10
 多线程，共享不可变               → Arc<T>
 多线程，共享且可变               → Arc<Mutex<T>>
 多线程，读多写少                 → Arc<RwLock<T>>
+读多写少，按需克隆               → Cow<T>
 ```
 
 ---
@@ -738,6 +845,13 @@ let handle = thread::spawn(move || {
     println!("{:?}", v);                // v 的所有权移入线程
 });
 handle.join().unwrap();
+
+// thread::scope：限定作用域的线程，可借用局部变量（子线程在 scope 结束前必须结束）
+let data = vec![1, 2, 3];
+thread::scope(|s| {
+    s.spawn(|| println!("借用: {:?}", data));  // 无需 move，可直接借用 data
+    s.spawn(|| println!("also: {:?}", data));
+});  // 所有子线程在此处 join，data 之后仍可用
 ```
 
 ---
@@ -862,12 +976,30 @@ async fn main() {
 }
 ```
 
+**线程 vs async 对比：**
+
+| | 线程（thread） | async（tokio） |
+|--|--------------|--------------|
+| 调度 | OS 内核抢占式 | 运行时协作式（.await 让出） |
+| 切换成本 | 微秒级（内核态切换） | 纳秒级（函数调用级别） |
+| 内存 | 每线程独立栈（MB 级） | 所有任务共享栈 |
+| 适合 | CPU 密集、阻塞 IO | IO 密集、大量并发连接 |
+
 **同步 vs 异步 选择原则：**
 ```
 CPU 密集型任务（计算、压缩）      → 普通线程（thread::spawn）
 IO 密集型任务（网络、文件、DB）   → async/await + Tokio
 需要并行利用多核                  → rayon（数据并行库）或多线程
+async 中调用阻塞/CPU 密集代码     → tokio::task::spawn_blocking
 简单的后台任务                    → thread::spawn 足够
+```
+
+```rust
+// async 中不能直接调用阻塞操作，用 spawn_blocking 扔到线程池
+let result = tokio::task::spawn_blocking(|| {
+    // 耗时的 CPU 计算或同步阻塞 IO
+    heavy_computation()
+}).await.unwrap();
 ```
 
 ---
@@ -1040,15 +1172,79 @@ mod parent {
 
 ---
 
-### 6.5 常用宏
+### 6.5 format和print
+
+**打印宏家族：**
+```rust
+println!("{}", x);              // stdout + 换行
+print!("{x}");                  // stdout 无换行
+eprintln!("{x:?}");             // stderr + 换行（错误日志用）
+eprint!("...");                 // stderr 无换行
+format!("{} {}", a, b);        // → String，不打印
+write!(buf, "{}", x);          // 写入实现 Write 的目标（文件、Vec<u8>…）
+writeln!(buf, "{}", x);        // 同上 + 换行
+dbg!(&x);                       // 调试：打印 文件名:行号 变量名 = 值，并返回值
+```
+
+**基础占位符：**
+```rust
+{}          // Display（面向用户的输出，需实现 Display trait）
+{:?}        // Debug（面向开发者，需 #[derive(Debug)] 或手动实现）
+{:#?}       // Debug 美化缩进（pretty-print，结构体/嵌套容器一目了然）
+```
+
+**参数引用方式：**
+```rust
+println!("{0} {1} {0}", "a", "b");   // 按位置索引：a b a
+println!("{x} {y}", x=1, y=2);       // 命名参数（旧式）
+let name = "world";
+println!("hello {name}");             // 直接捕获外部变量（Rust 1.58+，最常用）
+```
+
+**数字进制与科学记数：**
+```rust
+println!("{:b}",  42);    // 二进制：         101010
+println!("{:o}",  42);    // 八进制：          52
+println!("{:x}", 255);    // 十六进制小写：    ff
+println!("{:X}", 255);    // 十六进制大写：    FF
+println!("{:e}", 1234.5); // 科学记数法：      1.2345e3
+println!("{:E}", 1234.5); // 科学记数法大写：  1.2345E3
+println!("{:#b}", 42);    // 带前缀：          0b101010
+println!("{:#x}", 255);   // 带前缀：          0xff
+println!("{:+}", 42);     // 强制显示正负号：  +42
+```
+
+**宽度与对齐：**
+```rust
+//              ↓ 填充字符  ↓ 对齐  ↓ 宽度
+println!("{:<10}",  "hi"); // 左对齐：  "hi        "
+println!("{:>10}",  "hi"); // 右对齐：  "        hi"
+println!("{:^10}",  "hi"); // 居中：    "    hi    "
+println!("{:*^10}", "hi"); // 居中，* 填充："****hi****"
+println!("{:0>5}",  42);   // 右对齐，0 填充："00042"
+println!("{:05}",   42);   // 数字零填充简写（同上）："00042"
+// 规律：数字默认右对齐，字符串默认左对齐
+```
+
+**精度：**
+```rust
+println!("{:.2}",  3.14159);       // 浮点小数位数：    3.14
+println!("{:.5}",  "hello world"); // 字符串最大字符数：hello
+println!("{:8.2}", 3.14159);       // 宽度 8，精度 2：  "    3.14"
+```
+
+**组合示例：**
+```rust
+println!("{:+.3e}",  1234.5);  // 带符号科学记数 3 位精度：+1.235e3
+println!("{:#010x}", 255);     // 带前缀零填充十六进制：    0x000000ff
+println!("{:>10.3}",  3.14);   // 右对齐宽度 10 精度 3：   "     3.140"
+```
+
+---
+
+### 6.6 其他常用宏
 
 ```rust
-// 打印
-println!("{}", x);              // 标准输出 + 换行
-print!("{x}");                  // 无换行（支持 {变量名} 简写）
-eprintln!("{x:?}");             // 标准错误输出
-dbg!(&x);                       // 调试打印，输出文件/行号/值，并返回值
-
 // 断言
 assert!(condition);
 assert_eq!(a, b);               // 不等则 panic 并打印两者的值
@@ -1061,7 +1257,7 @@ format!("{}_{}", a, b);         // → String
 // 错误处理（anyhow）
 bail!("错误信息 {x}");           // 直接 return Err(...)
 ensure!(x > 0, "x 必须为正");   // 条件不满足则 return Err(...)
-anyhow!("描述 {x}")              // 构造一个 anyhow::Error
+anyhow!("描述 {x}");             // 构造一个 anyhow::Error
 
 // todo! / unimplemented! / unreachable!
 todo!("这里还没实现");           // panic，提醒开发者
@@ -1071,7 +1267,198 @@ unreachable!("不应该到这里");    // 到达则 panic
 
 ---
 
-## 七、所有权·借用·生命周期 常见编译错误速查
+### 6.7 const / static / type
+
+```rust
+// const：编译期常量，可在任意作用域使用，无固定内存地址
+const MAX_SIZE: usize = 100;
+const PI: f64 = 3.14159_26535;
+
+// static：全局静态变量，有固定内存地址，程序整个生命周期存在
+static GREETING: &str = "hello";          // 不可变静态变量
+static mut COUNTER: u32 = 0;             // 可变静态变量（读写需要 unsafe）
+
+// 安全的全局可变状态：用 OnceLock / Mutex
+use std::sync::{OnceLock, Mutex};
+static CONFIG: OnceLock<String> = OnceLock::new();
+static GLOBAL: Mutex<Vec<i32>> = Mutex::new(Vec::new()); // Rust 1.70+
+
+// type：类型别名（透明别名，不产生新类型）
+type Meters = f64;                        // 语义化，但仍是 f64，可互换
+type Result<T> = std::result::Result<T, MyError>; // 简化函数签名（最常见用法）
+type Callback = Box<dyn Fn(i32) -> i32>;
+
+fn distance() -> Result<Meters> { Ok(42.0) }  // 比 Result<f64, MyError> 简洁
+```
+
+**const vs static：**
+```
+const   → 编译期内联，无地址，适合魔法数字和数组大小
+static  → 运行时存在，有固定地址，适合全局状态和 FFI 导出
+```
+
+---
+
+### 6.8 Deref 自动解引用
+
+> 编译器在类型不匹配时自动插入 `*`（解引用），可连续多次，直到类型匹配。
+
+```rust
+// 常见的自动 deref 链：
+// &String  →  &str     （String 实现了 Deref<Target=str>）
+// &Vec<T>  →  &[T]     （Vec 实现了 Deref<Target=[T]>）
+// &Box<T>  →  &T
+// &Arc<T>  →  &T
+
+fn takes_str(s: &str) { println!("{s}"); }
+fn takes_slice(s: &[i32]) { println!("{:?}", s); }
+
+let owned: String = String::from("hello");
+takes_str(&owned);          // ✅ &String → &str，自动 deref
+
+let v: Vec<i32> = vec![1, 2, 3];
+takes_slice(&v);            // ✅ &Vec<i32> → &[i32]，自动 deref
+
+let boxed: Box<String> = Box::new(String::from("hi"));
+takes_str(&boxed);          // ✅ &Box<String> → &String → &str，两次 deref
+```
+
+```rust
+// 自定义 Deref（智能指针实现的核心）
+use std::ops::Deref;
+struct MyBox<T>(T);
+impl<T> Deref for MyBox<T> {
+    type Target = T;
+    fn deref(&self) -> &T { &self.0 }
+}
+let b = MyBox(String::from("hello"));
+takes_str(&b);              // ✅ MyBox → String → &str
+```
+
+**记住：** `&String` 和 `&str` 不是同一类型，但 `&String` 可以当 `&str` 用；函数参数写 `&str` 比 `&String` 适用范围更广。
+
+---
+
+### 6.9 常用属性（#[...]）
+
+```rust
+// ─── derive：自动生成 trait 实现 ───
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Default, PartialOrd, Ord)]
+struct Point { x: i32, y: i32 }
+
+// ─── 编译条件 ───
+#[cfg(test)]                          // 只在 cargo test 时编译
+#[cfg(target_os = "windows")]         // 平台条件
+#[cfg(feature = "serde")]             // feature flag 条件
+#[cfg(debug_assertions)]              // 只在 debug 模式
+
+// ─── 编译器提示 ───
+#[allow(dead_code)]                   // 允许未使用的代码（不报警告）
+#[allow(unused_variables)]
+#[deny(unsafe_code)]                  // 把警告升级为错误（禁止 unsafe）
+#[warn(missing_docs)]
+
+// ─── 函数/方法属性 ───
+#[inline]                             // 建议编译器内联
+#[inline(always)]                     // 强制内联
+#[must_use]                           // 返回值必须被使用，否则警告
+#[must_use = "忘记使用会导致 XXX"]
+#[deprecated(since = "2.0.0", note = "请用 new_fn()")]
+
+// ─── 测试 ───
+#[test]                               // 标记为测试函数
+#[should_panic]                       // 期望 panic 的测试
+#[should_panic(expected = "overflow")] // 期望特定 panic 信息
+#[ignore]                             // 跳过（cargo test -- --ignored 才运行）
+
+// ─── 模块/可见性 ───
+#[doc(hidden)]                        // 隐藏于文档
+#[path = "other_file.rs"]             // 指定模块对应的文件路径
+```
+
+---
+
+## 七、实践速查
+
+### 7.1 看返回值类型决定怎么用
+
+```
+方法返回值
+├── 直接值（String / usize / bool）   → 直接用
+├── Option<T>                         → unwrap_or / if let / match / ?（返回 Option 的函数中）
+├── Result<T, E>                      → ? / unwrap_or / match
+├── &T / &str                         → 注意生命周期，跨作用域存活要 .to_string() / .clone()
+├── impl Iterator                     → 惰性，链式处理后 .collect() / .sum() / .count()
+└── impl Trait                        → 能用不能命名，想存储用 Box<dyn Trait>
+```
+
+```rust
+// Option → Result：有 None 则 Err
+opt.ok_or("没有值")          // Result<T, &str>
+opt.ok_or_else(|| compute()) // 错误值懒求值
+
+// Result → Option：丢弃错误
+res.ok()   // Ok → Some，Err → None
+res.err()  // Err → Some，Ok → None
+
+// 在返回 Option 的函数里处理 Result
+fn first_number(s: &str) -> Option<i32> {
+    s.split(',').next()?.parse().ok()  // 找不到或解析失败都返回 None
+}
+```
+
+---
+
+### 7.2 类型推导规律
+
+```rust
+// 函数体内基本不用写，函数签名必须写
+fn add(x: i32, y: i32) -> i32 { x + y }  // 签名：必须写
+
+let name = "hello";       // 推导为 &str
+let nums = vec![1, 2, 3]; // 推导为 Vec<i32>
+
+// 必须手动指定的情况：
+let r: Vec<&str> = "a,b".split(',').collect();  // collect 容器不唯一
+let n = 1_i64;                                  // 数字默认 i32，需其他类型加后缀
+let mut v: Vec<i32> = Vec::new();               // 空容器，后续无 push 则无法推导
+
+// _ 占位让编译器填具体类型
+let map: HashMap<_, _> = vec![("a", 1)].into_iter().collect();
+```
+
+---
+
+### 7.3 Vec 存放不同类型
+
+**方式一：enum（推荐，类型安全）**
+```rust
+enum Value { Int(i32), Str(String), Bool(bool) }
+
+let mut v = vec![Value::Int(1), Value::Str("hi".to_string())];
+v.push(Value::Bool(true));
+
+for item in &v {
+    match item {
+        Value::Int(n)  => println!("int: {n}"),
+        Value::Str(s)  => println!("str: {s}"),
+        Value::Bool(b) => println!("bool: {b}"),
+    }
+}
+```
+
+**方式二：Box\<dyn Any\>（万不得已，类型信息丢失）**
+```rust
+use std::any::Any;
+let v: Vec<Box<dyn Any>> = vec![Box::new(1_i32), Box::new("hello"), Box::new(true)];
+if let Some(n) = v[0].downcast_ref::<i32>() { println!("{n}"); }
+```
+
+实际开发 99% 用 enum，`dyn Any` 难以维护，仅极少数通用库使用。
+
+---
+
+## 八、所有权·借用·生命周期 常见编译错误速查
 
 ```rust
 // ❌ 错误1：移动后使用
@@ -1103,4 +1490,35 @@ thread::spawn(move || { println!("{rc}"); }); // Rc is not Send
 let v = vec![1, 2, 3];
 v.push(4);      // cannot borrow `v` as mutable, as it is not declared as mutable
 // ✅ 修复：let mut v = ...
+```
+
+---
+
+## 九、遇到问题顺着链条想
+
+```
+1. 编译器报 borrow 错
+   → 检查：是不是同时有 &mut 和 &？是不是引用比原值活得久？
+
+2. 编译器报 lifetime 错
+   → 检查：返回的引用来自哪个参数？函数签名需要加 'a 标注
+
+3. 不知道用什么类型存数据
+   → Vec → HashMap/BTreeMap → 自定义 enum → 智能指针
+
+4. 不知道怎么处理错误
+   → Option → Result → ? → thiserror（库）→ anyhow（应用）
+
+5. 不知道怎么组织多态代码
+   → enum（变体固定）→ 泛型 + trait bound（编译期）→ dyn Trait（运行时）
+
+6. 不知道用线程还是 async
+   → CPU 密集 → thread / rayon
+   → IO 密集 → async / tokio
+   → async 中有阻塞代码 → tokio::task::spawn_blocking
+
+7. 不知道用哪个智能指针
+   → 单一所有权 → Box
+   → 单线程共享 → Rc（只读）/ Rc<RefCell<T>>（可变）
+   → 多线程共享 → Arc（只读）/ Arc<Mutex<T>>（可变）
 ```
