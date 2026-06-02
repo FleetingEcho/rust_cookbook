@@ -1269,32 +1269,135 @@ unreachable!("不应该到这里");    // 到达则 panic
 
 ### 6.7 const / static / type
 
+#### const：编译期常量
+
+`const` 是**关键字**，不需要 `use` 导入。编译时会被内联到每个使用处，没有固定内存地址。
+
 ```rust
-// const：编译期常量，可在任意作用域使用，无固定内存地址
-const MAX_SIZE: usize = 100;
-const PI: f64 = 3.14159_26535;
+// ① 模块级（最常见）：任何地方都能用，命名约定全大写
+const MAX_SIZE: usize = 1024;
+const PI: f64 = 3.141_592_653_589_793;
 
-// static：全局静态变量，有固定内存地址，程序整个生命周期存在
-static GREETING: &str = "hello";          // 不可变静态变量
-static mut COUNTER: u32 = 0;             // 可变静态变量（读写需要 unsafe）
+// ② 函数内部：作用域仅限当前函数（用于避免魔法数字）
+fn process(data: &[u8]) {
+    const CHUNK: usize = 512;   // 仅在此函数内可见
+    for chunk in data.chunks(CHUNK) { let _ = chunk; }
+}
 
-// 安全的全局可变状态：用 OnceLock / Mutex
-use std::sync::{OnceLock, Mutex};
+// ③ impl 块内：成为类型的关联常量
+struct Circle { radius: f64 }
+impl Circle {
+    const DEFAULT_RADIUS: f64 = 1.0;  // 用 Circle::DEFAULT_RADIUS 访问
+    fn unit() -> Self { Circle { radius: Self::DEFAULT_RADIUS } }
+}
+
+// ④ trait 中定义（可以有默认值）
+trait HasMax {
+    const MAX: usize;           // 实现者必须指定
+    const MIN: usize = 0;       // 默认值，可覆盖
+}
+impl HasMax for Vec<u8> {
+    const MAX: usize = 65536;
+}
+```
+
+**跨模块使用 const**（需要路径，不需要 `use`，但 `use` 可以省路径）：
+```rust
+mod limits {
+    pub const TIMEOUT_MS: u64 = 5000;    // pub 才能被外部看见
+    pub(crate) const RETRY: u32 = 3;     // 仅 crate 内可见
+}
+
+// 直接用路径
+let t = limits::TIMEOUT_MS;
+
+// 或者 use 进来简化
+use limits::TIMEOUT_MS;
+let t = TIMEOUT_MS;
+```
+
+---
+
+#### static：全局静态变量
+
+有固定内存地址，程序整个生命周期存在。值必须是**编译期可确定**的（和 `const` 一样），但不会内联。
+
+```rust
+// ① 不可变 static（最安全，无需 unsafe）
+static GREETING: &str = "hello";
+static PRIMES: [u32; 5] = [2, 3, 5, 7, 11];
+
+// ② 可变 static：读写都需要 unsafe（因为多线程下不安全）
+static mut COUNTER: u32 = 0;
+unsafe { COUNTER += 1; }           // ⚠️ 生产代码尽量避免
+unsafe { println!("{COUNTER}"); }
+
+// ③ 安全的全局只初始化一次：OnceLock（Rust 1.70+）
+use std::sync::OnceLock;
 static CONFIG: OnceLock<String> = OnceLock::new();
-static GLOBAL: Mutex<Vec<i32>> = Mutex::new(Vec::new()); // Rust 1.70+
 
-// type：类型别名（透明别名，不产生新类型）
-type Meters = f64;                        // 语义化，但仍是 f64，可互换
-type Result<T> = std::result::Result<T, MyError>; // 简化函数签名（最常见用法）
-type Callback = Box<dyn Fn(i32) -> i32>;
+fn get_config() -> &'static str {
+    CONFIG.get_or_init(|| {
+        // 只在第一次调用时执行，之后直接返回已有值
+        std::env::var("APP_ENV").unwrap_or_else(|_| "dev".to_string())
+    })
+}
 
-fn distance() -> Result<Meters> { Ok(42.0) }  // 比 Result<f64, MyError> 简洁
+// ④ 安全的全局懒初始化：LazyLock（Rust 1.80+，推荐）
+use std::sync::LazyLock;
+static REGEX: LazyLock<String> = LazyLock::new(|| {
+    "compiled_value".to_string()    // 第一次访问时才执行
+});
+// 直接当引用用，无需调用方法
+println!("{}", *REGEX);
+
+// ⑤ 安全的全局可变状态：static + Mutex
+use std::sync::Mutex;
+static GLOBAL_VEC: Mutex<Vec<i32>> = Mutex::new(Vec::new());
+
+fn push_global(n: i32) {
+    GLOBAL_VEC.lock().unwrap().push(n);   // 线程安全修改
+}
 ```
 
-**const vs static：**
+---
+
+#### type：类型别名
+
+`type` 创建的是**透明别名**——和原类型完全等价，可以互换，不产生新类型（这与 `struct NewType(T)` 不同）。
+
+```rust
+// ① 语义化（让代码更易读，但类型检查不变）
+type Meters = f64;
+type Seconds = f64;
+fn speed(d: Meters, t: Seconds) -> f64 { d / t }
+// 注意：Meters 和 Seconds 是同一个类型，编译器不阻止你传错
+
+// ② 简化复杂函数签名（最常用）
+type Result<T> = std::result::Result<T, MyError>;
+type Callback = Box<dyn Fn(i32) -> i32 + Send + Sync>;
+type Matrix = Vec<Vec<f64>>;
+
+fn parse(s: &str) -> Result<i32> { Ok(s.parse().unwrap()) }  // 不用写 MyError
+
+// ③ 简化泛型写法
+use std::collections::HashMap;
+type StrMap<V> = HashMap<String, V>;   // 带泛型参数的别名
+
+let m: StrMap<i32> = HashMap::new();
+
+// ④ trait 中的关联类型（见 2.2 关联类型）
+trait Parser {
+    type Output;
+    fn parse(&self, s: &str) -> Self::Output;
+}
 ```
-const   → 编译期内联，无地址，适合魔法数字和数组大小
-static  → 运行时存在，有固定地址，适合全局状态和 FFI 导出
+
+**三者对比一览：**
+```
+const   → 编译期内联，无内存地址，任意作用域，适合魔法数字/数组大小/关联常量
+static  → 运行时存在，有固定地址，生命周期 'static，适合全局状态/FFI导出
+type    → 透明别名，不产生新类型，适合简化复杂签名/语义化命名
 ```
 
 ---
@@ -1374,6 +1477,341 @@ struct Point { x: i32, y: i32 }
 // ─── 模块/可见性 ───
 #[doc(hidden)]                        // 隐藏于文档
 #[path = "other_file.rs"]             // 指定模块对应的文件路径
+```
+
+---
+
+### 6.10 impl 完整指南
+
+`impl` 是 Rust 中**为类型附加行为**的唯一方式，有多种用法，覆盖了面向对象语言中"方法"、"接口实现"、"条件实现"等所有场景。
+
+---
+
+#### ① 为结构体添加方法（最基本用法）
+
+```rust
+struct Rectangle {
+    width: f64,
+    height: f64,
+}
+
+impl Rectangle {
+    // ── 关联函数（没有 self）：相当于"静态方法"/"构造函数" ──
+    fn new(width: f64, height: f64) -> Self {   // Self = Rectangle
+        Rectangle { width, height }
+    }
+    fn square(size: f64) -> Self {
+        Rectangle { width: size, height: size }
+    }
+
+    // ── 不可变方法（&self）：只读访问 ──
+    fn area(&self) -> f64 {
+        self.width * self.height
+    }
+    fn is_square(&self) -> bool {
+        self.width == self.height
+    }
+
+    // ── 可变方法（&mut self）：修改自身 ──
+    fn scale(&mut self, factor: f64) {
+        self.width  *= factor;
+        self.height *= factor;
+    }
+
+    // ── 消耗自身的方法（self）：调用后原值失效 ──
+    fn into_tuple(self) -> (f64, f64) {
+        (self.width, self.height)
+    }
+}
+
+// 调用
+let mut r = Rectangle::new(3.0, 4.0);  // 关联函数用 ::
+println!("{}", r.area());              // 方法用 .
+r.scale(2.0);
+let (w, h) = r.into_tuple();           // r 消耗，之后不可用
+```
+
+---
+
+#### ② 为枚举添加方法（同样用 impl）
+
+```rust
+#[derive(Debug)]
+enum Direction { North, South, East, West }
+
+impl Direction {
+    fn opposite(&self) -> Direction {
+        match self {
+            Direction::North => Direction::South,
+            Direction::South => Direction::North,
+            Direction::East  => Direction::West,
+            Direction::West  => Direction::East,
+        }
+    }
+    fn is_horizontal(&self) -> bool {
+        matches!(self, Direction::East | Direction::West)
+    }
+}
+
+let d = Direction::North;
+println!("{:?}", d.opposite()); // South
+```
+
+---
+
+#### ③ 实现 trait（impl Trait for Type）
+
+```rust
+use std::fmt;
+
+struct Point { x: f64, y: f64 }
+
+// 为 Point 实现标准库 trait
+impl fmt::Display for Point {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "({:.1}, {:.1})", self.x, self.y)
+    }
+}
+
+// 实现自定义 trait
+trait Translate {
+    fn translate(&mut self, dx: f64, dy: f64);
+    fn translated(mut self, dx: f64, dy: f64) -> Self     // 默认实现
+    where Self: Sized {
+        self.translate(dx, dy);
+        self
+    }
+}
+impl Translate for Point {
+    fn translate(&mut self, dx: f64, dy: f64) {
+        self.x += dx;
+        self.y += dy;
+    }
+    // translated 使用 trait 的默认实现，无需重写
+}
+
+let p = Point { x: 1.0, y: 2.0 };
+println!("{p}");   // (1.0, 2.0)  — 用了 Display
+```
+
+---
+
+#### ④ 泛型 impl（为泛型类型实现方法）
+
+```rust
+struct Stack<T> {
+    data: Vec<T>,
+}
+
+// impl 和类型定义都要写 <T>
+impl<T> Stack<T> {
+    fn new() -> Self {
+        Stack { data: Vec::new() }
+    }
+    fn push(&mut self, item: T) { self.data.push(item); }
+    fn pop(&mut self) -> Option<T> { self.data.pop() }
+    fn peek(&self) -> Option<&T> { self.data.last() }
+    fn is_empty(&self) -> bool { self.data.is_empty() }
+}
+
+// 只对特定约束的 T 添加额外方法（条件 impl）
+impl<T: fmt::Display> Stack<T> {
+    fn print_top(&self) {
+        match self.peek() {
+            Some(v) => println!("top: {v}"),
+            None    => println!("empty"),
+        }
+    }
+}
+
+// 使用
+let mut s: Stack<i32> = Stack::new();
+s.push(1);
+s.push(2);
+s.print_top(); // top: 2
+```
+
+---
+
+#### ⑤ 条件 impl / where 从句
+
+只有当 `T` 满足某些约束时，才为类型实现某个 trait：
+
+```rust
+use std::fmt;
+
+struct Wrapper<T>(T);
+
+// 只有当 T 实现了 Display，Wrapper<T> 才实现 Display
+impl<T: fmt::Display> fmt::Display for Wrapper<T> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "[{}]", self.0)
+    }
+}
+
+// 约束复杂时用 where 从句（可读性更好）
+impl<T> Wrapper<T>
+where
+    T: fmt::Display + fmt::Debug + Clone,
+{
+    fn describe(&self) -> String {
+        format!("display={} debug={:?}", self.0, self.0)
+    }
+}
+
+println!("{}", Wrapper(42));   // [42]
+println!("{}", Wrapper("hi")); // [hi]
+// println!("{}", Wrapper(vec![1])); // ❌ Vec 没实现 Display，编译报错
+```
+
+---
+
+#### ⑥ 毯子实现（Blanket impl）—— 为"所有满足条件的类型"批量实现
+
+```rust
+trait Printable {
+    fn print(&self);
+}
+
+// 为所有实现了 Display 的类型自动实现 Printable
+impl<T: fmt::Display> Printable for T {
+    fn print(&self) { println!("{self}"); }
+}
+
+// 现在 i32、String、f64、自定义类型…只要实现了 Display 都有 .print()
+42.print();
+"hello".print();
+3.14_f64.print();
+```
+
+标准库最著名的毯子实现：`impl<T, U: Into<T>> From<U> for T`，这就是为什么实现 `From` 后 `Into` 自动可用。
+
+---
+
+#### ⑦ 为外部类型实现自定义 trait（孤儿规则）
+
+Rust 的**孤儿规则（Orphan Rule）**：`impl Trait for Type` 中，`Trait` 和 `Type` 至少有一个必须是**当前 crate 定义的**。
+
+```rust
+// ✅ 自定义 trait + 外部类型
+trait Summarize { fn summary(&self) -> String; }
+impl Summarize for Vec<i32> {              // Summarize 是我们定义的
+    fn summary(&self) -> String {
+        format!("Vec with {} items", self.len())
+    }
+}
+
+// ✅ 外部 trait + 自定义类型
+struct MyNum(i32);
+impl fmt::Display for MyNum {             // MyNum 是我们定义的
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "MyNum({})", self.0)
+    }
+}
+
+// ❌ 外部 trait + 外部类型：编译报错
+// impl fmt::Display for Vec<i32> {}       // 两个都不是本 crate 的
+```
+
+---
+
+#### ⑧ impl Trait 在函数参数和返回值中
+
+```rust
+// 参数位置：impl Trait 是泛型的语法糖
+fn print_it(item: &impl fmt::Display) {   // 等价于 fn print_it<T: Display>(item: &T)
+    println!("{item}");
+}
+
+// 多个参数用同一 impl Trait：它们可以是不同的具体类型
+fn compare(a: &impl fmt::Display, b: &impl fmt::Display) { println!("{a} vs {b}"); }
+
+// 如果要求两个参数是同一类型，必须用泛型：
+fn same_type<T: fmt::Display>(a: &T, b: &T) { println!("{a} {b}"); }
+
+// ─────────────────────────────────────────────
+
+// 返回位置：隐藏具体类型（调用方只知道它实现了某 trait）
+fn make_adder(x: i32) -> impl Fn(i32) -> i32 {
+    move |y| x + y                       // 返回闭包，不用写闭包的具体类型
+}
+let add5 = make_adder(5);
+println!("{}", add5(3));  // 8
+
+// ⚠️ 限制：返回位置的 impl Trait 只能返回一种具体类型（编译期确定）
+fn bad(flag: bool) -> impl fmt::Display {
+    if flag { "str" } else { 42 }  // ❌ 两个分支类型不同，编译报错
+}
+// 解决：用 Box<dyn Trait>（动态派发）
+fn good(flag: bool) -> Box<dyn fmt::Display> {
+    if flag { Box::new("str") } else { Box::new(42) }  // ✅
+}
+```
+
+---
+
+#### ⑨ 多个 impl 块（同一类型可以有多个）
+
+```rust
+struct Matrix { data: Vec<Vec<f64>> }
+
+// 可以把方法按功能分组写在不同 impl 块里（编译器会合并）
+impl Matrix {
+    fn new(rows: usize, cols: usize) -> Self {
+        Matrix { data: vec![vec![0.0; cols]; rows] }
+    }
+}
+
+impl Matrix {
+    fn rows(&self) -> usize { self.data.len() }
+    fn cols(&self) -> usize { self.data.first().map_or(0, |r| r.len()) }
+}
+
+// 同一类型多次 impl 同一 trait 是不允许的，但可以 impl 不同 trait
+impl fmt::Display for Matrix {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        for row in &self.data { writeln!(f, "{:?}", row)?; }
+        Ok(())
+    }
+}
+```
+
+---
+
+#### ⑩ Self 关键字
+
+在 `impl` 块内，`Self`（大写）始终指代**当前正在实现的具体类型**：
+
+```rust
+#[derive(Clone)]
+struct Config { debug: bool, level: u32 }
+
+impl Config {
+    // Self 代替 Config，重构时改类型名不用改方法内部
+    fn new() -> Self { Self { debug: false, level: 1 } }
+    fn with_debug(mut self) -> Self { self.debug = true; self }
+    fn with_level(mut self, level: u32) -> Self { self.level = level; self }
+}
+
+// Builder 模式（方法链）
+let cfg = Config::new()
+    .with_debug()
+    .with_level(3);
+```
+
+---
+
+**impl 用法速查：**
+
+```
+impl Type { }                       → 为类型添加方法（关联函数 / &self / &mut self / self）
+impl Trait for Type { }             → 为类型实现某个 trait
+impl<T> Type<T> { }                 → 泛型类型的 impl
+impl<T: Bound> Type<T> { }          → 条件：只有 T 满足约束时才有这些方法
+impl<T: Bound> Trait for Type<T> { }→ 条件 trait 实现
+impl<T: Bound> Trait for T { }      → 毯子实现：为所有满足约束的类型批量实现
+fn f(x: impl Trait)                 → 参数位置 impl Trait（泛型语法糖）
+fn f() -> impl Trait                → 返回位置 impl Trait（隐藏具体类型）
 ```
 
 ---
