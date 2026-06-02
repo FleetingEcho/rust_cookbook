@@ -78,9 +78,9 @@ rust_cookbook/
 
 | # | 文件 | 核心内容 | 建议时间 |
 |:-:|------|---------|:-------:|
-| 1 | `rust_concepts.md` | 所有权·借用·生命周期·trait·智能指针·async 基础 | 3-4h |
-| 2 | `rust_type_system.md` | struct/enum/trait/impl 的所有写法和协作方式 | 2-3h |
-| 3 | `datastructure_tips.md` | Vec/HashMap/迭代器实用技巧 75 则 | 随用随查 |
+| 1 | [`rust_concepts.md`](rust_concepts.md) | 所有权·借用·生命周期·trait·智能指针·async 基础 | 3-4h |
+| 2 | [`rust_type_system.md`](rust_type_system.md) | struct/enum/trait/impl 的所有写法和协作方式 | 2-3h |
+| 3 | [`datastructure_tips.md`](datastructure_tips.md) | Vec/HashMap/迭代器实用技巧 75 则 | 随用随查 |
 
 > **关键点**：第 1、2 篇必须认真读，是后续所有内容的基础。
 > 第 3 篇当字典用，遇到不熟悉的方法来查即可。
@@ -91,9 +91,9 @@ rust_cookbook/
 
 | # | 文件 | 核心内容 |
 |:-:|------|---------|
-| 4 | `business/serde_in_practice.md` | rename/skip/default/flatten；枚举 4 种 JSON 表示；Option 三种情况 |
-| 5 | `business/error_handling_in_practice.md` | 错误分层；HTTP 错误响应；`?` 的工作原理 |
-| 6 | `business/async_tokio_patterns.md` | join!/select!/JoinSet；Mutex 死锁根因；spawn_blocking |
+| 4 | [`business/serde_in_practice.md`](business/serde_in_practice.md) | rename/skip/default/flatten；枚举 4 种 JSON 表示；Option 三种情况 |
+| 5 | [`business/error_handling_in_practice.md`](business/error_handling_in_practice.md) | 错误分层；HTTP 错误响应；`?` 的工作原理 |
+| 6 | [`business/async_tokio_patterns.md`](business/async_tokio_patterns.md) | join!/select!/JoinSet；Mutex 死锁根因；spawn_blocking |
 
 > 这三篇会在之后每篇文章里反复被用到，先吃透再往下走。
 
@@ -103,9 +103,9 @@ rust_cookbook/
 
 | # | 文件 | 核心内容 |
 |:-:|------|---------|
-| 7 | `business/web_api_axum.md` | 路由·提取器·State·中间件·统一响应 |
-| 8 | `business/validation.md` | ValidatedJson 提取器；422 错误格式 |
-| 9 | `business/auth.md` | JWT 中间件；密码哈希；Refresh Token |
+| 7 | [`business/web_api_axum.md`](business/web_api_axum.md) | 路由·提取器·State·中间件·统一响应 |
+| 8 | [`business/validation.md`](business/validation.md) | ValidatedJson 提取器；422 错误格式 |
+| 9 | [`business/auth.md`](business/auth.md) | JWT 中间件；密码哈希；Refresh Token |
 
 ---
 
@@ -113,8 +113,8 @@ rust_cookbook/
 
 | # | 文件 | 核心内容 |
 |:-:|------|---------|
-| 10 | `business/database_sqlx.md` | query!/query_as!；事务；迁移；批量操作 |
-| 11 | `business/redis.md` | 缓存；Session；分布式锁；限流 |
+| 10 | [`business/database_sqlx.md`](business/database_sqlx.md) | query!/query_as!；事务；迁移；批量操作 |
+| 11 | [`business/redis.md`](business/redis.md) | 缓存；Session；分布式锁；限流 |
 
 ---
 
@@ -122,8 +122,8 @@ rust_cookbook/
 
 | # | 文件 | 核心内容 |
 |:-:|------|---------|
-| 12 | `business/http_client.md` | reqwest；重试退避；并发限速 |
-| 13 | `business/background_jobs.md` | 定时任务；任务队列；优雅关闭 |
+| 12 | [`business/http_client.md`](business/http_client.md) | reqwest；重试退避；并发限速 |
+| 13 | [`business/background_jobs.md`](business/background_jobs.md) | 定时任务；任务队列；优雅关闭 |
 
 ---
 
@@ -131,10 +131,10 @@ rust_cookbook/
 
 | # | 文件 | 核心内容 |
 |:-:|------|---------|
-| 14 | `business/config_logging_testing.md` | 分层配置；结构化日志；集成测试；DB 测试隔离 |
-| 15 | `business/observability.md` | /health + /ready；Prometheus 指标；请求 ID 追踪 |
-| 16 | `business/deployment.md` | 多阶段 Dockerfile；docker-compose；GitHub Actions |
-| 17 | `business/api_docs.md` | utoipa 注解；Swagger UI 集成 |
+| 14 | [`business/config_logging_testing.md`](business/config_logging_testing.md) | 分层配置；结构化日志；集成测试；DB 测试隔离 |
+| 15 | [`business/observability.md`](business/observability.md) | /health + /ready；Prometheus 指标；请求 ID 追踪 |
+| 16 | [`business/deployment.md`](business/deployment.md) | 多阶段 Dockerfile；docker-compose；GitHub Actions |
+| 17 | [`business/api_docs.md`](business/api_docs.md) | utoipa 注解；Swagger UI 集成 |
 
 ---
 
@@ -142,7 +142,7 @@ rust_cookbook/
 
 | 文件 | 适合时机 |
 |------|---------|
-| `business/business_patterns.md` | 觉得代码设计不够优雅时；重构时 |
+| [`business/business_patterns.md`](business/business_patterns.md) | 觉得代码设计不够优雅时；重构时 |
 
 ---
 
@@ -150,19 +150,19 @@ rust_cookbook/
 
 | 类别 | Crate | 版本 |
 |------|-------|:----:|
-| Web 框架 | axum | 0.7 |
-| 异步运行时 | tokio | 1 |
-| 序列化 | serde + serde_json | 1 |
-| 数据库 | sqlx | 0.7 |
-| 缓存 | deadpool-redis / redis | 0.16 / 0.26 |
-| HTTP 客户端 | reqwest | 0.12（基于 hyper 1.0）|
-| 错误处理 | thiserror / anyhow | 1 |
-| 认证 | jsonwebtoken / argon2 | 9 / 0.5 |
-| 校验 | validator | 0.18 |
-| 日志追踪 | tracing / tracing-subscriber | 0.1 / 0.3 |
-| 指标 | metrics / metrics-exporter-prometheus | 0.23 / 0.15 |
-| 定时任务 | tokio-cron-scheduler | 0.13 |
-| API 文档 | utoipa / utoipa-swagger-ui | 4 / 7 |
+| Web 框架 | [axum](https://github.com/tokio-rs/axum) | 0.7 |
+| 异步运行时 | [tokio](https://github.com/tokio-rs/tokio) | 1 |
+| 序列化 | [serde](https://github.com/serde-rs/serde) + [serde_json](https://github.com/serde-rs/json) | 1 |
+| 数据库 | [sqlx](https://github.com/launchbadge/sqlx) | 0.7 |
+| 缓存 | [deadpool-redis](https://github.com/bikeshedder/deadpool) / [redis](https://github.com/redis-rs/redis-rs) | 0.16 / 0.26 |
+| HTTP 客户端 | [reqwest](https://github.com/seanmonstar/reqwest) | 0.12（基于 hyper 1.0）|
+| 错误处理 | [thiserror](https://github.com/dtolnay/thiserror) / [anyhow](https://github.com/dtolnay/anyhow) | 1 |
+| 认证 | [jsonwebtoken](https://github.com/Keats/jsonwebtoken) / [argon2](https://github.com/RustCrypto/password-hashes/tree/master/argon2) | 9 / 0.5 |
+| 校验 | [validator](https://github.com/Keats/validator) | 0.18 |
+| 日志追踪 | [tracing](https://github.com/tokio-rs/tracing) / [tracing-subscriber](https://github.com/tokio-rs/tracing) | 0.1 / 0.3 |
+| 指标 | [metrics](https://github.com/metrics-rs/metrics) / [metrics-exporter-prometheus](https://github.com/metrics-rs/metrics) | 0.23 / 0.15 |
+| 定时任务 | [tokio-cron-scheduler](https://github.com/mvniekerk/tokio-cron-scheduler) | 0.13 |
+| API 文档 | [utoipa](https://github.com/juhaku/utoipa) / [utoipa-swagger-ui](https://github.com/juhaku/utoipa) | 4 / 7 |
 
 ---
 
@@ -170,20 +170,20 @@ rust_cookbook/
 
 | 问题 | 去哪找 |
 |------|-------|
-| 编译器报 borrow/move 错误 | `rust_concepts.md` → §1.2 所有权、§1.3 借用 |
-| 不知道用 Box/Rc/Arc 哪个 | `rust_concepts.md` → §4.8 智能指针选择表 |
-| async 里 Mutex 死锁 | `async_tokio_patterns.md` → §五 |
-| `?` 运算符报类型不匹配 | `error_handling_in_practice.md` → §六 |
-| JSON 字段名转 camelCase | `serde_in_practice.md` → §2.1 rename |
-| 枚举如何序列化成 JSON | `serde_in_practice.md` → §三 |
-| axum Handler 返回值类型报错 | `web_api_axum.md` → §四 统一响应 |
-| 校验失败返回 422 | `validation.md` → §四 ValidatedJson |
-| JWT 接入 axum 中间件 | `auth.md` → §三 |
-| SQLx 事务怎么写 | `database_sqlx.md` → §四 |
-| Redis 实现分布式锁 | `redis.md` → §六 |
-| 后台任务如何优雅关闭 | `background_jobs.md` → §五 |
-| Docker 镜像太大 | `deployment.md` → §一 多阶段构建 |
-| 如何写集成测试 | `config_logging_testing.md` → 第三部分 |
+| 编译器报 borrow/move 错误 | [`rust_concepts.md`](rust_concepts.md) → §1.2 所有权、§1.3 借用 |
+| 不知道用 Box/Rc/Arc 哪个 | [`rust_concepts.md`](rust_concepts.md) → §4.8 智能指针选择表 |
+| async 里 Mutex 死锁 | [`async_tokio_patterns.md`](business/async_tokio_patterns.md) → §五 |
+| `?` 运算符报类型不匹配 | [`error_handling_in_practice.md`](business/error_handling_in_practice.md) → §六 |
+| JSON 字段名转 camelCase | [`serde_in_practice.md`](business/serde_in_practice.md) → §2.1 rename |
+| 枚举如何序列化成 JSON | [`serde_in_practice.md`](business/serde_in_practice.md) → §三 |
+| axum Handler 返回值类型报错 | [`web_api_axum.md`](business/web_api_axum.md) → §四 统一响应 |
+| 校验失败返回 422 | [`validation.md`](business/validation.md) → §四 ValidatedJson |
+| JWT 接入 axum 中间件 | [`auth.md`](business/auth.md) → §三 |
+| SQLx 事务怎么写 | [`database_sqlx.md`](business/database_sqlx.md) → §四 |
+| Redis 实现分布式锁 | [`redis.md`](business/redis.md) → §六 |
+| 后台任务如何优雅关闭 | [`background_jobs.md`](business/background_jobs.md) → §五 |
+| Docker 镜像太大 | [`deployment.md`](business/deployment.md) → §一 多阶段构建 |
+| 如何写集成测试 | [`config_logging_testing.md`](business/config_logging_testing.md) → 第三部分 |
 
 
 
