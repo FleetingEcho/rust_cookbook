@@ -3,34 +3,195 @@
 这是我的 Rust 学习仓库。仓库已经整理成一个 Cargo workspace：主要学习代码在
 [`main/src`](main/src)，小项目在 [`main/projects`](main/projects)。
 
+
+# Rust 后端开发手册
+
+> 18 个文档，覆盖从语言基础到生产部署的完整路径。
+> 面向有其他语言经验、初学 Rust 后端开发的工程师。
+
+---
+
+## 文档地图
+
+```
+rust_cookbook/
+│
+├── 语言基础（先打好地基）
+│   ├── rust_concepts.md          核心概念：所有权/借用/生命周期/trait/泛型/并发
+│   ├── rust_type_system.md       类型系统精讲：struct/enum/trait/impl 全套
+│   └── datastructure_tips.md     数据结构实用技巧：Vec/HashMap/迭代器等 75 则
+│
+└── business/（业务开发专题）
+    │
+    ├── 序列化与错误（地基）
+    │   ├── serde_in_practice.md          JSON 序列化完整指南
+    │   └── error_handling_in_practice.md 错误处理：thiserror + anyhow + HTTP 响应
+    │
+    ├── 运行时
+    │   └── async_tokio_patterns.md       Tokio 异步模式：并发/Channel/死锁/关闭
+    │
+    ├── HTTP 层
+    │   ├── web_api_axum.md               axum 路由/提取器/中间件/完整示例
+    │   ├── validation.md                 请求校验：validator + axum 集成
+    │   └── auth.md                       认证：JWT + 密码哈希 + RBAC
+    │
+    ├── 数据层
+    │   ├── database_sqlx.md              SQLx：连接池/查询/事务/迁移
+    │   └── redis.md                      Redis：缓存/Session/分布式锁/限流
+    │
+    ├── 集成
+    │   ├── http_client.md                reqwest：调外部 API/重试/并发
+    │   └── background_jobs.md            后台任务：定时/队列/优雅关闭
+    │
+    ├── 工程化
+    │   ├── config_logging_testing.md     配置管理 + 结构化日志 + 测试体系
+    │   ├── observability.md              健康检查 + Prometheus 指标
+    │   ├── deployment.md                 Docker + docker-compose + CI/CD
+    │   └── api_docs.md                   utoipa + Swagger UI 自动生成文档
+    │
+    └── 设计
+        └── business_patterns.md          业务设计模式：Newtype/状态机/Builder
+```
+
+---
+
+## 推荐阅读路径
+
+### ⚡ 快速通道（已有其他语言经验，急着上手）
+
+只看这 6 个，能写出第一个能跑的业务接口：
+
+```
+1. rust_concepts.md                   → 理解所有权，避开编译器报错
+2. business/serde_in_practice.md      → JSON 进出
+3. business/error_handling_in_practice.md → ? 运算符和错误处理
+4. business/async_tokio_patterns.md   → async/await 心智模型
+5. business/web_api_axum.md           → 写第一个 HTTP 接口
+6. business/database_sqlx.md          → 连数据库
+```
+
+---
+
+### 📚 完整路径（建议顺序）
+
+#### 第一阶段：语言地基（必读）
+
+| # | 文件 | 核心内容 | 建议时间 |
+|:-:|------|---------|:-------:|
+| 1 | `rust_concepts.md` | 所有权·借用·生命周期·trait·智能指针·async 基础 | 3-4h |
+| 2 | `rust_type_system.md` | struct/enum/trait/impl 的所有写法和协作方式 | 2-3h |
+| 3 | `datastructure_tips.md` | Vec/HashMap/迭代器实用技巧 75 则 | 随用随查 |
+
+> **关键点**：第 1、2 篇必须认真读，是后续所有内容的基础。
+> 第 3 篇当字典用，遇到不熟悉的方法来查即可。
+
+---
+
+#### 第二阶段：业务核心（最高频使用）
+
+| # | 文件 | 核心内容 |
+|:-:|------|---------|
+| 4 | `business/serde_in_practice.md` | rename/skip/default/flatten；枚举 4 种 JSON 表示；Option 三种情况 |
+| 5 | `business/error_handling_in_practice.md` | 错误分层；HTTP 错误响应；`?` 的工作原理 |
+| 6 | `business/async_tokio_patterns.md` | join!/select!/JoinSet；Mutex 死锁根因；spawn_blocking |
+
+> 这三篇会在之后每篇文章里反复被用到，先吃透再往下走。
+
+---
+
+#### 第三阶段：HTTP 接口
+
+| # | 文件 | 核心内容 |
+|:-:|------|---------|
+| 7 | `business/web_api_axum.md` | 路由·提取器·State·中间件·统一响应 |
+| 8 | `business/validation.md` | ValidatedJson 提取器；422 错误格式 |
+| 9 | `business/auth.md` | JWT 中间件；密码哈希；Refresh Token |
+
+---
+
+#### 第四阶段：数据层
+
+| # | 文件 | 核心内容 |
+|:-:|------|---------|
+| 10 | `business/database_sqlx.md` | query!/query_as!；事务；迁移；批量操作 |
+| 11 | `business/redis.md` | 缓存；Session；分布式锁；限流 |
+
+---
+
+#### 第五阶段：外部集成
+
+| # | 文件 | 核心内容 |
+|:-:|------|---------|
+| 12 | `business/http_client.md` | reqwest；重试退避；并发限速 |
+| 13 | `business/background_jobs.md` | 定时任务；任务队列；优雅关闭 |
+
+---
+
+#### 第六阶段：上生产前必读
+
+| # | 文件 | 核心内容 |
+|:-:|------|---------|
+| 14 | `business/config_logging_testing.md` | 分层配置；结构化日志；集成测试；DB 测试隔离 |
+| 15 | `business/observability.md` | /health + /ready；Prometheus 指标；请求 ID 追踪 |
+| 16 | `business/deployment.md` | 多阶段 Dockerfile；docker-compose；GitHub Actions |
+| 17 | `business/api_docs.md` | utoipa 注解；Swagger UI 集成 |
+
+---
+
+#### 随时可读
+
+| 文件 | 适合时机 |
+|------|---------|
+| `business/business_patterns.md` | 觉得代码设计不够优雅时；重构时 |
+
+---
+
+## 技术栈版本
+
+| 类别 | Crate | 版本 |
+|------|-------|:----:|
+| Web 框架 | axum | 0.7 |
+| 异步运行时 | tokio | 1 |
+| 序列化 | serde + serde_json | 1 |
+| 数据库 | sqlx | 0.7 |
+| 缓存 | deadpool-redis / redis | 0.16 / 0.26 |
+| HTTP 客户端 | reqwest | 0.12（基于 hyper 1.0）|
+| 错误处理 | thiserror / anyhow | 1 |
+| 认证 | jsonwebtoken / argon2 | 9 / 0.5 |
+| 校验 | validator | 0.18 |
+| 日志追踪 | tracing / tracing-subscriber | 0.1 / 0.3 |
+| 指标 | metrics / metrics-exporter-prometheus | 0.23 / 0.15 |
+| 定时任务 | tokio-cron-scheduler | 0.13 |
+| API 文档 | utoipa / utoipa-swagger-ui | 4 / 7 |
+
+---
+
+## 遇到问题速查
+
+| 问题 | 去哪找 |
+|------|-------|
+| 编译器报 borrow/move 错误 | `rust_concepts.md` → §1.2 所有权、§1.3 借用 |
+| 不知道用 Box/Rc/Arc 哪个 | `rust_concepts.md` → §4.8 智能指针选择表 |
+| async 里 Mutex 死锁 | `async_tokio_patterns.md` → §五 |
+| `?` 运算符报类型不匹配 | `error_handling_in_practice.md` → §六 |
+| JSON 字段名转 camelCase | `serde_in_practice.md` → §2.1 rename |
+| 枚举如何序列化成 JSON | `serde_in_practice.md` → §三 |
+| axum Handler 返回值类型报错 | `web_api_axum.md` → §四 统一响应 |
+| 校验失败返回 422 | `validation.md` → §四 ValidatedJson |
+| JWT 接入 axum 中间件 | `auth.md` → §三 |
+| SQLx 事务怎么写 | `database_sqlx.md` → §四 |
+| Redis 实现分布式锁 | `redis.md` → §六 |
+| 后台任务如何优雅关闭 | `background_jobs.md` → §五 |
+| Docker 镜像太大 | `deployment.md` → §一 多阶段构建 |
+| 如何写集成测试 | `config_logging_testing.md` → 第三部分 |
+
+
+
 ## Rust vs TypeScript 对照示例
 
 专为有 TypeScript 背景的人设计。本仓库提供了**两层** TypeScript 对照：
 
-### 1️⃣ 各源文件内联对比（新增 ✨）
-
-`main/src/` 下 50+ 个学习文件的末尾都添加了 `📘 TypeScript 对比` 段落，
-直接在每个主题旁边标注 Rust ↔ TS 的关键差异。
-
-```rust
-// 📘 TypeScript 对比
-// | 特性 | Rust | TypeScript |
-// |------|------|-----------|
-// | 默认可变性 | 不可变 `let` | 可变 `let` |
-// | 变量遮蔽 | ✅ 同一作用域可重复 `let` | ❌ 不能重复声明 |
-```
-
-### 2️⃣ 对照指南 & 专题文档
-
-所有文档统一放在 [`markdown/`](markdown/)（[完整索引](markdown/src/README.md)）。
-
-| 文件 | 定位 | 掌握程度 |
-|------|------|----------|
-| [`rust_vs_typescript.md`](markdown/src/rust_vs_typescript.md) | 27 个主题全景对照，熟悉 TS 对应什么 Rust 概念 | `████████░░░░░░░░░░░░` 知道有什么、在哪查即可 |
-| [`lifetimes_from_ts_basics.md`](markdown/src/lifetimes_from_ts_basics.md) | 生命周期核心：为什么需要、三大场景、消除规则、编译错误解读、实战 | `████████████████████` **必须掌握**，写 Rust 天天打交道 |
-| [`lifetimes_advanced.md`](markdown/src/lifetimes_advanced.md) | 生命周期进阶：Variance / HRTB / GAT / Pin / async 等 | `████░░░░░░░░░░░░░░░░` 理解概念，遇到时回来翻 |
-
-### 3️⃣ 运行式对照示例
+### 运行式对照示例
 
 `main/examples/rust_vs_typescript/` 目录下的独立可运行示例，每个文件同时包含
 Rust 实现和完整的 TypeScript 版本（注释对比）。
