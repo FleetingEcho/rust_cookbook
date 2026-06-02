@@ -438,44 +438,7 @@ let (a, b) = join!(a_fut, b_fut).await;  // 交替执行
 
 ---
 
-## 七、完整的知识全景图
 
-```
-Rust 两个根本决策：不用 GC + 零成本抽象
-            │
-            ├──────────────────┬──────────────────────┐
-            │                  │                      │
-         内存管理            类型系统              错误处理
-            │                  │                      │
-     ┌──────┴──────┐    ┌─────┴──────┐          ┌────┴────┐
-     │             │    │            │          │         │
-   栈 vs 堆    所有权   trait   泛型  dyn      Result   Option
-     │             │    │            │          │         │
-     │         ┌───┴───┐  │    ┌─────┴──┐       ? 运算符  │
-     │         │       │   │    │        │       │         │
-     │       借用    Copy  │  泛型函数 泛型结构体  │     │
-     │         │          │    │        │       │         │
-     │     ┌───┴───┐      │  monomorphization  thiserror  │
-     │     │       │      │                      │        │
-     │   &T   &mut T    trait bound             anyhow   from
-     │         │          │                              │
-     │     ┌───┴───┐      │                          ok_or
-     │     │       │      │                              │
-     │  生命周期  借用检查  impl Trait               transpose
-     │                    │
-     │              dyn Trait
-     │
-     ├──────────────────┬──────────────────────┐
-     │                  │                      │
-   容器选择          智能指针                 并发
-     │                  │                      │
-   Vec HashMap       Box   Rc               thread
-   BTreeMap           Arc  RefCell            channel
-     │                Mutex  RwLock         Arc<Mutex>
-     │                  │                      │
-  迭代器管线         Rc<RefCell>             async/tokio
-  map/filter/collect  Arc<Mutex>           join!/select!
-```
 
 ---
 

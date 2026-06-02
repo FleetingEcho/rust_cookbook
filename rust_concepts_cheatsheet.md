@@ -5,6 +5,53 @@
 
 ---
 
+## 完整的知识全景图
+
+```
+Rust 两个根本决策：不用 GC + 零成本抽象
+            │
+            ├──────────────────┬──────────────────────┬──────────────────
+            │                  │                      │                  │
+         内存管理            类型系统              错误处理            unsafe
+            │                  │                      │                  │
+     ┌──────┴──────┐    ┌──────┴──────┐          ┌────┴────┐        ┌───┴───┐
+     │             │    │             │           │         │        │       │
+   栈 vs 堆    所有权   多态         泛型        Result   Option   裸指针  FFI
+     │             │    │             │           │         │
+     │         ┌───┴───┐  │      ┌────┴────┐      ? 运算符  │
+     │         │       │  │      │         │      │         │
+     │       借用    Copy  │   泛型函数  泛型结构体  │     ok_or
+     │         │          │    │         │       │         │
+     │     ┌───┴───┐      │  monomorphization  ┌─┴──────────────┐
+     │     │       │      │                    │                │
+     │   &T   &mut T    trait bound        thiserror/anyhow  Box<dyn Error>
+     │         │          │                    │
+     │     ┌───┴───┐      │                  from / transpose
+     │     │       │      │
+     │  生命周期  借用检查  ├──────────────┐
+     │     │              │              │
+     │   'a标注          trait       impl Trait / dyn Trait
+     │                    │              │
+     │                Associated     静态派发 vs 动态派发
+     │                 types
+     │
+     ├──────────────────┬──────────────────────┐
+     │                  │                      │
+   容器选择          智能指针                 并发
+     │                  │                      │
+   Vec  HashMap      Box   Rc               ┌──┴──────────────┐
+   BTreeMap  HashSet  Arc  RefCell          │                 │
+   BTreeSet  VecDeque  Mutex  RwLock     线程模型           async
+   BinaryHeap          │                   │                  │
+     │            Rc<RefCell>           thread            tokio运行时
+     │            Arc<Mutex>            channel           join!/select!
+     │                  │              Arc<Mutex>              │
+  迭代器管线        内存安全保证          │               Send / Sync
+  map/filter/collect  Drop/RAII      Mutex poisoning
+  Entry API
+```
+
+
 ## 一、内存管理基础
 
 ### 1.1 栈 vs 堆
