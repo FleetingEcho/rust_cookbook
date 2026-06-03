@@ -15,6 +15,424 @@
 
 ---
 
+## 1. 核心概念对照表
+
+| Rust 关键字 | TS 最接近的写法 | 它是干什么的 | 关键区别 |
+|---|---|---|---|
+| `struct` | `interface / type` | 定义对象的字段形状 | Rust 是值类型，赋值会转移所有权（move） |
+| tuple struct | `type Point = [number, number]` | 没有字段名、只有位置的结构体 | Rust 是独立具名类型，TS 只是带标注的数组 |
+| `enum` | discriminated union | 一个值是"几种形态之一"，每种可携带不同数据 | Rust enum 天然携带数据，TS 要手动加 `kind` 字段 |
+| `impl` | class（方法块） | 给某个类型绑定方法 | Rust 把数据（struct）和行为（impl）分开写 |
+| `impl Trait for T` | `implements` | 为具体类型实现 trait 要求的方法 | Rust 可给任意类型加 impl，TS 只能用在自己的 class |
+| `trait` | interface + abstract class | 声明一组必须实现的方法，可以有默认实现 | TS interface 不能有默认实现，abstract class 才行 |
+| 泛型约束 `T: Trait` | `T extends Interface` | 限制泛型只接受实现了某契约的类型 | 语法相似，但 Rust 编译期单态化，零运行时开销 |
+| `dyn Trait` | interface 类型注解 | 运行时多态，通过 vtable 派发 | TS 因类型擦除，永远是这种模式 |
+| `Option<T>` | `T \| null` | 表示可能不存在的值 | Rust 编译器强制处理 None，TS 可以悄悄忽略 |
+| `Result<T, E>` | try/catch 或自定义联合 | 表示可能成功或失败的操作 | Rust 错误是值，类型系统强制处理；TS throw 对类型不可见 |
+
+---
+
+## 2. struct：定义数据结构
+
+```rust
+pub struct Config {
+    pub host: String,       // pub：外部可读写
+    pub port: u16,
+    timeout: u64,           // 无 pub：只在本模块可见
+    pub label: Option<String>,   // 可选字段，≈ TS 的 label?: string
+    pub timeout_ms: Option<u64>, // 可选字段，≈ TS 的 timeoutMs?: number
+}
+```
+
+对应 TypeScript：
+
+```typescript
+interface Config {
+  host: string
+  port: number
+  // timeout 是私有的，TS interface 没有这个概念（需要 class）
+  label?: string       // ≈ Option<String>
+  timeoutMs?: number   // ≈ Option<u64>
+}
+```
+
+### 创建实例
+
+```rust
+let cfg = Config {
+    host: "localhost".to_string(),
+    port: 8080,
+    timeout: 30,
+    timeout_ms: Some(5000),  // 有值
+    label: None,             // 没有值
+};
+```
+
+### 处理 Option 字段
+
+```rust
+// 方式一：match（穷举，像 switch 但不会漏）
+match config.label {
+    Some(l) => println!("{}", l.to_uppercase()),
+    None    => println!("no label"),
+}
+
+// 方式二：if let（最常用，像 TS 的 if 检查）
+if let Some(l) = &config.label {
+    println!("{}", l.to_uppercase());
+}
+
+// 方式三：unwrap_or（给默认值，≈ TS 的 ?? 运算符）
+let label = config.label.unwrap_or("default".to_string());
+// TS: config.label ?? "default"
+```
+
+> 💡 口诀：TS 的 `T | null` → Rust 的 `Option<T>`，TS 的 `?.` 和 `??` → Rust 的 `if let` 和 `unwrap_or`
+
+---
+
+## 3. enum：比 TS 联合类型强大得多
+
+```rust
+#[derive(Debug)]
+pub enum Class {
+    Warrior { rage: u32 },        // 战士：携带怒气值
+    Mage    { mana: u32 },        // 法师：携带魔法值
+    Rogue   { stealth: bool },    // 盗贼：携带隐身状态
+}
+```
+
+对应 TypeScript（需要手动加 `kind`）：
+
+```typescript
+type Class =
+  | { kind: "warrior"; rage: number }
+  | { kind: "mage";    mana: number }
+  | { kind: "rogue";   stealth: boolean }
+```
+
+### 用 match 处理（编译器强制穷举，漏掉会报错）
+
+```rust
+impl Class {
+    fn bonus_damage(&self) -> u32 {
+        match self {
+            Class::Warrior { rage }            => rage / 10,
+            Class::Mage    { mana }            => mana / 5,
+            Class::Rogue   { stealth: true  }  => 20,
+            Class::Rogue   { stealth: false }  => 5,
+        }
+    }
+}
+```
+
+---
+
+## 4. trait：必选 vs 可选方法
+
+```rust
+pub trait Fighter {
+    // 必须实现（无默认值）
+    fn name(&self)   -> &str;
+    fn hp(&self)     -> u32;
+    fn attack(&self) -> u32;
+
+    // 可选实现（有默认值，不写就用这个）
+    fn battle_cry(&self) -> String {
+        format!("{}：为了荣耀！", self.name())
+    }
+    fn is_alive(&self) -> bool {
+        self.hp() > 0
+    }
+}
+```
+
+对应 TypeScript：
+
+```typescript
+// TS 的 interface 不支持默认实现
+// 需要用 abstract class 才能做到同样的事
+abstract class Fighter {
+    abstract name(): string       // 必须实现
+    abstract hp(): number
+    abstract attack(): number
+
+    battleCry(): string {         // 可选覆盖
+        return `${this.name()}：为了荣耀！`
+    }
+    isAlive(): boolean {
+        return this.hp() > 0
+    }
+}
+```
+
+| | Rust trait | TS interface | TS abstract class |
+|---|---|---|---|
+| 必须实现 | 无默认值的方法 | 所有方法 | `abstract` 方法 |
+| 可选实现 | 有默认值的方法 ✅ | ❌ 不支持 | 普通方法 ✅ |
+| 默认可调用其他方法 | ✅ `self.name()` | — | ✅ `this.name()` |
+
+> 💡 口诀：Rust `trait` = TS `interface` 的契约能力 + `abstract class` 的默认实现能力，合二为一
+
+---
+
+## 5. impl：给 struct 绑定行为
+
+```rust
+impl Hero {
+    // 关联函数（≈ TS static 方法，常用作构造器）
+    pub fn new(name: &str, hp: u32, class: Class) -> Self {
+        Hero { name: name.to_string(), hp, max_hp: hp, inventory: vec![], class }
+    }
+
+    // &self = 只读方法
+    pub fn describe(&self) -> String {
+        format!("{} HP:{}/{}", self.name, self.hp, self.max_hp)
+    }
+
+    // &mut self = 修改自身状态
+    pub fn pick_up(&mut self, item: Item) {
+        println!("{}捡起了{}", self.name, item.name);
+        self.inventory.push(item);
+    }
+
+    pub fn use_item(&mut self, index: usize) {
+        let item = self.inventory.remove(index); // 所有权转移
+        if let Some(heal) = item.heal {
+            self.hp = (self.hp + heal).min(self.max_hp);
+            println!("回血 {}，当前 HP: {}", heal, self.hp);
+        }
+    }
+}
+
+// 为 Hero 实现 Fighter trait
+impl Fighter for Hero {
+    fn name(&self)   -> &str { &self.name }
+    fn hp(&self)     -> u32  { self.hp }
+    fn attack(&self) -> u32  { 15 + self.class.bonus_damage() }
+
+    // 覆盖默认的 battle_cry
+    fn battle_cry(&self) -> String {
+        match &self.class {
+            Class::Warrior {..} => format!("{}：我要把你砍成两半！", self.name),
+            Class::Mage    {..} => format!("{}：火球术！", self.name),
+            Class::Rogue   {..} => format!("{}：...", self.name),
+        }
+    }
+    // is_alive 没写 → 直接用 trait 的默认实现 ✅
+}
+```
+
+### &self vs &mut self vs 无 self
+
+```rust
+fn read_only(&self)            // ≈ TS 普通方法，不修改
+fn mutating(&mut self)         // ≈ TS 修改 this 的方法
+fn static_fn(x: u32) -> u32   // ≈ TS static 方法，通过 Hero::static_fn() 调用
+```
+
+---
+
+## 6. dyn Trait：异构集合（运行时多态）
+
+```rust
+// Vec<Box<dyn Fighter>> ≈ TypeScript 的 Fighter[]
+let party: Vec<Box<dyn Fighter>> = vec![
+    Box::new(Hero::new("梅林",     60, Class::Mage  { mana:  80 })),
+    Box::new(Hero::new("迪尔蒙德", 90, Class::Rogue { stealth: true })),
+];
+
+for f in &party {  // & = 借用，不消耗 party
+    println!("{} | 攻击力:{} | 存活:{}",
+        f.name(), f.attack(), f.is_alive());
+}
+```
+
+### 为什么需要 Box？
+
+```
+Rust 的 Vec 要求每个元素大小固定
+Hero 的大小运行时才知道 → 无法直接放进 Vec
+
+解决方案：Box = 堆上的指针（固定 8 字节）
+  ┌─────────────────┬──────────────────┐
+  │ 指向数据的指针   │ 指向 vtable 的指针 │  ← 胖指针
+  └─────────────────┴──────────────────┘
+        vtable 里存着 name/attack/is_alive 的实际函数地址
+```
+
+```rust
+Vec<dyn Fighter>        // ❌ 编译报错：大小不固定
+Vec<Box<dyn Fighter>>   // ✅ Box 指针大小固定
+```
+
+### for 循环的 & 为什么重要？
+
+```rust
+for f in &party   // f 是借用，循环后 party 还能用  ✅
+for f in party    // f 把所有权 move 进来，循环后 party 没了 ❌
+```
+
+对应 TypeScript：
+
+```typescript
+// TS 永远是引用，不存在"消耗"概念
+for (const f of party) { ... }  // party 之后还能用，Rust 不一定
+```
+
+### 整体对比
+
+```
+Rust                              TypeScript
+──────────────────────────────    ────────────────────────
+Vec<Box<dyn Fighter>>         ≈   Fighter[]
+Box::new(Hero::new(...))      ≈   new Hero(...)
+for f in &party               ≈   for (const f of party)
+f.name()   // vtable 查找      ≈   f.name()  // 原型链查找
+f.is_alive() // trait 默认实现  ≈   f.isAlive() // 父类方法
+```
+
+> 💡 核心记住：**TS 的 `T[]` = Rust 的 `Vec<Box<dyn T>>`**，TS 把 `Box` 和 `dyn` 都帮你隐藏掉了
+
+---
+
+## 7. 完整 RPG 示例
+
+```rust
+use std::fmt;
+
+// ── struct：纯数据 ──────────────────────────────────────────
+#[derive(Debug, Clone)]
+pub struct Item {
+    pub name:   String,
+    pub damage: Option<u32>,   // 可选：武器才有伤害
+    pub heal:   Option<u32>,   // 可选：药水才有回血
+}
+
+#[derive(Debug)]
+pub struct Hero {
+    pub name:      String,
+    pub hp:        u32,
+    pub max_hp:    u32,
+    pub inventory: Vec<Item>,
+    pub class:     Class,
+}
+
+// ── enum：职业，每个变体携带不同数据 ────────────────────────
+#[derive(Debug)]
+pub enum Class {
+    Warrior { rage: u32 },
+    Mage    { mana: u32 },
+    Rogue   { stealth: bool },
+}
+
+impl Class {
+    fn bonus_damage(&self) -> u32 {
+        match self {
+            Class::Warrior { rage }           => rage / 10,
+            Class::Mage    { mana }           => mana / 5,
+            Class::Rogue   { stealth: true  } => 20,
+            Class::Rogue   { stealth: false } => 5,
+        }
+    }
+}
+
+// ── trait：定义契约，含默认实现 ──────────────────────────────
+pub trait Fighter {
+    fn name(&self)   -> &str;           // 必须实现
+    fn hp(&self)     -> u32;
+    fn attack(&self) -> u32;
+
+    fn battle_cry(&self) -> String {    // 可选覆盖
+        format!("{}：为了荣耀！", self.name())
+    }
+    fn is_alive(&self) -> bool {        // 可选覆盖
+        self.hp() > 0
+    }
+}
+
+// ── impl：给 Hero 加方法 ─────────────────────────────────────
+impl Hero {
+    pub fn new(name: &str, hp: u32, class: Class) -> Self {
+        Hero { name: name.to_string(), hp, max_hp: hp,
+               inventory: vec![], class }
+    }
+
+    pub fn pick_up(&mut self, item: Item) {
+        println!("{}捡起了{}", self.name, item.name);
+        self.inventory.push(item);
+    }
+
+    pub fn use_item(&mut self, index: usize) {
+        let item = self.inventory.remove(index);
+        if let Some(heal) = item.heal {
+            self.hp = (self.hp + heal).min(self.max_hp);
+            println!("回血 {}，当前 HP: {}", heal, self.hp);
+        }
+    }
+}
+
+// ── impl Trait for Struct：实现 Fighter ─────────────────────
+impl Fighter for Hero {
+    fn name(&self)   -> &str { &self.name }
+    fn hp(&self)     -> u32  { self.hp }
+    fn attack(&self) -> u32  { 15 + self.class.bonus_damage() }
+
+    fn battle_cry(&self) -> String {
+        match &self.class {
+            Class::Warrior {..} => format!("{}：我要把你砍成两半！", self.name),
+            Class::Mage    {..} => format!("{}：火球术！", self.name),
+            Class::Rogue   {..} => format!("{}：...", self.name),
+        }
+    }
+    // is_alive 没写 → 使用 trait 默认实现
+}
+
+// ── main：组合起来 ───────────────────────────────────────────
+fn main() {
+    let mut hero = Hero::new("阿尔托利亚", 100, Class::Warrior { rage: 50 });
+
+    hero.pick_up(Item { name: "圣剑 Excalibur".to_string(),
+                        damage: Some(999), heal: None });
+    hero.pick_up(Item { name: "红瓶".to_string(),
+                        damage: None, heal: Some(30) });
+
+    println!("{}", hero.battle_cry());
+    println!("攻击力: {}", hero.attack());   // 15 + 5 = 20
+
+    hero.hp = 40;
+    hero.use_item(1);   // 使用红瓶，回血 30
+
+    // dyn Trait：不同职业放进同一个 Vec
+    let party: Vec<Box<dyn Fighter>> = vec![
+        Box::new(Hero::new("梅林",     60, Class::Mage  { mana:  80 })),
+        Box::new(Hero::new("迪尔蒙德", 90, Class::Rogue { stealth: true })),
+    ];
+    for f in &party {
+        println!("{} | 攻击力:{} | 存活:{}",
+            f.name(), f.attack(), f.is_alive());
+    }
+}
+```
+
+---
+
+## 8. 一句话总结
+
+| 概念 | 记法 |
+|---|---|
+| `struct` | TS 的 `interface`，但赋值是 move 不是引用 |
+| `enum` | TS 的 discriminated union，但更简洁、编译器强制穷举 |
+| `impl` | TS class 的方法块，数据和行为分开写 |
+| `trait` | TS `interface` + `abstract class` 合体 |
+| `Option<T>` | `T \| null`，但编译器强制你处理 None |
+| `Result<T,E>` | try/catch，但错误是值，类型系统可见 |
+| `Vec<Box<dyn T>>` | `T[]`，TS 把 Box 和 dyn 都帮你隐藏了 |
+| `&self` / `&mut self` | 普通方法 / 修改 this 的方法 |
+| `for f in &vec` | `for (const f of arr)`，加 `&` 才不会消耗所有权 |
+
+
+
 ## 一、struct：数据的形状
 
 ### 1.1 三种写法
