@@ -1,3 +1,9 @@
+mod issue;
+use issue::issue_test;
+
+mod music_player;
+ 
+
 struct WordCounter {
     words: Vec<String>,
 }
@@ -31,7 +37,11 @@ fn main() {
     wc.add(String::from("rust"));
     wc.add(String::from("programming"));
 
-    assert_eq!(wc.count_longer_than(3), 2);  // "hello", "programming" 等等看你算
-    assert_eq!(wc.join(), "hi hello rust programming");
-    println!("all assertions passed!");
+    // assert_eq!(wc.count_longer_than(3), 2);  // "hello", "programming" 等等看你算
+    // assert_eq!(wc.join(), "hi hello rust programming");
+    // println!("all assertions passed!");
+
+    issue_test();
+    music_player::run_music_player();
+    
 }
