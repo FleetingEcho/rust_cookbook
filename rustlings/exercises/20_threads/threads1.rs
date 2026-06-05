@@ -20,11 +20,11 @@ fn main() {
         handles.push(handle);
     }
 
-    let mut results:Vec<u128> = Vec::new();
+    let mut results: Vec<u128> = Vec::new();
     for handle in handles {
         // TODO: Collect the results of all threads into the `results` vector.
         // Use the `JoinHandle` struct which is returned by `thread::spawn`.
-        let result = handle.join().unwrap();  // unwrap 获取线程的返回值
+        let result = handle.join().unwrap(); // unwrap 获取线程的返回值
         results.push(result);
     }
 

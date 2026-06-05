@@ -40,7 +40,9 @@ pub async fn create_comment(
     Path(issue_id): Path<i64>,
     Json(input): Json<CreateCommentRequest>,
 ) -> AppResult<Json<CommentResponse>> {
-    input.validate().map_err(|e| AppError::BadRequest(e.to_string()))?;
+    input
+        .validate()
+        .map_err(|e| AppError::BadRequest(e.to_string()))?;
     super::issues::fetch_issue(&state, issue_id).await?;
     let comment = sqlx::query_as::<_, Comment>(
         "INSERT INTO comments (issue_id, author, body) VALUES (?, ?, ?) RETURNING *",

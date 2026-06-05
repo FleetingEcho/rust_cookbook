@@ -64,8 +64,6 @@ fn main() {
     m.call();
 }
 
-
-
 /// 定义 Rectangle 结构体
 struct Rectangle {
     width: u32,

@@ -5,13 +5,16 @@ struct Book2<'a, 'b> {
 
 fn test() {
     let title = String::from("Rust Programming");
-    
+
     // 只提取 title 的引用，不保留整个 book
     let title_ref;
     {
         let author = String::from("Jane Smith");
-        let book = Book2 { author: &author, title: &title };
-        title_ref = book.title;  // 只借用 title
+        let book = Book2 {
+            author: &author,
+            title: &title,
+        };
+        title_ref = book.title; // 只借用 title
         println!("Inside: {} by {}", book.title, book.author);
     } // author 和 book 销毁，但 title_ref 仍然有效
     println!("Outside title: {}", title_ref);
@@ -31,5 +34,3 @@ fn main() {
     println!("{} by {}", book.title, book.author);
     test();
 }
-
-

@@ -69,7 +69,7 @@ fn main() {
     }
 
     fn divide(a: i32, b: i32) -> (i32, i32) {
-        (a / b, a % b)   // 同时返回商和余数，TS 需要对象或两次调用
+        (a / b, a % b) // 同时返回商和余数，TS 需要对象或两次调用
     }
 
     let data = [3, 1, 4, 1, 5, 9, 2, 6];
@@ -83,13 +83,13 @@ fn main() {
     // 四、嵌套元组
     // ============================================================
     let nested = ((1_i32, 2_i32), (3_i32, 4_i32));
-    println!("嵌套 [0][0]={}, [1][1]={}", nested.0.0, nested.1.1);
+    println!("嵌套 [0][0]={}, [1][1]={}", nested.0 .0, nested.1 .1);
 
     // ============================================================
     // 五、单元素元组（注意必须加逗号）
     // TS: [42] 是 [number] 类型
     // ============================================================
-    let single = (42_i32,);  // (42) 只是括号，不是元组！
+    let single = (42_i32,); // (42) 只是括号，不是元组！
     println!("单元素元组: {:?}", single);
     println!("取值: {}", single.0);
 
@@ -97,13 +97,10 @@ fn main() {
     // 六、元组数组（常见于 HashMap::iter() 等）
     // TS: [string, number][]
     // ============================================================
-    let pairs: Vec<(&str, i32)> = vec![
-        ("alice", 90),
-        ("bob",   85),
-        ("charlie", 92),
-    ];
+    let pairs: Vec<(&str, i32)> = vec![("alice", 90), ("bob", 85), ("charlie", 92)];
 
-    for (name, score) in &pairs {   // TS: for (const [name, score] of pairs)
+    for (name, score) in &pairs {
+        // TS: for (const [name, score] of pairs)
         println!("{name}: {score}");
     }
 
@@ -111,7 +108,8 @@ fn main() {
     let mut map = HashMap::new();
     map.insert("x", 1_i32);
     map.insert("y", 2);
-    for (k, v) in &map {            // TS: for (const [k, v] of map)
+    for (k, v) in &map {
+        // TS: for (const [k, v] of map)
         println!("key={k}, val={v}");
     }
 
@@ -120,7 +118,7 @@ fn main() {
     // TS 4.0+: type Point = [x: number, y: number]
     // Rust: 给元组包装一个类型名，增加语义
     // ============================================================
-    struct Meters(f64);     // 包装类型，防止把 kg 传给需要 m 的函数
+    struct Meters(f64); // 包装类型，防止把 kg 传给需要 m 的函数
     struct Kilograms(f64);
 
     fn print_distance(d: Meters) {
@@ -155,9 +153,9 @@ fn main() {
     // ============================================================
     let pair = (true, 42_i32);
     let msg = match pair {
-        (true,  n) if n > 0 => format!("正数: {n}"),
-        (true,  _)          => "非正数".to_string(),
-        (false, _)          => "false".to_string(),
+        (true, n) if n > 0 => format!("正数: {n}"),
+        (true, _) => "非正数".to_string(),
+        (false, _) => "false".to_string(),
     };
     println!("match 元组: {msg}");
 
@@ -166,9 +164,9 @@ fn main() {
     // TS: void（函数无返回值）
     // Rust: 无返回值的函数隐式返回 ()，也叫 unit type
     // ============================================================
-    fn do_nothing() -> () {  // 等价于 fn do_nothing() {
-        // 什么也不做
+    fn do_nothing() -> () { // 等价于 fn do_nothing() {
+                            // 什么也不做
     }
     let unit: () = do_nothing();
-    println!("unit: {:?}", unit);  // ()
+    println!("unit: {:?}", unit); // ()
 }

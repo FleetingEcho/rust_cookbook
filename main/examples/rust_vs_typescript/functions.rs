@@ -50,11 +50,13 @@ fn main() {
     // Rust 惯用风格：最后一个表达式就是返回值（无分号，无 return）
     // TS 箭头函数也有类似写法: const add = (x: number, y: number) => x + y;
     fn add(x: i32, y: i32) -> i32 {
-        x + y   // 不加分号，这就是返回值！(TS: return x + y)
+        x + y // 不加分号，这就是返回值！(TS: return x + y)
     }
 
     // 表达式体函数（单表达式时甚至可以省略 {}）
-    fn add_short(x: i32, y: i32) -> i32 { x + y }
+    fn add_short(x: i32, y: i32) -> i32 {
+        x + y
+    }
 
     println!("add(3, 5) = {}", add(3, 5));
     println!("add_return(3, 5) = {}", add_return(3, 5));
@@ -105,7 +107,7 @@ fn main() {
 
     // 方案A：Option 参数
     fn greet(name: &str, greeting: Option<&str>) -> String {
-        let g = greeting.unwrap_or("Hello");  // TS: greeting ?? "Hello"
+        let g = greeting.unwrap_or("Hello"); // TS: greeting ?? "Hello"
         format!("{g}, {name}!")
     }
     println!("greet: {}", greet("Alice", None));
@@ -113,7 +115,7 @@ fn main() {
 
     // 方案B：为常见场景提供便捷包装函数
     fn greet_default(name: &str) -> String {
-        greet(name, None)  // 内部调用完整版本
+        greet(name, None) // 内部调用完整版本
     }
     println!("greet_default: {}", greet_default("Bob"));
 
@@ -137,8 +139,8 @@ fn main() {
         *numbers.iter().max().unwrap_or(&0)
     }
 
-    println!("sum_all: {}", sum_all(&[1, 2, 3, 4, 5]));   // 15
-    println!("max_all: {}", max_all(&[3, 7, 2, 9, 1]));   // 9
+    println!("sum_all: {}", sum_all(&[1, 2, 3, 4, 5])); // 15
+    println!("max_all: {}", max_all(&[3, 7, 2, 9, 1])); // 9
 
     // 如果需要真正的 rest 参数语法，用宏或可变参数：
     macro_rules! sum_all_macro {
@@ -172,7 +174,7 @@ fn main() {
     fn process_optional(x: Option<i32>) -> i32 {
         match x {
             Some(n) => n,
-            None    => unreachable_msg("x 应该总有值"),
+            None => unreachable_msg("x 应该总有值"),
             // ! 类型可以兼容任何类型，所以这里编译通过
         }
     }
@@ -185,15 +187,19 @@ fn main() {
     // ============================================================
 
     fn do_twice(f: fn(i32) -> i32, x: i32) -> i32 {
-        f(f(x))  // TS: f(f(x))
+        f(f(x)) // TS: f(f(x))
     }
 
-    fn square(x: i32) -> i32 { x * x }
-    fn double(x: i32) -> i32 { x * 2 }
+    fn square(x: i32) -> i32 {
+        x * x
+    }
+    fn double(x: i32) -> i32 {
+        x * 2
+    }
 
     // 函数名自动转为函数指针
-    println!("do_twice(square, 3): {}", do_twice(square, 3));   // 81
-    println!("do_twice(double, 3): {}", do_twice(double, 3));   // 12
+    println!("do_twice(square, 3): {}", do_twice(square, 3)); // 81
+    println!("do_twice(double, 3): {}", do_twice(double, 3)); // 12
 
     // 也可以传入闭包（如果闭包不捕获变量）
     println!("do_twice(|x| x+1, 5): {}", do_twice(|x| x + 1, 5)); // 7
@@ -213,7 +219,8 @@ fn main() {
     }
 
     impl Counter {
-        fn new(value: i32) -> Self { // 关联函数，类似 TS 的 static 方法/constructor
+        fn new(value: i32) -> Self {
+            // 关联函数，类似 TS 的 static 方法/constructor
             Counter { value }
         }
 
@@ -224,7 +231,7 @@ fn main() {
 
         // &mut self：可变借用，可修改 (TS: 普通方法，能改 this)
         fn increment(&mut self) {
-            self.value += 1;  // TS: this.value++
+            self.value += 1; // TS: this.value++
         }
 
         // self：消耗所有权 (TS 没有对应，但可以用 return this 链式调用)
@@ -234,12 +241,12 @@ fn main() {
         }
     }
 
-    let mut c = Counter::new(10);     // TS: const c = new Counter(10)
-    println!("get: {}", c.get());     // 10
-    c.increment();                    // TS: c.increment()
+    let mut c = Counter::new(10); // TS: const c = new Counter(10)
+    println!("get: {}", c.get()); // 10
+    c.increment(); // TS: c.increment()
     println!("after increment: {}", c.get()); // 11
 
-    let display = c.into_display();   // c 的所有权被消耗
+    let display = c.into_display(); // c 的所有权被消耗
     println!("into_display: {display}");
     // println!("{}", c.get()); // ❌ c 已被消耗
 
@@ -253,15 +260,15 @@ fn main() {
     // ============================================================
 
     fn identity<T>(x: T) -> T {
-        x  // TS: return x
+        x // TS: return x
     }
 
     fn first<T>(list: &[T]) -> Option<&T> {
-        list.first()  // TS: arr.length > 0 ? arr[0] : undefined
+        list.first() // TS: arr.length > 0 ? arr[0] : undefined
     }
 
     fn swap<T>(a: &mut T, b: &mut T) {
-        std::mem::swap(a, b);  // TS: [a, b] = [b, a]（解构交换）
+        std::mem::swap(a, b); // TS: [a, b] = [b, a]（解构交换）
     }
 
     println!("identity(42): {}", identity(42));
@@ -328,19 +335,23 @@ fn main() {
     }
 
     impl Length for String {
-        fn length(&self) -> usize { self.len() }
+        fn length(&self) -> usize {
+            self.len()
+        }
     }
 
     impl<T> Length for Vec<T> {
-        fn length(&self) -> usize { self.len() }
+        fn length(&self) -> usize {
+            self.len()
+        }
     }
 
     fn print_len<T: Length>(item: &T) {
         println!("长度: {}", item.length());
     }
 
-    print_len(&String::from("hello"));   // TS: len("hello")
-    print_len(&vec![1, 2, 3, 4]);        // TS: len([1,2,3,4])
+    print_len(&String::from("hello")); // TS: len("hello")
+    print_len(&vec![1, 2, 3, 4]); // TS: len([1,2,3,4])
 
     // 方案B：枚举（运行时分发，类似 TS union type）
     enum Input<'a> {
@@ -350,13 +361,16 @@ fn main() {
 
     fn len_input(input: &Input) -> usize {
         match input {
-            Input::Text(s)    => s.len(),
+            Input::Text(s) => s.len(),
             Input::Numbers(v) => v.len(),
         }
     }
 
     println!("len_input(Text): {}", len_input(&Input::Text("hello")));
-    println!("len_input(Numbers): {}", len_input(&Input::Numbers(&[1, 2, 3])));
+    println!(
+        "len_input(Numbers): {}",
+        len_input(&Input::Numbers(&[1, 2, 3]))
+    );
 
     // ============================================================
     // 十三、内嵌函数（TS 不支持函数内的函数）
@@ -374,7 +388,7 @@ fn main() {
     // 注意：内嵌函数不能捕获外部变量（要用闭包）
     let factor = 3_i32;
     // fn cant_capture(y: i32) -> i32 { y * factor } // ❌ 编译错误
-    let can_capture = |y: i32| y * factor;             // ✅ 闭包才能捕获
+    let can_capture = |y: i32| y * factor; // ✅ 闭包才能捕获
     println!("闭包捕获: {}", can_capture(5));
 
     // ============================================================

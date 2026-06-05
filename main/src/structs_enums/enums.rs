@@ -7,13 +7,12 @@ enum Message {
 
 fn main() {
     let m1 = Message::Quit;
-    let m2 = Message::Move{x:1,y:1};
-    let m3 = Message::ChangeColor(255,255,0);
+    let m2 = Message::Move { x: 1, y: 1 };
+    let m3 = Message::ChangeColor(255, 255, 0);
 }
 
 //Rust 中 的 null Option 枚举变量来表述这种结果。
 //Rust 强制你在使用 Option<T> 之前先处理 None 的情况，这避免了 空指针错误（null pointer error）。
-
 
 fn get_username(id: u32) -> Option<String> {
     if id == 1 {
@@ -35,12 +34,11 @@ fn example_option() {
     // let username = Some("Olivia".to_string());
     // println!("{}", username.unwrap()); // Olivia
     // ✔ 推荐用 .expect() 提供错误信息
-// println!("{}", username.expect("Username not found!"));
+    // println!("{}", username.expect("Username not found!"));
 
     // 3️⃣ .unwrap_or() 提供默认值
     let username = None;
     println!("{}", username.unwrap_or("Guest".to_string())); // Guest
-
 
     fn first_char(s: Option<&str>) -> Option<char> {
         Some(s?.chars().next()?) // 如果 s 是 None，直接返回 None
@@ -48,7 +46,6 @@ fn example_option() {
 
     println!("{:?}", first_char(Some("hello"))); // Some('h')
     println!("{:?}", first_char(None)); // None
-
 }
 
 // 📘 TypeScript 对比

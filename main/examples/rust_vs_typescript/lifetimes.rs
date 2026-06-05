@@ -38,7 +38,11 @@
 // 'a 标注说明："返回值的生命周期至少和 a、b 中较短的那个一样长"
 fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
     // TS: function longest(a: string, b: string): string — 无需标注
-    if x.len() >= y.len() { x } else { y }
+    if x.len() >= y.len() {
+        x
+    } else {
+        y
+    }
 }
 
 // 如果不加 'a，编译器不知道返回的引用指向 x 还是 y，无法验证安全性
@@ -51,7 +55,7 @@ fn first_word(s: &str) -> &str {
     // TS: function firstWord(s: string): string
     match s.find(' ') {
         Some(i) => &s[..i],
-        None    => s,
+        None => s,
     }
 }
 
@@ -69,7 +73,7 @@ struct TextExtract<'a> {
 impl<'a> TextExtract<'a> {
     fn announce(&self, announcement: &str) -> &str {
         println!("公告: {announcement}");
-        self.part   // 返回 part，生命周期与 'a 绑定
+        self.part // 返回 part，生命周期与 'a 绑定
     }
 }
 
@@ -98,8 +102,12 @@ fn main() {
     // 规则3：有 &self 或 &mut self 时，输出生命周期=self 的生命周期
 
     // 以下函数都不需要手动标注（编译器自动推断）：
-    fn first(s: &str) -> &str { &s[..1] }         // 规则2：单参数
-    fn identity(x: &i32) -> &i32 { x }             // 规则2：单参数
+    fn first(s: &str) -> &str {
+        &s[..1]
+    } // 规则2：单参数
+    fn identity(x: &i32) -> &i32 {
+        x
+    } // 规则2：单参数
 
     let s = String::from("hello");
     println!("first: {}", first(&s));
@@ -115,7 +123,9 @@ fn main() {
         first_sentence = &novel[..i];
     }
 
-    let excerpt = TextExtract { part: first_sentence };
+    let excerpt = TextExtract {
+        part: first_sentence,
+    };
     let displayed = excerpt.announce("精彩片段：");
     println!("摘录: {displayed}");
 
@@ -124,12 +134,12 @@ fn main() {
     // TS: 字符串字面量永远存在，不需要考虑
     // Rust: 'static 表示整个程序运行期间都有效
     // ============================================================
-    let s: &'static str = "我会一直存在";  // 字符串字面量都是 'static
+    let s: &'static str = "我会一直存在"; // 字符串字面量都是 'static
     println!("{s}");
 
     // 函数返回 'static 引用（不依赖参数）
     fn always_valid() -> &'static str {
-        "永远有效的字符串"   // 字面量是 'static
+        "永远有效的字符串" // 字面量是 'static
     }
     println!("{}", always_valid());
 
@@ -137,16 +147,16 @@ fn main() {
     // 七、生命周期 + 泛型 + trait bound 组合
     // TS: 无需这么复杂，直接写泛型
     // ============================================================
-    fn longest_with_announce<'a, T>(
-        x: &'a str,
-        y: &'a str,
-        ann: T,
-    ) -> &'a str
+    fn longest_with_announce<'a, T>(x: &'a str, y: &'a str, ann: T) -> &'a str
     where
         T: std::fmt::Display,
     {
         println!("公告: {ann}");
-        if x.len() >= y.len() { x } else { y }
+        if x.len() >= y.len() {
+            x
+        } else {
+            y
+        }
     }
 
     let s1 = String::from("long string");

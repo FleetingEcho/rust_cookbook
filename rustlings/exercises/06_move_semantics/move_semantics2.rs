@@ -18,7 +18,7 @@ mod tests {
     // fix the compiler error in the test.
     #[test]
     fn move_semantics2() {
-        let vec0 : Vec<i32>= vec![22, 44, 66];
+        let vec0: Vec<i32> = vec![22, 44, 66];
 
         let vec1 = fill_vec(vec0.clone());
 

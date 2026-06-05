@@ -38,7 +38,7 @@ fn demonstrate_pattern_matching() {
 
     let x = 'c';
     match x {
-        'a'..='j' => println!("Early ASCII letter"),//✅
+        'a'..='j' => println!("Early ASCII letter"), //✅
         'k'..='z' => println!("Late ASCII letter"),
         _ => println!("Something else"),
     }
@@ -46,11 +46,11 @@ fn demonstrate_pattern_matching() {
     // Struct destructuring
     let p = Point { x: 0, y: 7 };
     let Point { x: a, y: b } = p;
-    println!("Destructured Point: a = {}, b = {}", a, b);//✅Destructured Point: a = 0, b = 7
+    println!("Destructured Point: a = {}, b = {}", a, b); //✅Destructured Point: a = 0, b = 7
 
     match p {
         Point { x, y: 0 } => println!("On the x-axis at {}", x),
-        Point { x: 0, y } => println!("On the y-axis at {}", y),//✅
+        Point { x: 0, y } => println!("On the y-axis at {}", y), //✅
         Point { x, y } => println!("On neither axis: ({}, {})", x, y),
     }
 
@@ -59,13 +59,12 @@ fn demonstrate_pattern_matching() {
 
     match msg {
         Message::Quit => println!("The Quit variant has no data to destructure."),
-        Message::Move { x, y } => println!(
-            "Move in the x direction {} and in the y direction {}",
-            x, y
-        ),
+        Message::Move { x, y } => {
+            println!("Move in the x direction {} and in the y direction {}", x, y)
+        }
         Message::Write(text) => println!("Text message: {}", text),
         Message::ChangeColor(Color::Rgb(r, g, b)) => {
-            println!("Change the color to RGB({}, {}, {})", r, g, b)//Change the color to RGB(255, 160, 255)
+            println!("Change the color to RGB({}, {}, {})", r, g, b) //Change the color to RGB(255, 160, 255)
         }
         Message::ChangeColor(Color::Hsv(h, s, v)) => {
             println!("Change the color to HSV({}, {}, {})", h, s, v)
@@ -75,23 +74,23 @@ fn demonstrate_pattern_matching() {
     // Nested destructuring of structs and tuples
     let ((feet, inches), Point { x, y }) = ((3, 10), Point { x: 3, y: -10 });
     println!(
-        "Nested destructuring: feet = {}, inches = {}, x = {}, y = {}",//Nested destructuring: feet = 3, inches = 10, x = 3, y = -10
+        "Nested destructuring: feet = {}, inches = {}, x = {}, y = {}", //Nested destructuring: feet = 3, inches = 10, x = 3, y = -10
         feet, inches, x, y
     );
 
     // Array destructuring
     let arr: [u16; 2] = [114, 514];
     let [x, y] = arr;
-    println!("Array destructuring: x = {}, y = {}", x, y);//Array destructuring: x = 114, y = 514
+    println!("Array destructuring: x = {}, y = {}", x, y); //Array destructuring: x = 114, y = 514
 
     let arr: &[u16] = &[114, 514];
 
     if let [x, ..] = arr {
-        println!("First element in the slice: {:?}", x);//First element in the slice: 114
+        println!("First element in the slice: {:?}", x); //First element in the slice: 114
     }
 
     if let &[.., y] = arr {
-        println!("Last element in the slice: {:?}", y);//Last element in the slice: 514
+        println!("Last element in the slice: {:?}", y); //Last element in the slice: 514
     }
 
     let arr: &[u16] = &[];
@@ -105,22 +104,21 @@ pub fn test() {
     demonstrate_pattern_matching2();
 }
 
-
 fn demonstrate_pattern_matching2() {
-  #[derive(Debug)]
-  struct Point {
-      x: i32,
-      y: i32,
-      z: i32,
-  }
+    #[derive(Debug)]
+    struct Point {
+        x: i32,
+        y: i32,
+        z: i32,
+    }
 
-  enum Message {
-      Hello { id: i32 },
-  }
+    enum Message {
+        Hello { id: i32 },
+    }
 
     // 1. 忽略函数参数中的某些值
     fn foo(_: i32, y: i32) {
-        println!("这个代码只使用了 y 参数: {}", y);// y 参数: 4
+        println!("这个代码只使用了 y 参数: {}", y); // y 参数: 4
     }
     foo(3, 4);
 
@@ -136,13 +134,13 @@ fn demonstrate_pattern_matching2() {
             setting_value = new_setting_value;
         }
     }
-    println!("当前设置值: {:?}", setting_value);//当前设置值: Some(5)
+    println!("当前设置值: {:?}", setting_value); //当前设置值: Some(5)
 
     // 3. 忽略元组中的特定元素
     let numbers = (2, 4, 8, 16, 32);
     match numbers {
         (first, _, third, _, fifth) => {
-            println!("选取的数字: {}, {}, {}", first, third, fifth);//选取的数字: 2, 8, 32
+            println!("选取的数字: {}, {}, {}", first, third, fifth); //选取的数字: 2, 8, 32
         }
     }
 
@@ -154,13 +152,13 @@ fn demonstrate_pattern_matching2() {
     // 5. 使用 `..` 忽略结构体的剩余字段
     let origin = Point { x: 0, y: 0, z: 0 };
     match origin {
-        Point { x, .. } => println!("x 的值是 {}", x),//0
+        Point { x, .. } => println!("x 的值是 {}", x), //0
     }
 
     // 6. 使用 `..` 忽略元组中间的元素
     match numbers {
         (first, .., last) => {
-            println!("选取的数字: {}, {}", first, last);//选取的数字: 2, 32
+            println!("选取的数字: {}, {}", first, last); //选取的数字: 2, 32
         }
     }
 
@@ -183,8 +181,10 @@ fn demonstrate_pattern_matching2() {
     // 9. 使用 `@` 绑定变量，同时匹配范围
     let msg = Message::Hello { id: 5 };
     match msg {
-        Message::Hello { id: id_variable @ 3..=7 } => {
-            println!("找到一个在范围内的 id: {}", id_variable);//找到一个在范围内的 id: 5
+        Message::Hello {
+            id: id_variable @ 3..=7,
+        } => {
+            println!("找到一个在范围内的 id: {}", id_variable); //找到一个在范围内的 id: 5
         }
         Message::Hello { id: 10..=12 } => {
             println!("找到另一个范围内的 id");
@@ -196,8 +196,8 @@ fn demonstrate_pattern_matching2() {
 
     // 10. 绑定并解构结构体
     let p @ Point { x: px, y: py, z: _ } = Point { x: 10, y: 23, z: 0 };
-    println!("x: {}, y: {}", px, py);//x: 10, y: 23
-    println!("{:?}", p);//Point { x: 10, y: 23, z: 0 }
+    println!("x: {}, y: {}", px, py); //x: 10, y: 23
+    println!("{:?}", p); //Point { x: 10, y: 23, z: 0 }
 
     let point = Point { x: 10, y: 5, z: 0 };
     if let p @ Point { x: 10, y, .. } = point {
@@ -219,7 +219,7 @@ fn demonstrate_pattern_matching2() {
 // 📘 TypeScript 对比
 // ====================
 // Rust 的模式匹配覆盖了 TS 没有的很多能力：
-// 
+//
 // | 模式类型 | Rust | TypeScript |
 // |---------|------|-----------|
 // | 字面量匹配 | `match x { 1 => ... }` | `switch(x) { case 1: ... }` |
@@ -230,6 +230,5 @@ fn demonstrate_pattern_matching2() {
 // | 守卫 | `n if n > 0 =>` | `if` 守卫 |
 // | 通配 | `_ =>` | `default:` |
 // | 引用模式 | `ref x =>` / `ref mut x =>` | ❌ |
-// 
+//
 // 详细对照 → rust_vs_typescript.rs §5
-

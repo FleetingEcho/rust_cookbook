@@ -35,28 +35,28 @@ impl Default for Person {
 // 6. If parsing the age fails, return the default of `Person`.
 impl From<&str> for Person {
     fn from(s: &str) -> Self {
-                // 1. 按逗号分割字符串
+        // 1. 按逗号分割字符串
         let parts: Vec<&str> = s.split(',').collect();
-        
+
         // 2. 如果分割后不是恰好2个元素，返回默认值
         if parts.len() != 2 {
             return Person::default();
         }
-        
+
         let name = parts[0];
         let age_str = parts[1];
-        
+
         // 3. 如果名字为空，返回默认值
         if name.is_empty() {
             return Person::default();
         }
-        
+
         // 4. 解析年龄为 u8，如果失败则返回默认值
         let age = match age_str.parse::<u8>() {
             Ok(a) => a,
             Err(_) => return Person::default(),
         };
-        
+
         // 5. 成功创建 Person
         Person {
             name: name.to_string(),

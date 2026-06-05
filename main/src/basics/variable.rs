@@ -3,18 +3,17 @@ fn main() {
 }
 
 pub fn const_test(name: &str) {
-   let mut x = name;// 可变
+    let mut x = name; // 可变
     println!("The value of x is: {}", x);
-    x = "test";// 数据类型不可变
+    x = "test"; // 数据类型不可变
     println!("The value of x is: {}", x);
     destructuring_assignment();
     my_const();
     variable_shadowing()
 }
 
-
 struct Struct {
-    e: i32
+    e: i32,
 }
 
 fn destructuring_assignment() {
@@ -28,9 +27,8 @@ fn destructuring_assignment() {
 
 const MAX_POINTS: u32 = 100_000;
 
-
-fn my_const(){
-  println!("const_value={}",MAX_POINTS)
+fn my_const() {
+    println!("const_value={}", MAX_POINTS)
 }
 
 fn variable_shadowing() {
@@ -42,7 +40,6 @@ fn variable_shadowing() {
     }
     println!("The value of x is: {}", x);
 }
-
 
 /*
 变量遮蔽  两个都会存在

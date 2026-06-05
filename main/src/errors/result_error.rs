@@ -1,6 +1,5 @@
 //Result<T, E> 用于可恢复错误，panic! 用于不可恢复错误
 
-
 /*
 Panic
 
@@ -17,7 +16,6 @@ panic = 'abort'
 尽量不要在 main 线程中做太多任务，将这些任务交由子线程去做，就算子线程 panic 也不会导致整个程序的结束。
 
 */
-
 
 /*
 因为 panic 的触发方式比错误处理要简单，因此可以让代码更清晰，可读性也更加好，当我们的代码注定是正确时，你可以用 unwrap 等方法直接进行处理，反正也不可能 panic ：
@@ -36,8 +34,6 @@ let home: IpAddr = "127.0.0.1".parse().unwrap();
 内存安全的问题
 
 */
-
-
 
 //可恢复的错误 Result
 
@@ -86,8 +82,6 @@ fn main() {
 
 */
 
-
-
 //错误传播
 use std::fs::File;
 use std::io::{self, Read};
@@ -113,7 +107,6 @@ fn read_username_v1() -> Result<String, io::Error> {
     }
 }
 
-
 //其实不如这种方便
 fn open_file() -> Result<File, Box<dyn std::error::Error>> {
     let mut f = File::open("hello.txt")?;
@@ -130,11 +123,10 @@ fn read_username_v2() -> Result<String, io::Error> {
 // ? 不仅仅可以用于 Result 的传播，还能用于 Option 的传播
 // Result 通过 ? 返回错误，那么 Option 就通过 ? 返回 None：
 
-
 fn first(arr: &[i32]) -> Option<&i32> {
-   arr.get(0)
+    arr.get(0)
 }
-/*  
+/*
 
 会编译错误
 fn first(arr: &[i32]) -> Option<&i32> {

@@ -29,16 +29,18 @@ fn main() {
     // 一、两种字符串类型
     // TS 只有一种 string；Rust 有 &str 和 String，这是最大区别
     // ============================================================
-    let s1: &str    = "hello";              // &str：字符串切片，不可变，编译期已知，存在程序段
-    let s2: String  = String::from("world"); // String：堆分配，可增长，可变
-    let s3: String  = s1.to_string();       // &str → String（类似 TS 中的复制）
-    let s4: &str    = &s2;                  // String → &str（借用，不拷贝数据）
+    let s1: &str = "hello"; // &str：字符串切片，不可变，编译期已知，存在程序段
+    let s2: String = String::from("world"); // String：堆分配，可增长，可变
+    let s3: String = s1.to_string(); // &str → String（类似 TS 中的复制）
+    let s4: &str = &s2; // String → &str（借用，不拷贝数据）
     println!("&str: {s1}, String: {s2}, 转换: {s3}, 借用: {s4}");
 
     // 函数参数推荐接收 &str，而不是 &String，更灵活
-    fn print_str(s: &str) { println!("收到: {s}"); }
-    print_str("字面量");      // &str 直接传
-    print_str(&s2);           // String 自动解引用为 &str
+    fn print_str(s: &str) {
+        println!("收到: {s}");
+    }
+    print_str("字面量"); // &str 直接传
+    print_str(&s2); // String 自动解引用为 &str
 
     // ============================================================
     // 二、字符串拼接
@@ -62,7 +64,7 @@ fn main() {
     // TS 的 s.length 是 UTF-16 代码单元数
     // ============================================================
     let s = "hello 世界";
-    println!("字节长度 len(): {}", s.len());          // 12（汉字各占3字节）
+    println!("字节长度 len(): {}", s.len()); // 12（汉字各占3字节）
     println!("字符数 chars().count(): {}", s.chars().count()); // 8（真正的字符数）
 
     // ============================================================
@@ -76,9 +78,9 @@ fn main() {
     // 五、查找与检测
     // ============================================================
     let text = "hello rust programming";
-    println!("contains: {}", text.contains("rust"));       // TS: includes()
+    println!("contains: {}", text.contains("rust")); // TS: includes()
     println!("starts_with: {}", text.starts_with("hello")); // TS: startsWith()
-    println!("ends_with: {}", text.ends_with("ing"));       // TS: endsWith()
+    println!("ends_with: {}", text.ends_with("ing")); // TS: endsWith()
 
     // find 返回 Option<usize>，TS 的 indexOf 返回 -1 表示未找到
     match text.find("rust") {
@@ -94,7 +96,7 @@ fn main() {
     // 注意：Rust 切片按字节索引，中文字符必须在正确边界切割！
     // ============================================================
     let ascii = "hello world";
-    let sliced = &ascii[0..5];       // TS: ascii.slice(0, 5)
+    let sliced = &ascii[0..5]; // TS: ascii.slice(0, 5)
     println!("切片: {sliced}");
 
     // 中文切片需要小心字节边界
@@ -113,7 +115,7 @@ fn main() {
     // ============================================================
     let sentence = "foo bar foo baz foo";
     println!("replace 第一个: {}", sentence.replacen("foo", "qux", 1)); // TS: replace()
-    println!("replace 全部: {}", sentence.replace("foo", "qux"));        // TS: replaceAll()
+    println!("replace 全部: {}", sentence.replace("foo", "qux")); // TS: replaceAll()
 
     // ============================================================
     // 八、分割
@@ -138,7 +140,7 @@ fn main() {
     let padded = "  hello  ";
     println!("trim: '{}'", padded.trim());
     println!("trim_start: '{}'", padded.trim_start()); // TS: trimStart()
-    println!("trim_end: '{}'", padded.trim_end());     // TS: trimEnd()
+    println!("trim_end: '{}'", padded.trim_end()); // TS: trimEnd()
 
     // ============================================================
     // 十、重复
@@ -156,7 +158,7 @@ fn main() {
 
     // 按字节迭代（底层）
     for byte in "abc".bytes() {
-        print!("{byte} ");  // 97 98 99
+        print!("{byte} "); // 97 98 99
     }
     println!();
 
@@ -164,14 +166,14 @@ fn main() {
     // 十二、数字 ↔ 字符串
     // TS: parseInt / parseFloat / String() / toFixed()
     // ============================================================
-    let num: i32  = "42".parse().unwrap();       // TS: parseInt("42")
-    let flt: f64  = "3.14".parse().unwrap();     // TS: parseFloat("3.14")
+    let num: i32 = "42".parse().unwrap(); // TS: parseInt("42")
+    let flt: f64 = "3.14".parse().unwrap(); // TS: parseFloat("3.14")
     println!("解析: {num}, {flt}");
 
-    let to_str   = 42.to_string();               // TS: String(42) 或 (42).toString()
-    let fixed    = format!("{:.2}", 3.14159);    // TS: (3.14159).toFixed(2)
-    let padded_n = format!("{:>8}", "hi");       // 右对齐填充，TS 需要 padStart()
-    let zero_pad = format!("{:0>5}", 42);        // "00042"，TS: String(42).padStart(5, "0")
+    let to_str = 42.to_string(); // TS: String(42) 或 (42).toString()
+    let fixed = format!("{:.2}", 3.14159); // TS: (3.14159).toFixed(2)
+    let padded_n = format!("{:>8}", "hi"); // 右对齐填充，TS 需要 padStart()
+    let zero_pad = format!("{:0>5}", 42); // "00042"，TS: String(42).padStart(5, "0")
     println!("to_string: {to_str}, toFixed: {fixed}");
     println!("padStart: '{padded_n}', zeroPad: {zero_pad}");
 

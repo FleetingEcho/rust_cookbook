@@ -53,7 +53,6 @@ fn get_count_item(s: &str) -> (u64, &str) {
     (count, item)
 }
 
-
 // 使用标准库的 Result<T, E>（std::result::Result 已通过 prelude 自动引入）
 
 fn example_divide() {
@@ -69,13 +68,11 @@ fn example_divide() {
 
     let result = divide(10.0, 2.0);
     println!("直接获取结果: {}", result.unwrap()); // 5.0
-    //⚠ 注意：如果 result 是 Err，unwrap() 会触发 panic!，导致程序崩溃。
+                                                   //⚠ 注意：如果 result 是 Err，unwrap() 会触发 panic!，导致程序崩溃。
     if let Ok(value) = divide(10.0, 2.0) {
         println!("运算成功，值为 {}", value);
     }
 }
-
-
 
 fn divide(x: f64, y: f64) -> Result<f64, String> {
     if y == 0.0 {
@@ -96,12 +93,10 @@ fn example_divide_and_print() {
     let _ = divide_and_print(10.0, 0.0);
 }
 
-
-
 // OR use map
 fn example_divide_map() {
-  let result = divide(10.0, 2.0);
-  result.map(|val| println!("成功的值: {}", val));
+    let result = divide(10.0, 2.0);
+    result.map(|val| println!("成功的值: {}", val));
 }
 //如果 result 是 Ok(val)，则 map() 执行闭包，否则什么都不做。
 
@@ -118,5 +113,3 @@ fn example_divide_map() {
 // | 匹配守卫 | `n if n > 0 =>` | `if (n > 0)` |
 //
 // 详细对照 → rust_vs_typescript.rs §5 "枚举与模式匹配"
-
-

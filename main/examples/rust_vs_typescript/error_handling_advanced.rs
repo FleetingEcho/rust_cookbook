@@ -47,28 +47,34 @@ use std::num::ParseIntError;
 #[derive(Debug)]
 enum AppError {
     // 每个变体携带相关信息
-    NotFound { resource: String, id: u32 },
-    ParseError(ParseIntError),            // 包装标准库错误
-    Network { url: String, status: u16 },
+    NotFound {
+        resource: String,
+        id: u32,
+    },
+    ParseError(ParseIntError), // 包装标准库错误
+    Network {
+        url: String,
+        status: u16,
+    },
     InvalidInput(String),
     // 组合多种原因（类似 TS 的 cause）
-    Internal { message: String, source: Box<dyn std::error::Error> },
+    Internal {
+        message: String,
+        source: Box<dyn std::error::Error>,
+    },
 }
 
 // 实现 Display（让错误可以被 println! 打印，类似 TS 的 error.message）
 impl fmt::Display for AppError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            AppError::NotFound { resource, id } =>
-                write!(f, "未找到 {resource}（id={id}）"),
-            AppError::ParseError(e) =>
-                write!(f, "解析错误: {e}"),
-            AppError::Network { url, status } =>
-                write!(f, "网络错误 {status}: {url}"),
-            AppError::InvalidInput(msg) =>
-                write!(f, "无效输入: {msg}"),
-            AppError::Internal { message, source } =>
-                write!(f, "内部错误: {message}（原因: {source}）"),
+            AppError::NotFound { resource, id } => write!(f, "未找到 {resource}（id={id}）"),
+            AppError::ParseError(e) => write!(f, "解析错误: {e}"),
+            AppError::Network { url, status } => write!(f, "网络错误 {status}: {url}"),
+            AppError::InvalidInput(msg) => write!(f, "无效输入: {msg}"),
+            AppError::Internal { message, source } => {
+                write!(f, "内部错误: {message}（原因: {source}）")
+            }
         }
     }
 }
@@ -92,14 +98,14 @@ impl std::error::Error for AppError {
 // ============================================================
 impl From<ParseIntError> for AppError {
     fn from(e: ParseIntError) -> Self {
-        AppError::ParseError(e)  // 自动把 ParseIntError 包装成 AppError
+        AppError::ParseError(e) // 自动把 ParseIntError 包装成 AppError
     }
 }
 
 // 有了 From<ParseIntError>，? 运算符可以自动转换：
 // "abc".parse::<i32>()? 在返回 Result<_, AppError> 的函数里可以用
 fn parse_user_id(s: &str) -> Result<u32, AppError> {
-    let id = s.parse::<u32>()?;  // ParseIntError 自动转换为 AppError::ParseError
+    let id = s.parse::<u32>()?; // ParseIntError 自动转换为 AppError::ParseError
     if id == 0 {
         return Err(AppError::InvalidInput("ID 不能为 0".to_string()));
     }
@@ -111,18 +117,21 @@ fn parse_user_id(s: &str) -> Result<u32, AppError> {
 // TS: try { ... } catch (e) { throw new AppError(..., e); }
 // ============================================================
 fn find_user(id_str: &str) -> Result<String, AppError> {
-    let id = parse_user_id(id_str)?;  // 失败则立即返回错误
+    let id = parse_user_id(id_str)?; // 失败则立即返回错误
 
     // 模拟数据库查询
     match id {
         1 => Ok(String::from("Alice")),
         2 => Ok(String::from("Bob")),
-        _ => Err(AppError::NotFound { resource: "用户".to_string(), id }),
+        _ => Err(AppError::NotFound {
+            resource: "用户".to_string(),
+            id,
+        }),
     }
 }
 
 fn greet_user(id_str: &str) -> Result<String, AppError> {
-    let name = find_user(id_str)?;      // 链式传播
+    let name = find_user(id_str)?; // 链式传播
     Ok(format!("你好，{name}！"))
 }
 
@@ -145,23 +154,25 @@ fn flexible_parse(s: &str) -> Result<i64, Box<dyn std::error::Error>> {
 fn demonstrate_combinators() {
     // map_err：转换错误类型
     // TS: .catch(e => new AppError(e.message))
-    let result: Result<i32, String> = "42"
-        .parse::<i32>()
-        .map_err(|e| format!("解析失败: {e}"));
+    let result: Result<i32, String> = "42".parse::<i32>().map_err(|e| format!("解析失败: {e}"));
     println!("map_err: {:?}", result);
 
     // and_then：成功后继续操作
     // TS: .then(n => validate(n))
-    let validated: Result<i32, String> = "10"
-        .parse::<i32>()
-        .map_err(|e| e.to_string())
-        .and_then(|n| {
-            if n > 0 { Ok(n) } else { Err("必须是正数".to_string()) }
-        });
+    let validated: Result<i32, String> =
+        "10".parse::<i32>()
+            .map_err(|e| e.to_string())
+            .and_then(|n| {
+                if n > 0 {
+                    Ok(n)
+                } else {
+                    Err("必须是正数".to_string())
+                }
+            });
     println!("and_then: {:?}", validated);
 
     // unwrap_or / unwrap_or_else / unwrap_or_default
-    let val = "bad".parse::<i32>().unwrap_or(0);         // TS: || 0
+    let val = "bad".parse::<i32>().unwrap_or(0); // TS: || 0
     let val2 = "bad".parse::<i32>().unwrap_or_else(|e| {
         eprintln!("解析失败: {e}");
         -1
@@ -169,7 +180,7 @@ fn demonstrate_combinators() {
     println!("unwrap_or: {val}, unwrap_or_else: {val2}");
 
     // ok() / err()：Result ↔ Option 互转
-    let opt: Option<i32> = "42".parse::<i32>().ok();     // Ok → Some, Err → None
+    let opt: Option<i32> = "42".parse::<i32>().ok(); // Ok → Some, Err → None
     println!("ok(): {:?}", opt);
 
     // flatten：Option<Option<T>> 或 Result<Result<T, E>, E> → 展平
@@ -190,20 +201,20 @@ fn demonstrate_combinators() {
 fn main() {
     // 成功情况
     match greet_user("1") {
-        Ok(msg)  => println!("{msg}"),
-        Err(e)   => println!("错误: {e}"),
+        Ok(msg) => println!("{msg}"),
+        Err(e) => println!("错误: {e}"),
     }
 
     // 各种错误情况
     let test_cases = vec!["abc", "0", "99", "2"];
     for s in test_cases {
         match greet_user(s) {
-            Ok(msg)  => println!("✅ {msg}"),
+            Ok(msg) => println!("✅ {msg}"),
             Err(ref e) => {
                 println!("❌ {e}");
                 // 可以检查具体错误类型（TS: instanceof 检查）
                 match e {
-                    AppError::ParseError(_)   => println!("  → 是解析错误"),
+                    AppError::ParseError(_) => println!("  → 是解析错误"),
                     AppError::InvalidInput(_) => println!("  → 是无效输入"),
                     AppError::NotFound { .. } => println!("  → 是未找到错误"),
                     _ => {}
@@ -217,7 +228,7 @@ fn main() {
 
     // Box<dyn Error> 灵活处理
     match flexible_parse("  21  ") {
-        Ok(n)  => println!("flexible: {n}"),
+        Ok(n) => println!("flexible: {n}"),
         Err(e) => println!("flexible 错误: {e}"),
     }
 

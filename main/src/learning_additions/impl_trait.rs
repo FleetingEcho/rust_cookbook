@@ -67,7 +67,7 @@ impl Shape for Square {
 pub fn make_shape(kind: &str) -> Box<dyn Shape> {
     match kind {
         "circle" => Box::new(Circle { radius: 3.0 }),
-        _         => Box::new(Square { side: 4.0 }),
+        _ => Box::new(Square { side: 4.0 }),
     }
 }
 

@@ -35,38 +35,58 @@ fn main() {
     println!("=== Box<T> ===");
 
     // 基本用法：把值放到堆上
-    let b = Box::new(5_i32);  // TS: const b = 5（JS 数字在堆或栈，无需关心）
-    println!("b = {b}");      // Box 自动解引用，直接用值
+    let b = Box::new(5_i32); // TS: const b = 5（JS 数字在堆或栈，无需关心）
+    println!("b = {b}"); // Box 自动解引用，直接用值
 
     // Box 的主要用途1：递归类型（编译器需要知道大小，直接递归无法确定大小）
     // TS: 链表节点直接用对象，GC 处理
     #[derive(Debug)]
     enum List {
-        Cons(i32, Box<List>),  // Box 打断无限大小的递归
+        Cons(i32, Box<List>), // Box 打断无限大小的递归
         Nil,
     }
 
-    let list = List::Cons(1,
-        Box::new(List::Cons(2,
-            Box::new(List::Cons(3,
-                Box::new(List::Nil))))));
+    let list = List::Cons(
+        1,
+        Box::new(List::Cons(2, Box::new(List::Cons(3, Box::new(List::Nil))))),
+    );
     println!("链表: {:?}", list);
 
     // Box 的主要用途2：trait 对象（动态分发）
     // TS: 接口类型变量
-    trait Draw { fn draw(&self); }
-    struct Button { label: String }
-    struct Image  { src: String }
+    trait Draw {
+        fn draw(&self);
+    }
+    struct Button {
+        label: String,
+    }
+    struct Image {
+        src: String,
+    }
 
-    impl Draw for Button { fn draw(&self) { println!("按钮: {}", self.label); } }
-    impl Draw for Image  { fn draw(&self) { println!("图片: {}", self.src); } }
+    impl Draw for Button {
+        fn draw(&self) {
+            println!("按钮: {}", self.label);
+        }
+    }
+    impl Draw for Image {
+        fn draw(&self) {
+            println!("图片: {}", self.src);
+        }
+    }
 
     // TS: Draw[] — 可以放不同类型
     let widgets: Vec<Box<dyn Draw>> = vec![
-        Box::new(Button { label: String::from("确定") }),
-        Box::new(Image  { src: String::from("logo.png") }),
+        Box::new(Button {
+            label: String::from("确定"),
+        }),
+        Box::new(Image {
+            src: String::from("logo.png"),
+        }),
     ];
-    for w in &widgets { w.draw(); }
+    for w in &widgets {
+        w.draw();
+    }
 
     // ============================================================
     // 二、Rc<T>：引用计数（单线程共享所有权）
@@ -76,17 +96,17 @@ fn main() {
     println!("\n=== Rc<T> ===");
 
     let a = Rc::new(String::from("共享字符串"));
-    println!("引用计数: {}", Rc::strong_count(&a));  // 1
+    println!("引用计数: {}", Rc::strong_count(&a)); // 1
 
-    let b = Rc::clone(&a);  // 增加引用计数（不是深拷贝）
-    println!("clone 后引用计数: {}", Rc::strong_count(&a));  // 2
+    let b = Rc::clone(&a); // 增加引用计数（不是深拷贝）
+    println!("clone 后引用计数: {}", Rc::strong_count(&a)); // 2
 
     {
         let c = Rc::clone(&a);
-        println!("再 clone 后: {}", Rc::strong_count(&a));  // 3
-        println!("a={a}, b={b}, c={c}");  // 三者都指向同一数据
-    }   // c 离开作用域，引用计数 -1
-    println!("c 离开后: {}", Rc::strong_count(&a));  // 2
+        println!("再 clone 后: {}", Rc::strong_count(&a)); // 3
+        println!("a={a}, b={b}, c={c}"); // 三者都指向同一数据
+    } // c 离开作用域，引用计数 -1
+    println!("c 离开后: {}", Rc::strong_count(&a)); // 2
 
     // Rc 是不可变共享，如果需要修改，需要配合 RefCell
 
@@ -101,17 +121,17 @@ fn main() {
 
     // borrow()：不可变借用（运行时检查，违规会 panic）
     {
-        let r = data.borrow();  // 类似 &
+        let r = data.borrow(); // 类似 &
         println!("读取: {:?}", *r);
-    }   // 不可变借用结束
+    } // 不可变借用结束
 
     // borrow_mut()：可变借用
     {
-        let mut w = data.borrow_mut();  // 类似 &mut
+        let mut w = data.borrow_mut(); // 类似 &mut
         w.push(4);
-    }   // 可变借用结束
+    } // 可变借用结束
 
-    println!("修改后: {:?}", data.borrow());  // [1, 2, 3, 4]
+    println!("修改后: {:?}", data.borrow()); // [1, 2, 3, 4]
 
     // ============================================================
     // 四、Rc<RefCell<T>>：共享可变数据（单线程经典组合）
@@ -129,7 +149,7 @@ fn main() {
     *counter_a.borrow_mut() += 10;
     *counter_b.borrow_mut() += 20;
 
-    println!("共享计数器: {}", shared_counter.borrow());  // 30
+    println!("共享计数器: {}", shared_counter.borrow()); // 30
 
     // ============================================================
     // 五、Arc<T>：原子引用计数（多线程安全的 Rc）
@@ -162,14 +182,16 @@ fn main() {
     for _ in 0..5 {
         let c = Arc::clone(&counter);
         let h = std::thread::spawn(move || {
-            let mut num = c.lock().unwrap();  // 获取锁
+            let mut num = c.lock().unwrap(); // 获取锁
             *num += 1;
-        });   // 锁在这里自动释放（RAII）
+        }); // 锁在这里自动释放（RAII）
         handles.push(h);
     }
 
-    for h in handles { h.join().unwrap(); }
-    println!("5个线程各+1后: {}", counter.lock().unwrap());  // 5
+    for h in handles {
+        h.join().unwrap();
+    }
+    println!("5个线程各+1后: {}", counter.lock().unwrap()); // 5
 
     // ============================================================
     // 七、智能指针总结

@@ -1,9 +1,8 @@
 // 我们称 array 为数组，Vector 为动态数组。
-pub fn array_test(){
-  let a: [i32; 5] = [1, 2, 3, 4, 5];
+pub fn array_test() {
+    let a: [i32; 5] = [1, 2, 3, 4, 5];
 
-let a = [3; 5];// 类似 length 5
-
+    let a = [3; 5]; // 类似 length 5
 }
 
 /*
@@ -21,73 +20,69 @@ let array = [value; n];
 
 */
 
-fn example_string_array(){
-  // ⛔ [String::from("rust is good!"); 8] 无法编译，String 不是 Copy 类型
-  // let array = [String::from("rust is good!"); 8];
+fn example_string_array() {
+    // ⛔ [String::from("rust is good!"); 8] 无法编译，String 不是 Copy 类型
+    // let array = [String::from("rust is good!"); 8];
 
-  // ✅ 方案 1：用 vec![]
-  let array = vec![String::from("rust is good!"); 8];
-  println!("{:#?}", array);
+    // ✅ 方案 1：用 vec![]
+    let array = vec![String::from("rust is good!"); 8];
+    println!("{:#?}", array);
 
-  // ⛔ [expr; N] 同样需要 Copy — 下面写法无法编译:
-  // let array2 = [String::from("rust is good!"); 8].map(|s| s.clone());
-  // ✅ 方案 2：用 from_fn 构造数组再 map
-  let array2 = std::array::from_fn::<String, 8, _>(|_| String::from("rust is good!"));
-  println!("{:#?}", array2);
-
+    // ⛔ [expr; N] 同样需要 Copy — 下面写法无法编译:
+    // let array2 = [String::from("rust is good!"); 8].map(|s| s.clone());
+    // ✅ 方案 2：用 from_fn 构造数组再 map
+    let array2 = std::array::from_fn::<String, 8, _>(|_| String::from("rust is good!"));
+    println!("{:#?}", array2);
 }
-
 
 fn example_array_2d() {
-  // 编译器自动推导出one的类型
-  let one             = [1, 2, 3];
-  // 显式类型标注
-  let two: [u8; 3]    = [1, 2, 3];
-  let blank1          = [0; 3];
-  let blank2: [u8; 3] = [0; 3];
+    // 编译器自动推导出one的类型
+    let one = [1, 2, 3];
+    // 显式类型标注
+    let two: [u8; 3] = [1, 2, 3];
+    let blank1 = [0; 3];
+    let blank2: [u8; 3] = [0; 3];
 
-  // arrays是一个二维数组，其中每一个元素都是一个数组，元素类型是[u8; 3]
-  let arrays: [[u8; 3]; 4]  = [one, two, blank1, blank2];
+    // arrays是一个二维数组，其中每一个元素都是一个数组，元素类型是[u8; 3]
+    let arrays: [[u8; 3]; 4] = [one, two, blank1, blank2];
 
-  // 借用arrays的元素用作循环中
-  for a in &arrays {// 如果写 arrays就变成了，`a` 试图接管 `arrays` 内元素的所有权
-    // Rust 会尝试移动 arrays 的每个元素，但 arrays 是栈上固定大小的数组，Rust 不会自动克隆。所以，你需要借用它，而不是移动它。
-    // 这里的 `&` 表示借用 `arrays`，不会移动它的元素
-    // // `a` 变成 `[u8; 3]`，意味着 `arrays` 里的元素被移动
-// ✅ 牢记：在固定大小数组 [T; N] 上使用 for，必须 &借用！ 🚀
+    // 借用arrays的元素用作循环中
+    for a in &arrays {
+        // 如果写 arrays就变成了，`a` 试图接管 `arrays` 内元素的所有权
+        // Rust 会尝试移动 arrays 的每个元素，但 arrays 是栈上固定大小的数组，Rust 不会自动克隆。所以，你需要借用它，而不是移动它。
+        // 这里的 `&` 表示借用 `arrays`，不会移动它的元素
+        // // `a` 变成 `[u8; 3]`，意味着 `arrays` 里的元素被移动
+        // ✅ 牢记：在固定大小数组 [T; N] 上使用 for，必须 &借用！ 🚀
 
-    print!("{:?}: ", a);
-    // 将a变成一个迭代器，用于循环
-    // 你也可以直接用for n in a {}来进行循环
-    for n in a.iter() {
-      print!("\t{} + 10 = {}", n, n+10);
+        print!("{:?}: ", a);
+        // 将a变成一个迭代器，用于循环
+        // 你也可以直接用for n in a {}来进行循环
+        for n in a.iter() {
+            print!("\t{} + 10 = {}", n, n + 10);
+        }
+
+        let mut sum = 0;
+        // 0..a.len,是一个 Rust 的语法糖，其实就等于一个数组，元素是从0,1,2一直增加到到a.len-1
+        for i in 0..a.len() {
+            sum += a[i];
+        }
+        println!("\t({:?} = {})", a, sum);
     }
 
-    let mut sum = 0;
-    // 0..a.len,是一个 Rust 的语法糖，其实就等于一个数组，元素是从0,1,2一直增加到到a.len-1
-    for i in 0..a.len() {
-      sum += a[i];
+    // vec不需要借用
+    let arrays = vec![vec![1, 2, 3], vec![4, 5, 6]];
+
+    for a in arrays {
+        // Vec<T> 默认会借用，除非 `into_iter()`
+        print!("{:?}: ", a);
     }
-    println!("\t({:?} = {})", a, sum);
-  }
-
-  // vec不需要借用
-  let arrays = vec![
-    vec![1, 2, 3],
-    vec![4, 5, 6]
-];
-
-for a in arrays { // Vec<T> 默认会借用，除非 `into_iter()`
-    print!("{:?}: ", a);
 }
-
-}
-
 
 fn example_array_iter() {
     let a = [1, 2, 3];
 
-    for n in &a {  // ✅ 这里 `&a` 让 `n` 变成 `&i32`
+    for n in &a {
+        // ✅ 这里 `&a` 让 `n` 变成 `&i32`
         println!("{}", n);
     }
 
@@ -130,7 +125,6 @@ fn example_array_vec_ops() {
     let filtered: Vec<_> = arr.iter().filter(|&x| x % 2 == 0).collect();
 
     println!("偶数元素: {:?}", filtered);
-
 
     let mapped: Vec<_> = arr.iter().map(|x| x * 10).collect();
 

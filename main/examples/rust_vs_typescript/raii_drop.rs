@@ -104,8 +104,7 @@ fn main() {
         // File::create 返回 File，它实现了 Drop
         let mut file = File::create(Path::new("/tmp/raii_demo.txt"))
             .expect("创建文件失败（在 Windows 上可能需要调整路径）");
-        file.write_all(b"Hello from Rust RAII!")
-            .expect("写入失败");
+        file.write_all(b"Hello from Rust RAII!").expect("写入失败");
         println!("文件已写入，但尚未关闭");
         // 文件在这里自动 flush + close
     } // file.drop() 被自动调用 → 文件关闭
@@ -114,8 +113,8 @@ fn main() {
     // 4. 即使在错误路径上，RAII 也保证清理
     println!("--- 错误路径上的 RAII ---");
     fn might_fail(should_fail: bool) -> Result<(), String> {
-        let mut file = File::create("/tmp/raii_error_demo.txt")
-            .map_err(|e| format!("创建文件失败: {e}"))?;
+        let mut file =
+            File::create("/tmp/raii_error_demo.txt").map_err(|e| format!("创建文件失败: {e}"))?;
         file.write_all(b"some data")
             .map_err(|e| format!("写入失败: {e}"))?;
 
@@ -128,8 +127,8 @@ fn main() {
     }
 
     match might_fail(true) {
-        Ok(_)    => println!("成功"),
-        Err(e)   => println!("错误（文件已自动关闭）: {e}"),
+        Ok(_) => println!("成功"),
+        Err(e) => println!("错误（文件已自动关闭）: {e}"),
     }
     // 无论成功还是失败，文件句柄都不会泄漏！
 
@@ -191,7 +190,10 @@ fn main() {
     impl DbConnection {
         fn connect(id: u32) -> Self {
             println!(">>> DB #{id}: 连接已建立");
-            DbConnection { id, connected: true }
+            DbConnection {
+                id,
+                connected: true,
+            }
         }
 
         fn query(&self, sql: &str) {
@@ -230,8 +232,8 @@ fn main() {
     }
 
     match get_user(0) {
-        Ok(name)  => println!("用户: {name}"),
-        Err(e)    => println!("错误: {e}（但连接已自动关闭）"),
+        Ok(name) => println!("用户: {name}"),
+        Err(e) => println!("错误: {e}（但连接已自动关闭）"),
     }
 
     // ============================================================
@@ -247,7 +249,7 @@ fn main() {
         let guard = lock_obj.lock().unwrap();
         println!("持有锁，准备做一些快速操作...");
         // 做完必要的操作后，提前释放锁
-        drop(guard);  // 显式释放锁，不需要等作用域结束
+        drop(guard); // 显式释放锁，不需要等作用域结束
         println!("锁已提前释放，其他线程可以继续");
 
         // 这里可以做不需要锁的工作...
@@ -292,7 +294,7 @@ fn main() {
 
     impl<F: FnMut()> Drop for Defer<F> {
         fn drop(&mut self) {
-            (self.f)();  // 离开作用域时执行闭包
+            (self.f)(); // 离开作用域时执行闭包
         }
     }
 
@@ -310,10 +312,10 @@ fn main() {
             println!("提前返回，defer 仍然会执行");
         }
     } // 两个 defer 在这里反向执行（类似 TS finally 栈）
-    // 输出顺序：
-    //   主逻辑执行中...
-    //   >> 清理操作：释放锁
-    //   >> 清理操作：关闭文件
+      // 输出顺序：
+      //   主逻辑执行中...
+      //   >> 清理操作：释放锁
+      //   >> 清理操作：关闭文件
 
     // ============================================================
     // 八、RAII 在 Rust 生态中的常见应用

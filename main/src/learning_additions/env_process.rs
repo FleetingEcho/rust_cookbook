@@ -11,12 +11,15 @@ pub fn read_env_vars() {
     // var()：读取单个环境变量。找不到或值不是有效 UTF-8 时返回 Err。
     match env::var("HOME") {
         Ok(home) => println!("HOME = {home}"),
-        Err(e)   => println!("HOME 未设置: {e}"),
+        Err(e) => println!("HOME 未设置: {e}"),
     }
 
     // var_os()：返回 OsString，不要求 UTF-8，适合路径类变量。
     if let Some(path) = env::var_os("PATH") {
-        println!("PATH 前 50 字节: {:?}", &path.to_string_lossy()[..50.min(path.len())]);
+        println!(
+            "PATH 前 50 字节: {:?}",
+            &path.to_string_lossy()[..50.min(path.len())]
+        );
     }
 
     // 读取自定义变量，缺失时用默认值（常见于配置）。
@@ -53,13 +56,13 @@ pub fn working_directory() {
     // 获取当前工作目录
     match env::current_dir() {
         Ok(path) => println!("当前目录: {}", path.display()),
-        Err(e)   => println!("无法获取当前目录: {e}"),
+        Err(e) => println!("无法获取当前目录: {e}"),
     }
 
     // 获取可执行文件本身的路径
     match env::current_exe() {
         Ok(exe) => println!("可执行文件: {}", exe.display()),
-        Err(e)  => println!("无法获取可执行文件路径: {e}"),
+        Err(e) => println!("无法获取可执行文件路径: {e}"),
     }
 }
 
@@ -110,7 +113,7 @@ pub fn mutate_env_demo() {
     // 删除变量
     unsafe { env::remove_var("MY_TEST_VAR") };
     println!("删除后: {:?}", env::var("MY_TEST_VAR")); // Err(...)
-    // 注意：set_var / remove_var 在多线程环境下不安全，因此标记为 unsafe（Rust 1.81+）
+                                                       // 注意：set_var / remove_var 在多线程环境下不安全，因此标记为 unsafe（Rust 1.81+）
 }
 
 #[cfg(test)]

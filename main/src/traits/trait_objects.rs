@@ -17,14 +17,14 @@ impl Draw for f64 {
 }
 
 fn draw1(x: Box<dyn Draw>) {
-  // 这里的参数 x: Box<dyn Draw> 是一个特征对象，允许在 运行时 处理不同的类型
-  //由于 Box<T> 具有 Deref 特性，所以 Box<dyn Draw> 可以自动解引用调用 draw() 方法。
+    // 这里的参数 x: Box<dyn Draw> 是一个特征对象，允许在 运行时 处理不同的类型
+    //由于 Box<T> 具有 Deref 特性，所以 Box<dyn Draw> 可以自动解引用调用 draw() 方法。
     // 由于实现了 Deref 特征，Box 智能指针会自动解引用为它所包裹的值，然后调用该值对应的类型上定义的 `draw` 方法
     x.draw();
 }
 
 fn draw2(x: &dyn Draw) {
-  //这里的 x: &dyn Draw 是一个 Trait Object（特征对象），表示 x 只要实现了 Draw 特征就可以作为参数传递。
+    //这里的 x: &dyn Draw 是一个 Trait Object（特征对象），表示 x 只要实现了 Draw 特征就可以作为参数传递。
     x.draw();
 }
 
@@ -49,7 +49,6 @@ Box<dyn Draw> 可以 存储不同的类型，但它们都实现了 Draw。
 &dyn Draw 允许在 编译时未知确切类型 的情况下调用 draw() 方法。
 
 */
-
 
 /*
 Self 与 self

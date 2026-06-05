@@ -46,9 +46,9 @@ enum AppError {
 impl std::fmt::Display for AppError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            AppError::NotFound(s)      => write!(f, "未找到: {s}"),
-            AppError::ParseError(s)    => write!(f, "解析错误: {s}"),
-            AppError::InvalidInput(s)  => write!(f, "无效输入: {s}"),
+            AppError::NotFound(s) => write!(f, "未找到: {s}"),
+            AppError::ParseError(s) => write!(f, "解析错误: {s}"),
+            AppError::InvalidInput(s) => write!(f, "无效输入: {s}"),
         }
     }
 }
@@ -57,7 +57,7 @@ fn find_user(id: u32) -> Option<String> {
     match id {
         1 => Some(String::from("Alice")),
         2 => Some(String::from("Bob")),
-        _ => None,   // TS: return null
+        _ => None, // TS: return null
     }
 }
 
@@ -77,7 +77,7 @@ fn validate_age(age: u32) -> Result<u32, AppError> {
 // ? 运算符：自动传播错误，相当于 TS 的 throw/rethrow
 // TS 需要 try { const age = parseAge(s); validateAge(age); } catch(e) { throw e; }
 fn parse_and_validate(s: &str) -> Result<u32, AppError> {
-    let age = parse_age(s)?;       // 如果 Err，直接 return Err(...)
+    let age = parse_age(s)?; // 如果 Err，直接 return Err(...)
     let valid = validate_age(age)?;
     Ok(valid)
 }
@@ -98,7 +98,7 @@ fn main() {
     // TS: if (user !== null) { ... } else { ... }
     match find_user(1) {
         Some(name) => println!("找到用户: {name}"),
-        None       => println!("用户不存在"),
+        None => println!("用户不存在"),
     }
 
     // --- if let：只关心 Some 的情况 ---
@@ -125,18 +125,22 @@ fn main() {
     // --- map：对 Some 内的值做变换，None 直接穿透 ---
     // TS: user?.name.toUpperCase()
     let upper = find_user(1).map(|n| n.to_uppercase());
-    println!("map: {:?}", upper);  // Some("ALICE")
+    println!("map: {:?}", upper); // Some("ALICE")
 
     let upper_none = find_user(99).map(|n| n.to_uppercase());
-    println!("map None: {:?}", upper_none);  // None
+    println!("map None: {:?}", upper_none); // None
 
     // --- and_then：链式 Option 操作（可选链）---
     // TS: user?.address?.city
     fn get_address(name: &str) -> Option<String> {
-        if name == "Alice" { Some(String::from("北京")) } else { None }
+        if name == "Alice" {
+            Some(String::from("北京"))
+        } else {
+            None
+        }
     }
     let city = find_user(1).and_then(|name| get_address(&name));
-    println!("and_then: {:?}", city);   // Some("北京")，对应 TS: user?.address
+    println!("and_then: {:?}", city); // Some("北京")，对应 TS: user?.address
 
     // --- filter：对 Some 的值加条件，不满足变为 None ---
     // TS: user !== null && user.age > 18 ? user : null
@@ -144,12 +148,12 @@ fn main() {
     println!("filter: {:?}", long_name);
 
     // --- is_some / is_none ---
-    println!("is_some: {}", find_user(1).is_some());   // TS: user !== null
-    println!("is_none: {}", find_user(99).is_none());  // TS: user === null
+    println!("is_some: {}", find_user(1).is_some()); // TS: user !== null
+    println!("is_none: {}", find_user(99).is_none()); // TS: user === null
 
     // --- ok_or：Option → Result ---
-    let result: Result<String, AppError> = find_user(99)
-        .ok_or(AppError::NotFound("id=99".to_string()));
+    let result: Result<String, AppError> =
+        find_user(99).ok_or(AppError::NotFound("id=99".to_string()));
     println!("ok_or: {:?}", result);
 
     // ============================================================
@@ -166,13 +170,13 @@ fn main() {
     // --- match ---
     // TS: try { ... } catch (e) { ... }
     match parse_age("25") {
-        Ok(age)  => println!("解析成功: {age}"),
-        Err(e)   => println!("解析失败: {e}"),
+        Ok(age) => println!("解析成功: {age}"),
+        Err(e) => println!("解析失败: {e}"),
     }
 
     match parse_age("abc") {
-        Ok(age)  => println!("解析成功: {age}"),
-        Err(e)   => println!("解析失败: {e}"),
+        Ok(age) => println!("解析成功: {age}"),
+        Err(e) => println!("解析失败: {e}"),
     }
 
     // --- if let ---
@@ -191,8 +195,7 @@ fn main() {
     println!("map Ok: {:?}", doubled);
 
     // --- map_err：变换 Err 内的错误 ---
-    let result: Result<i32, String> = "42".parse::<i32>()
-        .map_err(|e| format!("解析失败: {e}"));
+    let result: Result<i32, String> = "42".parse::<i32>().map_err(|e| format!("解析失败: {e}"));
     println!("map_err: {:?}", result);
 
     // --- and_then：链式 Result ---
@@ -221,18 +224,14 @@ fn main() {
     let inputs = vec!["10", "abc", "20", "bad", "30"];
 
     // 收集所有结果（包含 Ok 和 Err）
-    let results: Vec<Result<u32, AppError>> = inputs.iter()
-        .map(|s| parse_age(s))
-        .collect();
+    let results: Vec<Result<u32, AppError>> = inputs.iter().map(|s| parse_age(s)).collect();
     for r in &results {
         println!("  {:?}", r);
     }
 
     // 只收集成功的值（忽略错误）
     // TS: inputs.map(parseInt).filter(n => !isNaN(n))
-    let successes: Vec<u32> = inputs.iter()
-        .filter_map(|s| parse_age(s).ok())
-        .collect();
+    let successes: Vec<u32> = inputs.iter().filter_map(|s| parse_age(s).ok()).collect();
     println!("只取成功: {:?}", successes);
 
     // 只要有一个失败就整体失败（collect::<Result<Vec<_>, _>>()）

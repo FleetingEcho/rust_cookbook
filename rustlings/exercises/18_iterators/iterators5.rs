@@ -50,10 +50,10 @@ fn count_collection_iterator(collection: &[HashMap<String, Progress>], value: Pr
     // collection = [{ "variables1": Complete, "from_str": None, … },
     //               { "variables2": Complete, … }, … ]
     collection
-    .iter()
-    .flat_map(|map| map.values())
-    .filter(|&&val| val == value)
-    .count()
+        .iter()
+        .flat_map(|map| map.values())
+        .filter(|&&val| val == value)
+        .count()
 }
 
 fn main() {

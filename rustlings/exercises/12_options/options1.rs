@@ -5,18 +5,20 @@
 fn maybe_ice_cream(hour_of_day: u16) -> Option<u16> {
     match hour_of_day {
         0..=21 => Some(5),
-        22|23 => Some(0),
+        22 | 23 => Some(0),
         _ => None,
     }
 }
 
 fn maybe_ice_cream2(hour_of_day: u16) -> Option<u16> {
-    if hour_of_day < 22 {           // ← 改成 < 22，不含 22
+    if hour_of_day < 22 {
+        // ← 改成 < 22，不含 22
         Some(5)
     } else if hour_of_day == 23 {
         Some(0)
-    } else if hour_of_day <= 23 {    // 包含 22 和 23 → 这里多捕获了 22
-        Some(0)                      // 但上面的 hour_of_day < 22 排除了 22}
+    } else if hour_of_day <= 23 {
+        // 包含 22 和 23 → 这里多捕获了 22
+        Some(0) // 但上面的 hour_of_day < 22 排除了 22}
     } else {
         None
     }

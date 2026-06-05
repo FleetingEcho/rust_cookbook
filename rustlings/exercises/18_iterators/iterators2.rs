@@ -7,25 +7,30 @@ fn capitalize_first(input: &str) -> String {
     let mut chars = input.chars();
     match chars.next() {
         None => String::new(),
-        Some(first) => {
-            first.to_uppercase().chain(chars).collect()
-        },
+        Some(first) => first.to_uppercase().chain(chars).collect(),
     }
 }
 
 // 当前代码
 fn capitalize_words_vector1(words: &[&str]) -> Vec<String> {
-    let new_words = words.to_vec();  // ❌ 不必要的转换
-    new_words.iter().map(|x| capitalize_first(x)).map(|x| x.to_string()).collect()
+    let new_words = words.to_vec(); // ❌ 不必要的转换
+    new_words
+        .iter()
+        .map(|x| capitalize_first(x))
+        .map(|x| x.to_string())
+        .collect()
     //                                    ↑ 已经返回 String  ↑ 又转一次 String？
 }
 
 fn capitalize_words_string1(words: &[&str]) -> String {
-    let arr: Vec<String> = words.to_vec().iter().map(|x| capitalize_first(x).to_string()).collect();
+    let arr: Vec<String> = words
+        .to_vec()
+        .iter()
+        .map(|x| capitalize_first(x).to_string())
+        .collect();
     //                     ↑ 不必要        ↑ iter() ↑ capitalize_first 已经返回 String，不需要 .to_string()
     arr.join("")
 }
-
 
 fn capitalize_words_vector(words: &[&str]) -> Vec<String> {
     words.iter().map(|&word| capitalize_first(word)).collect()
@@ -36,7 +41,6 @@ fn capitalize_words_string(words: &[&str]) -> String {
     words.iter().map(|&word| capitalize_first(word)).collect()
     //     ↑ 直接 collect() 到 String，不需要 join
 }
-
 
 fn main() {
     // You can optionally experiment here.

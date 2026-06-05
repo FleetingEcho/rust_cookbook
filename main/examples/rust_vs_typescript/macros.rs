@@ -35,17 +35,17 @@ fn main() {
     // ============================================================
 
     // println!：打印并换行（TS: console.log）
-    println!("Hello, {name}!");          // 直接内嵌变量名（Rust 1.58+）
-    println!("age = {}", age);           // 位置参数
-    println!("score = {:.2}", score);    // 格式化：保留2位小数（TS: score.toFixed(2)）
-    println!("debug: {:?}", vec![1,2,3]); // Debug 格式（TS: JSON.stringify）
-    println!("pretty: {:#?}", vec![1,2,3]); // 美化 Debug 格式
+    println!("Hello, {name}!"); // 直接内嵌变量名（Rust 1.58+）
+    println!("age = {}", age); // 位置参数
+    println!("score = {:.2}", score); // 格式化：保留2位小数（TS: score.toFixed(2)）
+    println!("debug: {:?}", vec![1, 2, 3]); // Debug 格式（TS: JSON.stringify）
+    println!("pretty: {:#?}", vec![1, 2, 3]); // 美化 Debug 格式
 
     // print!：不换行（TS: process.stdout.write）
     print!("A");
     print!("B");
     print!("C");
-    println!();  // 只打印换行
+    println!(); // 只打印换行
 
     // eprintln!：打印到 stderr（TS: console.error）
     eprintln!("这是错误输出: {name}");
@@ -58,14 +58,14 @@ fn main() {
     // 二、format!：字符串格式化（不打印，返回 String）
     // TS: 模板字符串 `Hello, ${name}!`
     // ============================================================
-    let greeting = format!("你好，{}！", name);   // TS: `你好，${name}！`
-    let age_str  = format!("{}岁", age);
-    let fixed    = format!("{:.2}", score);        // TS: score.toFixed(2)
-    let padded   = format!("{:>10}", "hi");        // 右对齐，宽度10（TS: "hi".padStart(10)）
-    let zero_pad = format!("{:0>5}", 42);          // "00042"（TS: String(42).padStart(5,"0")）
-    let hex      = format!("{:x}", 255);           // "ff"（TS: (255).toString(16)）
-    let binary   = format!("{:b}", 10);            // "1010"（TS: (10).toString(2)）
-    let sci      = format!("{:e}", 1234567.89);    // 科学计数法
+    let greeting = format!("你好，{}！", name); // TS: `你好，${name}！`
+    let age_str = format!("{}岁", age);
+    let fixed = format!("{:.2}", score); // TS: score.toFixed(2)
+    let padded = format!("{:>10}", "hi"); // 右对齐，宽度10（TS: "hi".padStart(10)）
+    let zero_pad = format!("{:0>5}", 42); // "00042"（TS: String(42).padStart(5,"0")）
+    let hex = format!("{:x}", 255); // "ff"（TS: (255).toString(16)）
+    let binary = format!("{:b}", 10); // "1010"（TS: (10).toString(2)）
+    let sci = format!("{:e}", 1234567.89); // 科学计数法
     println!("{greeting}, {age_str}");
     println!("fixed={fixed}, padded='{padded}', zero_pad={zero_pad}");
     println!("hex={hex}, binary={binary}, sci={sci}");
@@ -78,8 +78,8 @@ fn main() {
     // 三、vec!：创建 Vec（语法糖）
     // TS: [1, 2, 3] 或 Array.from(...)
     // ============================================================
-    let v1 = vec![1, 2, 3, 4, 5];           // TS: [1, 2, 3, 4, 5]
-    let v2 = vec![0_i32; 5];                 // [0, 0, 0, 0, 0]（TS: new Array(5).fill(0)）
+    let v1 = vec![1, 2, 3, 4, 5]; // TS: [1, 2, 3, 4, 5]
+    let v2 = vec![0_i32; 5]; // [0, 0, 0, 0, 0]（TS: new Array(5).fill(0)）
     let v3: Vec<String> = vec!["a", "b", "c"].into_iter().map(String::from).collect();
     println!("vec!: {:?}", v1);
     println!("重复: {:?}", v2);
@@ -91,15 +91,15 @@ fn main() {
     // ============================================================
 
     // assert!：条件为 false 时 panic
-    assert!(1 + 1 == 2);                      // TS: expect(1+1).toBe(2)
-    assert!(age > 0, "年龄必须为正，实际: {age}");  // 带自定义错误信息
+    assert!(1 + 1 == 2); // TS: expect(1+1).toBe(2)
+    assert!(age > 0, "年龄必须为正，实际: {age}"); // 带自定义错误信息
 
     // assert_eq!：相等断言（打印两者的值）
-    assert_eq!(2 + 2, 4);                    // TS: expect(2+2).toEqual(4)
-    assert_eq!(vec![1,2,3], vec![1,2,3]);
+    assert_eq!(2 + 2, 4); // TS: expect(2+2).toEqual(4)
+    assert_eq!(vec![1, 2, 3], vec![1, 2, 3]);
 
     // assert_ne!：不相等断言
-    assert_ne!(1, 2);                        // TS: expect(1).not.toBe(2)
+    assert_ne!(1, 2); // TS: expect(1).not.toBe(2)
 
     println!("所有断言通过");
 
@@ -108,8 +108,8 @@ fn main() {
     // TS: console.log("value:", value)（需要手动写名字）
     // ============================================================
     let x = 5_i32;
-    let y = dbg!(x * 2) + 1;  // 打印 [src/...:行号] x * 2 = 10，并返回值
-    println!("y = {y}");       // 11
+    let y = dbg!(x * 2) + 1; // 打印 [src/...:行号] x * 2 = 10，并返回值
+    println!("y = {y}"); // 11
 
     // dbg! 在表达式中使用（不中断代码流）
     let v = vec![1, 2, 3];
@@ -137,8 +137,8 @@ fn main() {
     fn categorize(n: i32) -> &'static str {
         match n.cmp(&0) {
             std::cmp::Ordering::Greater => "正数",
-            std::cmp::Ordering::Less    => "负数",
-            std::cmp::Ordering::Equal   => "零",
+            std::cmp::Ordering::Less => "负数",
+            std::cmp::Ordering::Equal => "零",
             // 不需要 unreachable! 因为 Ordering 只有三个变体（穷举）
         }
     }
@@ -161,7 +161,7 @@ fn main() {
     // ============================================================
     use std::fmt::Write as FmtWrite;
     let mut output = String::new();
-    write!(output, "Hello, {}!", name).unwrap();   // 写入 String
+    write!(output, "Hello, {}!", name).unwrap(); // 写入 String
     writeln!(output, " 你今年 {} 岁。", age).unwrap();
     println!("write! 结果: {output}");
 
@@ -178,7 +178,7 @@ fn main() {
         };
     }
     log_value!("name", name);
-    log_value!("vec", vec![1,2,3]);
+    log_value!("vec", vec![1, 2, 3]);
 
     // 可变参数宏（类似 TS 的 ...args）
     macro_rules! my_vec {

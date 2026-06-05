@@ -23,7 +23,6 @@ fn compare_license_types3(software1: Box<dyn Licensed>, software2: Box<dyn Licen
     software1.licensing_info() == software2.licensing_info()
 }
 
-
 fn main() {
     // You can optionally experiment here.
 }
@@ -35,9 +34,11 @@ mod tests {
     #[test]
     fn compare_license_information() {
         assert!(compare_license_types(SomeSoftware, OtherSoftware));
-        assert!(compare_license_types3(Box::new(SomeSoftware), Box::new(OtherSoftware)));
+        assert!(compare_license_types3(
+            Box::new(SomeSoftware),
+            Box::new(OtherSoftware)
+        ));
     }
-    
 
     #[test]
     fn compare_license_information_backwards() {

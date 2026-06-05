@@ -3,8 +3,8 @@ fn main() {
     // let a:u16[]=[10].repeat(100)
     let a: [u16; 100] = [10; 100];
     // let a: Vec<u16> = [10].repeat(100);
-// 或更简洁
-// let a = vec![10u16; 100];;
+    // 或更简洁
+    // let a = vec![10u16; 100];;
 
     if a.len() >= 100 {
         println!("Wow, that's a big array!");

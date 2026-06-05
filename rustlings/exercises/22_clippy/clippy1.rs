@@ -6,7 +6,7 @@
 
 fn main() {
     // TODO: Fix the Clippy lint in this line.
-    let pi= std::f64::consts::PI ;
+    let pi = std::f64::consts::PI;
     let radius: f64 = 5.0;
 
     let area = pi * radius.powi(2);

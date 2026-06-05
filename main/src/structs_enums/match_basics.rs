@@ -7,19 +7,20 @@ enum Action {
 fn main_action() {
     let actions = [
         Action::Say("Hello Rust".to_string()),
-        Action::MoveTo(1,2),
-        Action::ChangeColorRGB(255,255,0),
+        Action::MoveTo(1, 2),
+        Action::ChangeColorRGB(255, 255, 0),
     ];
     for action in actions {
         match action {
             Action::Say(s) => {
                 println!("{}", s);
-            },
+            }
             Action::MoveTo(x, y) => {
                 println!("point from (0, 0) move to ({}, {})", x, y);
-            },
+            }
             Action::ChangeColorRGB(r, g, _) => {
-                println!("change color into '(r:{}, g:{}, b:0)', 'b' has been ignored",
+                println!(
+                    "change color into '(r:{}, g:{}, b:0)', 'b' has been ignored",
                     r, g,
                 );
             }
@@ -97,7 +98,6 @@ fn main() {
 }
 */
 
-
 /*
 
 struct User {
@@ -127,7 +127,6 @@ API 设计清晰	Option<T> 让调用者知道可能无值	直接 T 让人误以�
 
 */
 
-
 pub fn match_if() {
     enum MyEnum {
         Foo,
@@ -136,20 +135,28 @@ pub fn match_if() {
 
     let v = vec![MyEnum::Foo, MyEnum::Bar, MyEnum::Foo];
 
-    let res: Vec<&MyEnum> = v.iter().filter(|x| {
-        println!("Type of x: {:?}", std::any::type_name::<&MyEnum>());
-        //   Type of x: &MyEnum
-        matches!(x, MyEnum::Foo)
-    }).collect();
+    let res: Vec<&MyEnum> = v
+        .iter()
+        .filter(|x| {
+            println!("Type of x: {:?}", std::any::type_name::<&MyEnum>());
+            //   Type of x: &MyEnum
+            matches!(x, MyEnum::Foo)
+        })
+        .collect();
     println!("Filtered Foo count: {}", res.len());
 
     let foo = 'f';
-    assert!(matches!(foo, 'A'..='Z' | 'a'..='z'), "foo is not an alphabet");
+    assert!(
+        matches!(foo, 'A'..='Z' | 'a'..='z'),
+        "foo is not an alphabet"
+    );
 
     let bar = Some(4);
-    assert!(matches!(bar, Some(x) if x > 2), "bar does not match the condition");
+    assert!(
+        matches!(bar, Some(x) if x > 2),
+        "bar does not match the condition"
+    );
 }
-
 
 // 变量遮蔽
 /*
@@ -191,11 +198,8 @@ num 原本是 &str，但被遮蔽后变成 i32。
 ✅ if let Some(age) = age 创建了新的 age，遮蔽了外部的 age，但不会影响外部变量。
 */
 
-
-
 // 结构 Option
-fn test(){
-
+fn test() {
     fn plus_one1(x: Option<i32>) -> Option<i32> {
         match x {
             None => None,
@@ -210,7 +214,6 @@ fn test(){
     let five = Some(5);
     let six = plus_one(five);
     let none = plus_one(None);
-
 }
 
 /*

@@ -89,7 +89,7 @@ pub fn vecdeque_basics() {
 
     // 两端都可以 pop
     println!("pop_front: {:?}", dq.pop_front()); // Some(0)
-    println!("pop_back:  {:?}", dq.pop_back());  // Some(3)
+    println!("pop_back:  {:?}", dq.pop_back()); // Some(3)
 
     // 当成普通 Vec 用也没问题
     dq.push_back(99);

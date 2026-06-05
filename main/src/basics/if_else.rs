@@ -25,11 +25,10 @@ for item in &collection	for item in collection.iter()	不可变借用
 for item in &mut collection	for item in collection.iter_mut()	可变借用
 */
 
-
 fn example_while() {
     let mut n = 0;
 
-    while n <= 5  {
+    while n <= 5 {
         println!("{}!", n);
 
         n = n + 1;
@@ -49,15 +48,15 @@ fn example_while_array() {
     }
 }
 
-
 fn example_loop_return() {
     let mut counter = 0;
 
-    let result = loop { //loop 是一个表达式，因此可以返回一个值
+    let result = loop {
+        //loop 是一个表达式，因此可以返回一个值
         counter += 1;
 
         if counter == 10 {
-            break counter * 2;//break 可以单独使用，也可以带一个返回值，有些类似 return
+            break counter * 2; //break 可以单独使用，也可以带一个返回值，有些类似 return
         }
     };
 
@@ -77,4 +76,3 @@ fn example_loop_return() {
 //    `for`（遍历迭代器）。TS 的 `for...of` 对应 Rust 的 `for item in iter`。
 //
 // 详细对照 → rust_vs_typescript.rs
-

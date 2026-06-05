@@ -56,22 +56,22 @@ impl Shape {
     fn area(&self) -> f64 {
         // match 相当于 TS 的 switch(shape.kind)，但更强大、且编译器强制穷举
         match self {
-            Shape::Circle(r)               => std::f64::consts::PI * r * r,
+            Shape::Circle(r) => std::f64::consts::PI * r * r,
             Shape::Rectangle { width, height } => width * height,
-            Shape::Triangle(base, h)       => 0.5 * base * h,
+            Shape::Triangle(base, h) => 0.5 * base * h,
         }
     }
 
     fn describe(&self) -> String {
         match self {
-            Shape::Circle(r)                   => format!("圆形，半径 {r:.1}"),
+            Shape::Circle(r) => format!("圆形，半径 {r:.1}"),
             Shape::Rectangle { width, height } => format!("矩形 {width:.1}×{height:.1}"),
-            Shape::Triangle(base, h)           => format!("三角形，底 {base:.1}，高 {h:.1}"),
+            Shape::Triangle(base, h) => format!("三角形，底 {base:.1}，高 {h:.1}"),
         }
     }
 
     fn is_circle(&self) -> bool {
-        matches!(self, Shape::Circle(_))  // 简洁写法，对应 TS: shape.kind === "circle"
+        matches!(self, Shape::Circle(_)) // 简洁写法，对应 TS: shape.kind === "circle"
     }
 }
 
@@ -81,19 +81,19 @@ impl Shape {
 // ============================================================
 #[derive(Debug)]
 enum Message {
-    Quit,                        // 无数据，对应 TS: { type: "quit" }
-    Move { x: i32, y: i32 },    // 命名字段，对应 TS: { type: "move"; x: number; y: number }
-    Write(String),               // 单值，对应 TS: { type: "write"; text: string }
-    ChangeColor(u8, u8, u8),     // 多值，对应 TS: { type: "color"; r: number; g: number; b: number }
+    Quit,                    // 无数据，对应 TS: { type: "quit" }
+    Move { x: i32, y: i32 }, // 命名字段，对应 TS: { type: "move"; x: number; y: number }
+    Write(String),           // 单值，对应 TS: { type: "write"; text: string }
+    ChangeColor(u8, u8, u8), // 多值，对应 TS: { type: "color"; r: number; g: number; b: number }
 }
 
 impl Message {
     fn process(&self) {
         match self {
-            Message::Quit                   => println!("退出"),
-            Message::Move { x, y }         => println!("移动到 ({x}, {y})"),
-            Message::Write(text)            => println!("写入: {text}"),
-            Message::ChangeColor(r, g, b)   => println!("颜色: rgb({r},{g},{b})"),
+            Message::Quit => println!("退出"),
+            Message::Move { x, y } => println!("移动到 ({x}, {y})"),
+            Message::Write(text) => println!("写入: {text}"),
+            Message::ChangeColor(r, g, b) => println!("颜色: rgb({r},{g},{b})"),
         }
     }
 }
@@ -106,8 +106,8 @@ fn main() {
     let text = match dir {
         Direction::North => "向北走",
         Direction::South => "向南走",
-        Direction::East  => "向东走",
-        Direction::West  => "向西走",
+        Direction::East => "向东走",
+        Direction::West => "向西走",
     };
     println!("{text}");
 
@@ -119,7 +119,10 @@ fn main() {
     // ============================================================
     let shapes = vec![
         Shape::Circle(5.0),
-        Shape::Rectangle { width: 4.0, height: 6.0 },
+        Shape::Rectangle {
+            width: 4.0,
+            height: 6.0,
+        },
         Shape::Triangle(3.0, 8.0),
     ];
 
@@ -143,15 +146,16 @@ fn main() {
     // 通配符 _ 匹配剩余所有情况（TS: default）
     match &s {
         Shape::Circle(r) if *r > 4.0 => println!("大圆，半径 {r}"),
-        Shape::Circle(_)             => println!("小圆"),
-        _                            => println!("不是圆"),  // TS: default
+        Shape::Circle(_) => println!("小圆"),
+        _ => println!("不是圆"), // TS: default
     }
 
     // ============================================================
     // 四、while let（持续弹出直到空）
     // ============================================================
     let mut stack = vec![1_i32, 2, 3];
-    while let Some(top) = stack.pop() {  // TS: while (stack.length > 0)
+    while let Some(top) = stack.pop() {
+        // TS: while (stack.length > 0)
         println!("弹出: {top}");
     }
 
@@ -177,14 +181,14 @@ fn main() {
         match id {
             1 => Some("Alice"),
             2 => Some("Bob"),
-            _ => None,              // TS: return null
+            _ => None, // TS: return null
         }
     }
 
     // match 处理 Option
     match find_user(1) {
         Some(name) => println!("找到: {name}"),
-        None       => println!("未找到"),
+        None => println!("未找到"),
     }
 
     // unwrap_or 提供默认值
@@ -202,23 +206,22 @@ fn main() {
     // TS 对应：try/catch 或 T | Error
     // ============================================================
     fn parse_number(s: &str) -> Result<i32, String> {
-        s.parse::<i32>()
-            .map_err(|_| format!("'{s}' 不是有效整数"))
+        s.parse::<i32>().map_err(|_| format!("'{s}' 不是有效整数"))
     }
 
     match parse_number("42") {
-        Ok(n)    => println!("解析成功: {n}"),
+        Ok(n) => println!("解析成功: {n}"),
         Err(msg) => println!("解析失败: {msg}"),
     }
 
     match parse_number("abc") {
-        Ok(n)    => println!("解析成功: {n}"),
+        Ok(n) => println!("解析成功: {n}"),
         Err(msg) => println!("解析失败: {msg}"),
     }
 
     // ? 运算符：自动向上传播错误（TS 里只能 try/catch）
     fn double_parse(s: &str) -> Result<i32, String> {
-        let n = parse_number(s)?;  // 如果 Err，立即 return Err(...)
+        let n = parse_number(s)?; // 如果 Err，立即 return Err(...)
         Ok(n * 2)
     }
     println!("double_parse: {:?}", double_parse("21"));
@@ -232,15 +235,15 @@ fn main() {
         Penny,
         Nickel,
         Dime,
-        Quarter(String),   // 携带州名
+        Quarter(String), // 携带州名
     }
 
     impl Coin {
         fn value(&self) -> u32 {
             match self {
-                Coin::Penny      => 1,
-                Coin::Nickel     => 5,
-                Coin::Dime       => 10,
+                Coin::Penny => 1,
+                Coin::Nickel => 5,
+                Coin::Dime => 10,
                 Coin::Quarter(_) => 25,
             }
         }

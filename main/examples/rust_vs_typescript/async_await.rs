@@ -58,7 +58,7 @@ async fn greet(name: &str) -> String {
 // TS: await new Promise(resolve => setTimeout(resolve, ms))
 // ============================================================
 async fn fetch_user(id: u32) -> Result<String, String> {
-    sleep(Duration::from_millis(10)).await;  // 模拟网络延迟
+    sleep(Duration::from_millis(10)).await; // 模拟网络延迟
 
     match id {
         1 => Ok(String::from("Alice")),
@@ -80,7 +80,7 @@ async fn fetch_posts(user_id: u32) -> Vec<String> {
 // TS: try/catch + await
 // ============================================================
 async fn get_user_greeting(id: u32) -> Result<String, String> {
-    let user = fetch_user(id).await?;   // ? 在 async fn 中同样适用
+    let user = fetch_user(id).await?; // ? 在 async fn 中同样适用
     Ok(format!("欢迎，{user}！"))
 }
 
@@ -93,10 +93,7 @@ async fn concurrent_demo() {
 
     // tokio::join! 同时等待多个 Future（并发，不是并行）
     // TS: const [user, posts] = await Promise.all([fetchUser(1), fetchPosts(1)])
-    let (user_result, posts) = tokio::join!(
-        fetch_user(1),
-        fetch_posts(1),
-    );
+    let (user_result, posts) = tokio::join!(fetch_user(1), fetch_posts(1),);
 
     println!("用户: {:?}", user_result);
     println!("文章: {:?}", posts);
@@ -111,21 +108,18 @@ async fn try_join_demo() {
 
     // tokio::try_join! 中任一 Future 失败则立即返回 Err
     // TS: Promise.all([...])（默认行为就是这样）
-    match tokio::try_join!(
-        fetch_user(1),
-        fetch_user(2),
-    ) {
+    match tokio::try_join!(fetch_user(1), fetch_user(2),) {
         Ok((u1, u2)) => println!("两个用户: {u1}, {u2}"),
-        Err(e)       => println!("有错误: {e}"),
+        Err(e) => println!("有错误: {e}"),
     }
 
     // 其中一个失败
     match tokio::try_join!(
         fetch_user(1),
-        fetch_user(99),  // 这个会失败
+        fetch_user(99), // 这个会失败
     ) {
         Ok((u1, u2)) => println!("两个用户: {u1}, {u2}"),
-        Err(e)       => println!("失败: {e}"),
+        Err(e) => println!("失败: {e}"),
     }
 }
 
@@ -163,12 +157,13 @@ async fn timeout_demo() {
     // TS: await Promise.race([fetch(...), timeout(1000)])
     let result = tokio::time::timeout(
         Duration::from_millis(5),
-        fetch_user(1),   // 这个任务 10ms，超时设置 5ms
-    ).await;
+        fetch_user(1), // 这个任务 10ms，超时设置 5ms
+    )
+    .await;
 
     match result {
-        Ok(Ok(user))  => println!("成功: {user}"),
-        Ok(Err(e))    => println!("任务失败: {e}"),
+        Ok(Ok(user)) => println!("成功: {user}"),
+        Ok(Err(e)) => println!("任务失败: {e}"),
         Err(_elapsed) => println!("超时！"),
     }
 }
@@ -183,7 +178,7 @@ async fn lazy_demo() {
     // let p = fetch(url);  // 立即开始网络请求！
 
     // Rust: Future 创建后什么都不做
-    let future = fetch_user(1);  // 什么都没发生！
+    let future = fetch_user(1); // 什么都没发生！
     println!("Future 已创建，但还没执行");
 
     // 只有 .await 才驱动 Future 执行
@@ -207,13 +202,13 @@ async fn main() {
     // 错误处理
     println!("\n=== 错误处理 ===");
     match get_user_greeting(1).await {
-        Ok(msg)  => println!("{msg}"),
-        Err(e)   => println!("错误: {e}"),
+        Ok(msg) => println!("{msg}"),
+        Err(e) => println!("错误: {e}"),
     }
 
     match get_user_greeting(99).await {
-        Ok(msg)  => println!("{msg}"),
-        Err(e)   => println!("错误: {e}"),
+        Ok(msg) => println!("{msg}"),
+        Err(e) => println!("错误: {e}"),
     }
 
     // 各种并发模式

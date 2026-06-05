@@ -1,9 +1,12 @@
 use clap::Parser;
-use minigrep::{Config, run};
+use minigrep::{run, Config};
 use std::process;
 
 #[derive(Parser)]
-#[command(name = "minigrep", about = "搜索文件或目录中的文本，支持彩色高亮和递归搜索")]
+#[command(
+    name = "minigrep",
+    about = "搜索文件或目录中的文本，支持彩色高亮和递归搜索"
+)]
 struct Args {
     /// 搜索关键词
     query: String,

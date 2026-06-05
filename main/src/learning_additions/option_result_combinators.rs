@@ -19,23 +19,23 @@ pub fn option_combinators() {
     println!("{:?}", result); // Some(100)
 
     // or / or_else：None 时提供备选值。
-    println!("{:?}", none_val.or(Some(42)));              // Some(42)
-    println!("{:?}", none_val.or_else(|| Some(99)));      // Some(99)
+    println!("{:?}", none_val.or(Some(42))); // Some(42)
+    println!("{:?}", none_val.or_else(|| Some(99))); // Some(99)
 
     // unwrap_or / unwrap_or_else / unwrap_or_default：解包，None 时给默认值。
-    println!("{}", none_val.unwrap_or(0));                // 0
-    println!("{}", none_val.unwrap_or_else(|| 2 + 2));   // 4（惰性求值）
-    println!("{}", none_val.unwrap_or_default());         // 0（i32 的 Default）
+    println!("{}", none_val.unwrap_or(0)); // 0
+    println!("{}", none_val.unwrap_or_else(|| 2 + 2)); // 4（惰性求值）
+    println!("{}", none_val.unwrap_or_default()); // 0（i32 的 Default）
 
     // filter：有值时按条件过滤，不满足则变 None。
-    println!("{:?}", some_val.filter(|&x| x > 5));  // Some(10)
+    println!("{:?}", some_val.filter(|&x| x > 5)); // Some(10)
     println!("{:?}", some_val.filter(|&x| x > 50)); // None
 
     // zip：把两个 Option 合并成一个 Option<(A, B)>，任一为 None 则结果为 None。
     let a = Some("hello");
     let b = Some(42);
-    println!("{:?}", a.zip(b));          // Some(("hello", 42))
-    println!("{:?}", a.zip(none_val));   // None
+    println!("{:?}", a.zip(b)); // Some(("hello", 42))
+    println!("{:?}", a.zip(none_val)); // None
 
     // flatten：Option<Option<T>> → Option<T>。
     let nested: Option<Option<i32>> = Some(Some(7));
@@ -53,8 +53,8 @@ pub fn result_combinators() {
     let err_val: Result<i32, &str> = Err("出错了");
 
     // map：Ok 时转换值，Err 直接透传。
-    println!("{:?}", ok_val.map(|x| x * 3));   // Ok(30)
-    println!("{:?}", err_val.map(|x| x * 3));  // Err("出错了")
+    println!("{:?}", ok_val.map(|x| x * 3)); // Ok(30)
+    println!("{:?}", err_val.map(|x| x * 3)); // Err("出错了")
 
     // map_err：Err 时转换错误，Ok 直接透传（常用于统一错误类型）。
     println!("{:?}", err_val.map_err(|e| format!("错误: {e}"))); // Err("错误: 出错了")
@@ -66,7 +66,7 @@ pub fn result_combinators() {
     println!("{:?}", chained); // Ok(21)
 
     // or / or_else：Err 时提供备选值。
-    println!("{:?}", err_val.or(Ok::<i32, &str>(0)));            // Ok(0)
+    println!("{:?}", err_val.or(Ok::<i32, &str>(0))); // Ok(0)
     println!("{:?}", err_val.or_else(|_| Ok::<i32, &str>(99))); // Ok(99)
 
     // unwrap_or / unwrap_or_else：解包，Err 时给默认值（不 panic）。
@@ -74,7 +74,7 @@ pub fn result_combinators() {
     println!("{}", err_val.unwrap_or_else(|_| -1));
 
     // ok() / err()：Result ↔ Option 互转。
-    println!("{:?}", ok_val.ok());  // Some(10)
+    println!("{:?}", ok_val.ok()); // Some(10)
     println!("{:?}", err_val.ok()); // None
     println!("{:?}", err_val.err()); // Some("出错了")
 
@@ -104,7 +104,7 @@ pub fn conversions() {
 
 fn parse_and_double(s: &str) -> Result<i32, String> {
     s.trim()
-        .parse::<i32>()                    // 可能失败：ParseIntError
+        .parse::<i32>() // 可能失败：ParseIntError
         .map_err(|e| format!("解析失败: {e}")) // 统一为 String 错误
         .and_then(|n| {
             if n >= 0 {
@@ -116,9 +116,9 @@ fn parse_and_double(s: &str) -> Result<i32, String> {
 }
 
 pub fn show_chain() {
-    println!("{:?}", parse_and_double("21"));   // Ok(42)
-    println!("{:?}", parse_and_double("abc"));  // Err("解析失败: ...")
-    println!("{:?}", parse_and_double("-5"));   // Err("不能是负数")
+    println!("{:?}", parse_and_double("21")); // Ok(42)
+    println!("{:?}", parse_and_double("abc")); // Err("解析失败: ...")
+    println!("{:?}", parse_and_double("-5")); // Err("不能是负数")
 }
 
 #[cfg(test)]

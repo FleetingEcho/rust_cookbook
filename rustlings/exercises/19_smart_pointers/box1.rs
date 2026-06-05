@@ -19,18 +19,21 @@ enum List {
 
 // TODO: Create an empty cons list.
 fn create_empty_list() -> List {
-     List::Nil
+    List::Nil
 }
 
 // TODO: Create a non-empty cons list.
 fn from_vec(v: Vec<i32>) -> List {
-    v.iter().rev().fold(List::Nil, |acc, &x| List::Cons(x, Box::new(acc)))
+    v.iter()
+        .rev()
+        .fold(List::Nil, |acc, &x| List::Cons(x, Box::new(acc)))
 }
 
 // 假设 vec = [1, 2, 3]
 // 不使用 rev()：从左到右处理
 fn from_vec_without_rev(v: Vec<i32>) -> List {
-    v.iter().fold(List::Nil, |acc, &x| List::Cons(x, Box::new(acc)))
+    v.iter()
+        .fold(List::Nil, |acc, &x| List::Cons(x, Box::new(acc)))
 }
 
 // 执行过程：

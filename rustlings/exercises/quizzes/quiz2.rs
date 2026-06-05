@@ -28,7 +28,7 @@ mod my_module {
 
     // TODO: Complete the function as described above.
 
-      pub fn transformer(input: Vec<(String, Command)>) -> Vec<String> {
+    pub fn transformer(input: Vec<(String, Command)>) -> Vec<String> {
         let mut output = Vec::new();
 
         for (s, cmd) in input {
@@ -47,7 +47,6 @@ mod my_module {
 
         output
     }
-
 }
 
 fn main() {
@@ -57,8 +56,8 @@ fn main() {
 #[cfg(test)]
 mod tests {
     // TODO: What do we need to import to have `transformer` in scope?
-    use super::my_module::transformer;
     use super::Command;
+    use super::my_module::transformer;
 
     #[test]
     fn it_works() {

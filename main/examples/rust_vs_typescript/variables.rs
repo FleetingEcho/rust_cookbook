@@ -49,7 +49,7 @@ fn main() {
     // ============================================================
     let mut y = 5;
     println!("y = {y}");
-    y = 10;  // ✅ mut 变量可以重新赋值
+    y = 10; // ✅ mut 变量可以重新赋值
     println!("y = {y}");
 
     let mut counter = 0;
@@ -63,14 +63,14 @@ fn main() {
     // Rust 的 shadowing 允许重新声明同名变量，甚至改变类型
     // ============================================================
     let s = 5;
-    let s = s + 1;      // 遮蔽：创建新变量，不是修改原变量
+    let s = s + 1; // 遮蔽：创建新变量，不是修改原变量
     let s = s * 2;
-    println!("遮蔽后 s = {s}");  // 12
+    println!("遮蔽后 s = {s}"); // 12
 
     // 遮蔽还可以改变类型（这是 mut 做不到的）
-    let spaces = "   ";         // &str 类型
-    let spaces = spaces.len();  // 遮蔽为 usize 类型
-    println!("spaces = {spaces}");  // 3
+    let spaces = "   "; // &str 类型
+    let spaces = spaces.len(); // 遮蔽为 usize 类型
+    println!("spaces = {spaces}"); // 3
 
     // mut 不能改变类型：
     // let mut spaces = "   ";
@@ -81,7 +81,7 @@ fn main() {
     // TS: const MAX_SIZE: number = 100（都是常量，但含义不同）
     // Rust 的 const 是真正的编译期常量，必须有类型注解，全大写命名
     // ============================================================
-    const MAX_POINTS: u32 = 100_000;  // 编译期确定，可用于数组大小等
+    const MAX_POINTS: u32 = 100_000; // 编译期确定，可用于数组大小等
     const PI: f64 = 3.14159265358979;
     println!("MAX_POINTS={MAX_POINTS}, PI={PI}");
 
@@ -92,8 +92,8 @@ fn main() {
     // 五、静态变量
     // TS 没有直接对应，类似模块级 const 但有内存地址
     // ============================================================
-    static GREETING: &str = "你好，世界";  // 程序运行期间一直存在，有固定内存地址
-    static mut CALL_COUNT: u32 = 0;        // 可变静态变量（需要 unsafe）
+    static GREETING: &str = "你好，世界"; // 程序运行期间一直存在，有固定内存地址
+    static mut CALL_COUNT: u32 = 0; // 可变静态变量（需要 unsafe）
     println!("GREETING = {GREETING}");
 
     // 可变静态变量需要 unsafe（多线程下不安全）
@@ -106,14 +106,17 @@ fn main() {
     // 六、类型推断
     // 与 TS 类似，但 Rust 的推断更强（可以跨语句推断）
     // ============================================================
-    let inferred = 42;           // 推断为 i32（TS 推断为 number）
-    let inferred_f = 3.14;       // 推断为 f64
-    let inferred_s = "hello";    // 推断为 &str（TS 推断为 string）
+    let inferred = 42; // 推断为 i32（TS 推断为 number）
+    let inferred_f = 3.14; // 推断为 f64
+    let inferred_s = "hello"; // 推断为 &str（TS 推断为 string）
 
     // Rust 可以根据后续使用推断类型（TS 不支持）
-    let mut collected = Vec::new();   // 现在还不知道类型
-    collected.push(1_i32);            // 根据这里推断出 Vec<i32>
-    println!("推断类型: {inferred}, {inferred_f}, {inferred_s}, {:?}", collected);
+    let mut collected = Vec::new(); // 现在还不知道类型
+    collected.push(1_i32); // 根据这里推断出 Vec<i32>
+    println!(
+        "推断类型: {inferred}, {inferred_f}, {inferred_s}, {:?}",
+        collected
+    );
 
     // ============================================================
     // 七、解构绑定
@@ -121,17 +124,20 @@ fn main() {
     // ============================================================
 
     // 元组解构
-    let (a, b, c) = (1, 2, 3);  // TS: const [a, b, c] = [1, 2, 3]
+    let (a, b, c) = (1, 2, 3); // TS: const [a, b, c] = [1, 2, 3]
     println!("元组解构: a={a}, b={b}, c={c}");
 
     // 结构体解构
-    struct Point { x: i32, y: i32 }
+    struct Point {
+        x: i32,
+        y: i32,
+    }
     let p = Point { x: 10, y: 20 };
-    let Point { x, y } = p;     // TS: const { x, y } = p
+    let Point { x, y } = p; // TS: const { x, y } = p
     println!("结构体解构: x={x}, y={y}");
 
     // 忽略某些字段
-    let (first, _, third) = (1, 2, 3);  // TS: const [first, , third] = [1, 2, 3]
+    let (first, _, third) = (1, 2, 3); // TS: const [first, , third] = [1, 2, 3]
     println!("忽略中间: {first}, {third}");
 
     // ============================================================
@@ -142,10 +148,10 @@ fn main() {
     let result = {
         let a = 3;
         let b = 4;
-        a * a + b * b  // 块的最后一个表达式就是返回值（不需要 return）
-        // TS 需要 IIFE: (() => { const a=3,b=4; return a*a+b*b; })()
+        a * a + b * b // 块的最后一个表达式就是返回值（不需要 return）
+                      // TS 需要 IIFE: (() => { const a=3,b=4; return a*a+b*b; })()
     };
-    println!("块表达式结果: {result}");  // 25
+    println!("块表达式结果: {result}"); // 25
 
     // 内层作用域的变量不会泄漏到外层
     {
@@ -157,10 +163,10 @@ fn main() {
     // ============================================================
     // 九、整数字面量的多种写法（TS 只有十六进制前缀 0x）
     // ============================================================
-    let decimal     = 1_000_000;   // 十进制，下划线分隔（TS 也支持）
-    let hex         = 0xFF;        // 十六进制（TS 也支持）
-    let octal       = 0o77;        // 八进制（TS: 0o77 也支持）
-    let binary      = 0b1111_0000; // 二进制（TS: 0b... 也支持）
-    let byte        = b'A';        // 字节字面量（u8），TS 没有
+    let decimal = 1_000_000; // 十进制，下划线分隔（TS 也支持）
+    let hex = 0xFF; // 十六进制（TS 也支持）
+    let octal = 0o77; // 八进制（TS: 0o77 也支持）
+    let binary = 0b1111_0000; // 二进制（TS: 0b... 也支持）
+    let byte = b'A'; // 字节字面量（u8），TS 没有
     println!("字面量: {decimal}, {hex}, {octal}, {binary}, {byte}");
 }

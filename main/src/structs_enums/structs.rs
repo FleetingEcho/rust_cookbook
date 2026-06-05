@@ -68,9 +68,6 @@ struct User {
 
 */
 
-
-
-
 fn build_user(email: String, username: String) -> User {
     User {
         email: email,

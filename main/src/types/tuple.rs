@@ -9,7 +9,6 @@ fn example_tuple_destructure() {
     println!("The value of y is: {}", y);
 }
 
-
 fn example_tuple_access() {
     let x: (i32, f64, u8) = (500, 6.4, 1);
 

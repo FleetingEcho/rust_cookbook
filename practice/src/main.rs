@@ -2,7 +2,6 @@ mod issue;
 use issue::issue_test;
 
 mod music_player;
- 
 
 struct WordCounter {
     words: Vec<String>,
@@ -10,24 +9,24 @@ struct WordCounter {
 
 impl WordCounter {
     // 创建一个空的 WordCounter
-    fn new() -> Self { 
-        WordCounter { words:vec![] }
-     }
+    fn new() -> Self {
+        WordCounter { words: vec![] }
+    }
 
     // 添加一个词（获取所有权）
     fn add(&mut self, word: String) {
         self.words.push(word);
-     }
+    }
 
     // 返回长度大于 n 的词的数量（不消耗 self）
     fn count_longer_than(&self, n: usize) -> usize {
-        self.words.iter().filter(|w| w.len()>n).count()
-     }
+        self.words.iter().filter(|w| w.len() > n).count()
+    }
 
     // 返回所有词拼成的字符串，用空格分隔（不消耗 self）
     fn join(&self) -> String {
-        return self.words.join(" ")
-     }
+        return self.words.join(" ");
+    }
 }
 
 fn main() {
@@ -43,5 +42,4 @@ fn main() {
 
     issue_test();
     music_player::run_music_player();
-    
 }

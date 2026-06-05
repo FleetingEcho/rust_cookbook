@@ -23,12 +23,13 @@ pub async fn labels_for_issue(state: &AppState, issue_id: i64) -> AppResult<Vec<
 }
 
 pub async fn list_labels(State(state): State<AppState>) -> AppResult<Json<Vec<LabelResponse>>> {
-    let labels: Vec<LabelResponse> = sqlx::query_as::<_, Label>("SELECT * FROM labels ORDER BY name")
-        .fetch_all(&state.db)
-        .await?
-        .into_iter()
-        .map(Into::into)
-        .collect();
+    let labels: Vec<LabelResponse> =
+        sqlx::query_as::<_, Label>("SELECT * FROM labels ORDER BY name")
+            .fetch_all(&state.db)
+            .await?
+            .into_iter()
+            .map(Into::into)
+            .collect();
     Ok(Json(labels))
 }
 
@@ -36,7 +37,9 @@ pub async fn create_label(
     State(state): State<AppState>,
     Json(input): Json<CreateLabelRequest>,
 ) -> AppResult<Json<LabelResponse>> {
-    input.validate().map_err(|e| AppError::BadRequest(e.to_string()))?;
+    input
+        .validate()
+        .map_err(|e| AppError::BadRequest(e.to_string()))?;
     let label =
         sqlx::query_as::<_, Label>("INSERT INTO labels (name, color) VALUES (?, ?) RETURNING *")
             .bind(input.name.trim())

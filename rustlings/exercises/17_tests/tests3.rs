@@ -49,11 +49,11 @@ mod tests {
         fn should_panic<F: FnOnce() + std::panic::UnwindSafe>(f: F) -> bool {
             std::panic::catch_unwind(f).is_err()
         }
-        
+
         let panicked = should_panic(|| {
             let _rect = Rectangle::new(10, -10);
         });
-        
+
         assert!(panicked, "Expected panic but didn't happen");
     }
 }

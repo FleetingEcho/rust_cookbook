@@ -44,27 +44,27 @@ impl FromStr for Person {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         // Step 1: Split the string on commas
         let parts: Vec<&str> = s.split(',').collect();
-        
+
         // Step 2: Check if we have exactly 2 parts
         if parts.len() != 2 {
             return Err(ParsePersonError::BadLen);
         }
-        
+
         // Step 3: Get the name and trim whitespace
         let name = parts[0].trim();
-        
+
         // Step 4: Check if name is empty
         if name.is_empty() {
             return Err(ParsePersonError::NoName);
         }
-        
+
         // Step 5: Parse the age
         let age_str = parts[1].trim();
         let age = match age_str.parse::<u8>() {
             Ok(a) => a,
             Err(e) => return Err(ParsePersonError::ParseInt(e)),
         };
-        
+
         // Step 6: Return the Person
         Ok(Person {
             name: name.to_string(),

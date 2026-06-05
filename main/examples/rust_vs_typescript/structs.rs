@@ -47,8 +47,8 @@
 // PartialEq：支持 == 比较
 #[derive(Debug, Clone, PartialEq)]
 struct User {
-    name:  String,
-    age:   u32,
+    name: String,
+    age: u32,
     email: String,
 }
 
@@ -59,7 +59,7 @@ impl User {
     fn new(name: &str, age: u32, email: &str) -> Self {
         User {
             name: name.to_string(),
-            age,                        // 字段名与变量名相同时可省略，TS 也支持 { age }
+            age, // 字段名与变量名相同时可省略，TS 也支持 { age }
             email: email.to_string(),
         }
     }
@@ -105,13 +105,13 @@ impl User {
 // ============================================================
 #[derive(Debug, Clone)]
 struct Address {
-    city:    String,
+    city: String,
     country: String,
 }
 
 #[derive(Debug)]
 struct Employee {
-    name:    String,
+    name: String,
     address: Address,
 }
 
@@ -121,7 +121,7 @@ struct Employee {
 // ============================================================
 #[derive(Debug)]
 struct Pair<T, U> {
-    first:  T,
+    first: T,
     second: U,
 }
 
@@ -141,8 +141,8 @@ fn main() {
     // TS: const user: User = new User("Alice", 30, "...")
     // ============================================================
     let mut user = User::new("Alice", 30, "alice@example.com");
-    println!("{:?}", user);            // Debug 输出，类似 console.log(user)
-    println!("{:#?}", user);           // 多行美化输出
+    println!("{:?}", user); // Debug 输出，类似 console.log(user)
+    println!("{:#?}", user); // 多行美化输出
 
     // 字段访问
     // TS: user.name, user.age
@@ -165,9 +165,9 @@ fn main() {
     // TS: const user2 = { ...user, name: "Bob", email: "bob@..." }
     // ============================================================
     let user2 = User {
-        name:  String::from("Bob"),
+        name: String::from("Bob"),
         email: String::from("bob@example.com"),
-        ..user.clone()   // 其余字段从 user 复制（需要 Clone）
+        ..user.clone() // 其余字段从 user 复制（需要 Clone）
     };
     println!("user2: {:?}", user2);
 
@@ -177,13 +177,13 @@ fn main() {
     // Rust: 派生 PartialEq 后可以用 ==
     // ============================================================
     let user3 = user.clone();
-    println!("user == user3: {}", user == user3);  // true
-    println!("user == user2: {}", user == user2);  // false
+    println!("user == user3: {}", user == user3); // true
+    println!("user == user2: {}", user == user2); // false
 
     // ============================================================
     // 四、消耗 self（转换操作）
     // ============================================================
-    let summary = user.into_summary();  // user 被消耗
+    let summary = user.into_summary(); // user 被消耗
     println!("摘要: {summary}");
     // println!("{}", user.name); // ❌ user 已被消耗，编译错误
 
@@ -194,14 +194,17 @@ fn main() {
     let emp = Employee {
         name: String::from("Charlie"),
         address: Address {
-            city:    String::from("北京"),
+            city: String::from("北京"),
             country: String::from("中国"),
         },
     };
     println!("员工: {}, 城市: {}", emp.name, emp.address.city);
 
     // 解构嵌套结构体
-    let Employee { name, address: Address { city, .. } } = emp;
+    let Employee {
+        name,
+        address: Address { city, .. },
+    } = emp;
     println!("解构: {name} 在 {city}");
 
     // ============================================================
@@ -224,7 +227,7 @@ fn main() {
     // TS: new Pair<number, string>(1, "hello")
     // ============================================================
     let int_str_pair = Pair::new(42, "hello");
-    let float_pair   = Pair::new(1.1_f64, 2.2_f64);
+    let float_pair = Pair::new(1.1_f64, 2.2_f64);
     int_str_pair.show();
     float_pair.show();
 
@@ -235,17 +238,17 @@ fn main() {
     #[derive(Debug)]
     struct Profile {
         username: String,
-        bio:      Option<String>,   // 对应 TS 的 bio?: string
-        age:      Option<u32>,      // 对应 TS 的 age?: number
+        bio: Option<String>, // 对应 TS 的 bio?: string
+        age: Option<u32>,    // 对应 TS 的 age?: number
     }
 
     let p1 = Profile {
         username: String::from("alice"),
-        bio:      Some(String::from("Rust 爱好者")),
-        age:      None,
+        bio: Some(String::from("Rust 爱好者")),
+        age: None,
     };
     println!("Profile: {:?}", p1);
-    println!("bio: {}", p1.bio.as_deref().unwrap_or("未填写"));  // TS: p1.bio ?? "未填写"
+    println!("bio: {}", p1.bio.as_deref().unwrap_or("未填写")); // TS: p1.bio ?? "未填写"
 
     // ============================================================
     // 十、Vec 中的结构体（常见模式）
@@ -258,7 +261,7 @@ fn main() {
     ];
 
     // 找到特定用户
-    let found = users.iter().find(|u| u.name == "Bob");  // TS: users.find(u => u.name === "Bob")
+    let found = users.iter().find(|u| u.name == "Bob"); // TS: users.find(u => u.name === "Bob")
     println!("找到: {:?}", found);
 
     // 过滤

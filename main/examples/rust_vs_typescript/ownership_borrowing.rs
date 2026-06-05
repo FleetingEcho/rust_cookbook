@@ -32,14 +32,14 @@ fn main() {
 
     // 基本类型（Copy 类型）：赋值是值拷贝，与 TS 相同
     let a = 5_i32;
-    let b = a;      // a 的值被复制到 b
-    println!("a={a}, b={b}");  // a 仍然可用
+    let b = a; // a 的值被复制到 b
+    println!("a={a}, b={b}"); // a 仍然可用
 
     // String（堆数据）：赋值是移动（Move），不是拷贝
     let s1 = String::from("hello");
-    let s2 = s1;    // s1 的所有权移动到 s2，s1 不再有效
-    // println!("{s1}"); // ❌ 编译错误：s1 已被移动
-    println!("s2 = {s2}");  // ✅ 只能用 s2
+    let s2 = s1; // s1 的所有权移动到 s2，s1 不再有效
+                 // println!("{s1}"); // ❌ 编译错误：s1 已被移动
+    println!("s2 = {s2}"); // ✅ 只能用 s2
 
     // TS 对比：const s2 = s1 后，s1 和 s2 都指向同一对象，都可用
     // Rust：移动后原变量失效，避免"双重释放"内存问题
@@ -49,8 +49,8 @@ fn main() {
     // TS: {...obj}（浅拷贝）或 JSON.parse(JSON.stringify(obj))（深拷贝）
     // ============================================================
     let s1 = String::from("hello");
-    let s2 = s1.clone();  // 显式深拷贝，s1 和 s2 各自独立
-    println!("s1={s1}, s2={s2}");  // 两者都可用
+    let s2 = s1.clone(); // 显式深拷贝，s1 和 s2 各自独立
+    println!("s1={s1}, s2={s2}"); // 两者都可用
 
     // Clone 会复制堆上的数据，有性能开销
     // 只在真正需要独立副本时才用 clone()
@@ -62,10 +62,10 @@ fn main() {
     // ============================================================
 
     // 实现了 Copy 的类型：i32, u32, f64, bool, char, &T, 元组（如果元素都 Copy）
-    let x: i32  = 5;
-    let y: i32  = x;   // 自动复制，x 仍可用
-    let flag    = true;
-    let flag2   = flag; // 自动复制
+    let x: i32 = 5;
+    let y: i32 = x; // 自动复制，x 仍可用
+    let flag = true;
+    let flag2 = flag; // 自动复制
     println!("x={x}, y={y}, flag={flag}, flag2={flag2}");
 
     // 没有实现 Copy 的类型：String, Vec, HashMap, 自定义结构体（默认）
@@ -77,24 +77,27 @@ fn main() {
     // Rust：传入非 Copy 类型会转移所有权，调用后原变量失效
     // ============================================================
 
-    fn takes_ownership(s: String) {   // s 进来，获得所有权
+    fn takes_ownership(s: String) {
+        // s 进来，获得所有权
         println!("获得所有权: {s}");
-    }   // s 在这里被丢弃
+    } // s 在这里被丢弃
 
-    fn makes_copy(n: i32) {           // i32 是 Copy，复制进来
+    fn makes_copy(n: i32) {
+        // i32 是 Copy，复制进来
         println!("Copy 进来: {n}");
     }
 
-    fn gives_ownership() -> String {  // 返回值转移所有权给调用者
+    fn gives_ownership() -> String {
+        // 返回值转移所有权给调用者
         String::from("新字符串")
     }
 
     let s = String::from("hello");
-    takes_ownership(s);    // s 的所有权移入函数
-    // println!("{s}");    // ❌ s 已被移动
+    takes_ownership(s); // s 的所有权移入函数
+                        // println!("{s}");    // ❌ s 已被移动
 
     let n = 5;
-    makes_copy(n);         // i32 是 Copy，n 仍可用
+    makes_copy(n); // i32 是 Copy，n 仍可用
     println!("n 仍然可用: {n}");
 
     let returned = gives_ownership();
@@ -106,18 +109,19 @@ fn main() {
     // Rust 需要显式用 & 表示借用
     // ============================================================
 
-    fn calculate_length(s: &String) -> usize {  // &String 是不可变借用
-        s.len()   // 只是借用，不获取所有权
-    }   // s 的借用结束，但原数据不被丢弃
+    fn calculate_length(s: &String) -> usize {
+        // &String 是不可变借用
+        s.len() // 只是借用，不获取所有权
+    } // s 的借用结束，但原数据不被丢弃
 
     let s1 = String::from("hello");
-    let len = calculate_length(&s1);  // 传入引用（借用），不转移所有权
-    println!("'{s1}' 的长度是 {len}");  // s1 仍然可用！
+    let len = calculate_length(&s1); // 传入引用（借用），不转移所有权
+    println!("'{s1}' 的长度是 {len}"); // s1 仍然可用！
 
     // 不可变借用：可以同时存在多个
     let s = String::from("hello");
-    let r1 = &s;   // 第一个不可变借用
-    let r2 = &s;   // 第二个不可变借用，✅ 允许
+    let r1 = &s; // 第一个不可变借用
+    let r2 = &s; // 第二个不可变借用，✅ 允许
     println!("r1={r1}, r2={r2}");
 
     // ============================================================
@@ -127,11 +131,11 @@ fn main() {
     // ============================================================
 
     fn change(s: &mut String) {
-        s.push_str("，世界");  // 通过可变借用修改值
+        s.push_str("，世界"); // 通过可变借用修改值
     }
 
     let mut s = String::from("你好");
-    change(&mut s);   // 传入可变借用
+    change(&mut s); // 传入可变借用
     println!("修改后: {s}");
 
     // 可变借用规则：同一时间只能有一个 &mut
@@ -143,11 +147,11 @@ fn main() {
 
     // 不可变借用和可变借用不能同时存在
     let mut s = String::from("hello");
-    let r1 = &s;      // 不可变借用
-    // let r2 = &mut s; // ❌ 已有不可变借用，不能再可变借用
+    let r1 = &s; // 不可变借用
+                 // let r2 = &mut s; // ❌ 已有不可变借用，不能再可变借用
     println!("{r1}"); // r1 最后一次使用
-    // 此后 r1 的借用结束，可以再借用
-    let r2 = &mut s;  // ✅ r1 已不再使用
+                      // 此后 r1 的借用结束，可以再借用
+    let r2 = &mut s; // ✅ r1 已不再使用
     r2.push_str("!");
     println!("{r2}");
 
@@ -165,13 +169,14 @@ fn main() {
     // 八、切片引用（&str 是 String 的借用切片）
     // ============================================================
     let s = String::from("hello world");
-    let hello = &s[0..5];   // &str：对 s 的部分借用
+    let hello = &s[0..5]; // &str：对 s 的部分借用
     let world = &s[6..11];
     println!("{hello} {world}");
     // s 仍然有效，hello 和 world 只是借用
 
     // 函数参数使用 &str 比 &String 更灵活
-    fn first_word(s: &str) -> &str {   // 接受 &str 或 &String（自动解引用）
+    fn first_word(s: &str) -> &str {
+        // 接受 &str 或 &String（自动解引用）
         let bytes = s.as_bytes();
         for (i, &item) in bytes.iter().enumerate() {
             if item == b' ' {
@@ -194,7 +199,8 @@ fn main() {
 
     // 使用借用遍历不消耗所有权
     let v = vec![1, 2, 3];
-    for x in &v {           // &v 借用
+    for x in &v {
+        // &v 借用
         print!("{x} ");
     }
     println!();
@@ -209,8 +215,11 @@ fn main() {
         age: u32,
     }
 
-    let u1 = User { name: String::from("Alice"), age: 30 };
-    let u2 = u1.clone();   // 深拷贝，TS: { ...u1 }（浅拷贝）
+    let u1 = User {
+        name: String::from("Alice"),
+        age: 30,
+    };
+    let u2 = u1.clone(); // 深拷贝，TS: { ...u1 }（浅拷贝）
     println!("u1={:?}, u2={:?}", u1, u2);
 
     // ============================================================

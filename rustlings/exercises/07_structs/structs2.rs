@@ -35,7 +35,7 @@ mod tests {
 
         // TODO: Create your own order using the update syntax and template above!
         let your_order = Order {
-            name:"Hacker in Rust".to_string(),
+            name: "Hacker in Rust".to_string(),
             year: order_template.year,
             made_by_phone: order_template.made_by_phone,
             made_by_mobile: order_template.made_by_mobile,

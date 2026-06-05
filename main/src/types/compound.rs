@@ -23,23 +23,22 @@ fn main() {
 */
 
 // String
-fn main(){
-  let s = String::from("hello");
+fn main() {
+    let s = String::from("hello");
 
-  let slice = &s[0..2]; // slice
-  let slice = &s[..2]; //slice same as above
+    let slice = &s[0..2]; // slice
+    let slice = &s[..2]; //slice same as above
 
-  {let s = String::from("hello");
+    {
+        let s = String::from("hello");
 
-let len = s.len();
+        let len = s.len();
 
-let slice = &s[4..len];
-let slice = &s[4..]; // same
-let slice = &s[..];// all string
-  }
-
+        let slice = &s[4..len];
+        let slice = &s[4..]; // same
+        let slice = &s[..]; // all string
+    }
 }
-
 
 /*
 fn main() {
@@ -60,10 +59,8 @@ fn first_word(s: &String) -> &str {
 2.println!("the first word is: {}", word); 又使用了不可变借用
 */
 
-
-
 fn example_string_say_hello() {
-  // String 与 &str 的转换
+    // String 与 &str 的转换
     let s = String::from("hello,world!");
     say_hello(&s);
     say_hello(&s[..]);
@@ -71,7 +68,7 @@ fn example_string_say_hello() {
 }
 
 fn say_hello(s: &str) {
-    println!("{}",s);
+    println!("{}", s);
 }
 
 /*
@@ -87,7 +84,7 @@ let s = &hello[0..2];
 fn example_string_mutate() {
     let mut s = String::from("Hello "); // 必须可变
 
-    s.push_str("rust");// 可以 push字面量
+    s.push_str("rust"); // 可以 push字面量
     println!("追加字符串 push_str() -> {}", s);
 
     s.push('!'); // 只能 push 一个字符
@@ -99,21 +96,20 @@ fn example_string_mutate() {
     println!("插入字符串 insert_str() -> {}", s);
 
     // 插入字符 insert() -> Hello, rust!
-// 插入字符串 insert_str() -> Hello, I like rust!
-//
+    // 插入字符串 insert_str() -> Hello, I like rust!
+    //
 
     let string_replace = String::from("I like rust. Learning rust is my favorite!");
-    let new_string_replace = string_replace.replace("rust", "RUST");// 替换所有匹配到的
+    let new_string_replace = string_replace.replace("rust", "RUST"); // 替换所有匹配到的
     dbg!(new_string_replace);
 
-
     let string_replace = "I like rust. Learning rust is my favorite!";
-    let new_string_replacen = string_replace.replacen("rust", "RUST", 1);// 只替换一次
-    dbg!(new_string_replacen);//new_string_replacen = "I like RUST. Learning rust is my favorite!"
+    let new_string_replacen = string_replace.replacen("rust", "RUST", 1); // 只替换一次
+    dbg!(new_string_replacen); //new_string_replacen = "I like RUST. Learning rust is my favorite!"
 
     let mut string_replace_range = String::from("I like rust!");
     string_replace_range.replace_range(7..8, "R");
-    dbg!(string_replace_range);//该方法是直接操作原来的字符串，不会返回新的字符串。该方法需要使用 mut 关键字修饰。
+    dbg!(string_replace_range); //该方法是直接操作原来的字符串，不会返回新的字符串。该方法需要使用 mut 关键字修饰。
 }
 
 fn example_string_pop() {
@@ -124,14 +120,14 @@ fn example_string_pop() {
     dbg!(p2);
     dbg!(string_pop);
     /*
-    p1 = Some(
-   '!',
-    )
-    p2 = Some(
-      '文',
-    )
-    string_pop = "rust pop 中"
-    */
+     p1 = Some(
+    '!',
+     )
+     p2 = Some(
+       '文',
+     )
+     string_pop = "rust pop 中"
+     */
 }
 
 // 因为中文占3 个字节，所以会报错，不在边界上
@@ -153,9 +149,8 @@ fn example_string_remove() {
 
 fn example_string_truncate() {
     let mut string_truncate = String::from("测试truncate");
-    string_truncate.truncate(3);// 因为一个汉字 3 字节
-    dbg!(string_truncate);//string_truncate = "测"
-
+    string_truncate.truncate(3); // 因为一个汉字 3 字节
+    dbg!(string_truncate); //string_truncate = "测"
 }
 
 fn example_string_clear() {
@@ -163,8 +158,6 @@ fn example_string_clear() {
     string_clear.clear();
     dbg!(string_clear);
 }
-
-
 
 fn example_string_concat() {
     let string_append = String::from("hello ");
@@ -175,7 +168,6 @@ fn example_string_concat() {
     result += "!!!";
 
     println!("连接字符串 + -> {}", result); //连接字符串 + -> hello rust!!!!
-
 }
 
 fn example_string_add_ownership() {
@@ -183,7 +175,7 @@ fn example_string_add_ownership() {
     let s2 = String::from("world!");
     // 在下句中，s1的所有权被转移走了，因此后面不能再使用s1
     let s3 = s1 + &s2;
-    assert_eq!(s3,"hello,world!");
+    assert_eq!(s3, "hello,world!");
     // 下面的语句如果去掉注释，就会报错
     // println!("{}",s1);
 }
@@ -192,34 +184,30 @@ fn example_string_format() {
     let s1 = "hello";
     let s2 = String::from("rust");
     let s = format!("{} {}!", s1, s2);
-    println!("{}", s);//hello rust!
-
+    println!("{}", s); //hello rust!
 }
 
+fn example_string_chars() {
+    for c in "中国人".chars() {
+        println!("{}", c);
+    }
 
-fn example_string_chars(){
+    for b in "中国人".bytes() {
+        println!("{}", b);
+    }
+    /*
+    228
+    184
+    173
+    229
+    155
+    189
+    228
+    186
+    186
 
-for c in "中国人".chars() {
-    println!("{}", c);
+    */
 }
-
-for b in "中国人".bytes() {
-    println!("{}", b);
-}
-/*
-228
-184
-173
-229
-155
-189
-228
-186
-186
-
-*/
-}
-
 
 // 📘 TypeScript 对比
 // ====================

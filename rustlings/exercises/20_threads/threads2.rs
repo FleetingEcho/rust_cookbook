@@ -2,7 +2,11 @@
 // work. But this time, the spawned threads need to be in charge of updating a
 // shared value: `JobStatus.jobs_done`
 
-use std::{sync::{Arc, Mutex}, thread, time::Duration};
+use std::{
+    sync::{Arc, Mutex},
+    thread,
+    time::Duration,
+};
 
 struct JobStatus {
     jobs_done: u32,
@@ -18,8 +22,8 @@ fn main() {
         let handle = thread::spawn(move || {
             thread::sleep(Duration::from_millis(250));
 
-            let mut data = status_shared.lock().unwrap();  // 获取锁
-            data.jobs_done += 1;  // 可以修改
+            let mut data = status_shared.lock().unwrap(); // 获取锁
+            data.jobs_done += 1; // 可以修改
         });
         handles.push(handle);
     }

@@ -58,7 +58,10 @@ impl Container for NumberContainer {
 }
 
 fn example_associated_types() {
-    let container = NumberContainer { item1: 10, item2: 20 };
+    let container = NumberContainer {
+        item1: 10,
+        item2: 20,
+    };
     println!("{}", container.contains(&10, &20)); // true
 }
 
@@ -69,13 +72,14 @@ struct DefaultContainer<T = String> {
 }
 
 fn example_default_generic() {
-    let a = DefaultContainer { value: "Hello".to_string() }; // 默认是 String
+    let a = DefaultContainer {
+        value: "Hello".to_string(),
+    }; // 默认是 String
     let b = DefaultContainer::<i32> { value: 42 }; // 显式指定为 i32
 
     println!("{}", a.value); // 输出: Hello
     println!("{}", b.value); // 输出: 42
 }
-
 
 //=========================================
 // 调用同名的方法
@@ -115,7 +119,6 @@ fn example_trait_ambiguity() {
     Wizard::fly(&person); // 调用Wizard特征上的方法
     person.fly(); // 调用Human类型自身的方法
 }
-
 
 //完全限定语法
 /*
@@ -160,8 +163,6 @@ fn example_full_qualified_syntax() {
     <MyStruct as B>::hello(&obj); // ✅ 输出：Hello from B!
 }
 
-
-
 //结构体
 
 trait Greet {
@@ -190,7 +191,6 @@ fn example_struct_trait_method() {
     // 调用特征的方法
     <Person as Greet>::hello(&p); // ✅ 输出：Hello from trait!
 }
-
 
 //泛型中的完全限定语法
 
@@ -229,8 +229,6 @@ fn example_generic_trait_disambiguation() {
     make_noise::<Dog>(); // ✅ 输出 Woof! 和 WOOF!
 }
 
-
-
 /*
 孤儿规则
 
@@ -240,7 +238,6 @@ fn example_generic_trait_disambiguation() {
 绕过孤儿规则，允许在 MyString 上实现 Display。
 防止与标准库冲突，避免对 String 进行不受控的修改。
 */
-
 
 use std::fmt;
 
@@ -258,7 +255,6 @@ fn example_newtype() {
     let s = MyString("Hello, world!".to_string());
     println!("{}", s); // ✅ 输出：Custom String: Hello, world!
 }
-
 
 /*
 ✅ 为什么需要 Newtype 模式？
@@ -296,5 +292,3 @@ impl Display for MyType { ... }
 //
 // 详细对照 → rust_vs_typescript.rs §10 "Trait"
 */
-
-

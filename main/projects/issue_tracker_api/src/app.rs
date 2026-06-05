@@ -45,10 +45,7 @@ pub fn build_app(state: AppState, api_key: String) -> Router {
     let request_id_header = HeaderName::from_static("x-request-id");
     let cors = CorsLayer::new()
         .allow_origin(AllowOrigin::predicate(|origin: &HeaderValue, _| {
-            origin
-                .to_str()
-                .map(is_local_dev_origin)
-                .unwrap_or(false)
+            origin.to_str().map(is_local_dev_origin).unwrap_or(false)
         }))
         .allow_methods([Method::GET, Method::POST, Method::PATCH, Method::DELETE])
         .allow_headers([
@@ -95,7 +92,10 @@ pub fn build_app(state: AppState, api_key: String) -> Router {
         .layer(RequestBodyLimitLayer::new(MAX_UPLOAD_BYTES));
 
     Router::new()
-        .route("/health", get(|| async { Json(HealthResponse { status: "ok" }) }))
+        .route(
+            "/health",
+            get(|| async { Json(HealthResponse { status: "ok" }) }),
+        )
         .nest("/api", api)
         .with_state(state)
         .layer(PropagateRequestIdLayer::new(request_id_header.clone()))

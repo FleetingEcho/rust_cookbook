@@ -131,7 +131,7 @@ enum MyResult<T, E> {
 // 自定义迭代器（关联类型比泛型参数更简洁）
 struct Counter {
     count: u32,
-    max:   u32,
+    max: u32,
 }
 
 impl Counter {
@@ -142,8 +142,8 @@ impl Counter {
 
 // Iterator trait 要求定义关联类型 Item
 impl Iterator for Counter {
-    type Item = u32;   // 关联类型：指定迭代产生的值类型
-                       // TS: interface Iterator<T> { ... } 中的 T 是参数，不是关联类型
+    type Item = u32; // 关联类型：指定迭代产生的值类型
+                     // TS: interface Iterator<T> { ... } 中的 T 是参数，不是关联类型
 
     fn next(&mut self) -> Option<u32> {
         if self.count < self.max {
@@ -168,7 +168,9 @@ impl Iterator for Counter {
 fn print_array<T: Display, const N: usize>(arr: [T; N]) {
     print!("[");
     for (i, item) in arr.iter().enumerate() {
-        if i > 0 { print!(", "); }
+        if i > 0 {
+            print!(", ");
+        }
         print!("{item}");
     }
     println!("] (长度: {N})");
@@ -194,13 +196,21 @@ struct Dog;
 struct Cat;
 
 impl Animal for Dog {
-    fn name(&self) -> &str { "狗" }
-    fn sound(&self) -> &str { "汪汪" }
+    fn name(&self) -> &str {
+        "狗"
+    }
+    fn sound(&self) -> &str {
+        "汪汪"
+    }
 }
 
 impl Animal for Cat {
-    fn name(&self) -> &str { "猫" }
-    fn sound(&self) -> &str { "喵喵" }
+    fn name(&self) -> &str {
+        "猫"
+    }
+    fn sound(&self) -> &str {
+        "喵喵"
+    }
 }
 
 // 静态分发（编译期单态化）：每种类型生成独立代码，零开销
@@ -252,7 +262,7 @@ fn main() {
 
     // 关联类型 Iterator
     let counter = Counter::new(5);
-    let sum: u32 = counter.sum();  // 自动获得所有 Iterator 方法
+    let sum: u32 = counter.sum(); // 自动获得所有 Iterator 方法
     println!("Counter sum: {sum}");
 
     let doubled: Vec<u32> = Counter::new(3).map(|x| x * 2).collect();

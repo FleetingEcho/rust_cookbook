@@ -93,34 +93,35 @@ main 函数中演示：
 
 use std::fmt;
 
-
-enum PlayState{
-  Stopped, 
-  Playing{track_index:usize},
-  Paused { track_index:usize, position_secs:u32},
+enum PlayState {
+    Stopped,
+    Playing {
+        track_index: usize,
+    },
+    Paused {
+        track_index: usize,
+        position_secs: u32,
+    },
 }
 
-
-#[derive(Debug, Clone,Copy,PartialEq,Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum RepeatMode {
-  None,
-  One,
-  All
+    None,
+    One,
+    All,
 }
 
-struct Track{
-   title : String,
-   artist: String,
-  duration_secs: u32,  // duration in seconds
-} 
+struct Track {
+    title: String,
+    artist: String,
+    duration_secs: u32, // duration in seconds
+}
 
 struct Player {
     playlist: Vec<Track>,
     state: PlayState,
     repeat_mode: RepeatMode,
 }
-
-
 
 impl Track {
     fn new(title: &str, artist: &str, duration_secs: u32) -> Self {
@@ -130,7 +131,7 @@ impl Track {
             duration_secs,
         }
     }
-    
+
     fn format_duration(&self) -> String {
         let minutes = self.duration_secs / 60;
         let seconds = self.duration_secs % 60;
@@ -140,11 +141,15 @@ impl Track {
 
 impl fmt::Display for Track {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{} - {} [{}]", self.artist, self.title, self.format_duration())
+        write!(
+            f,
+            "{} - {} [{}]",
+            self.artist,
+            self.title,
+            self.format_duration()
+        )
     }
 }
-
-
 
 impl Player {
     fn new(playlist: Vec<Track>) -> Self {
@@ -154,7 +159,7 @@ impl Player {
             repeat_mode: RepeatMode::None,
         }
     }
-    
+
     fn current_track_index(&self) -> Option<usize> {
         match &self.state {
             PlayState::Playing { track_index } => Some(*track_index),
@@ -162,12 +167,12 @@ impl Player {
             PlayState::Stopped => None,
         }
     }
-    
+
     fn set_repeat_mode(&mut self, mode: RepeatMode) {
         self.repeat_mode = mode;
         println!("Repeat mode set to: {:?}", mode);
     }
-    
+
     fn get_next_track_index(&self, current_index: usize) -> Option<usize> {
         match self.repeat_mode {
             RepeatMode::One => Some(current_index),
@@ -189,7 +194,6 @@ impl Player {
     }
 }
 
-
 // 假设未来有多种播放器
 // struct Mp3Player { ... }
 // struct StreamingPlayer { ... }
@@ -201,12 +205,12 @@ trait Playable {
     fn stop(&mut self) -> Result<(), String>;
     fn next(&mut self) -> Result<(), String>;
     fn previous(&mut self) -> Result<(), String>;
-    
+
     // Method with default implementation
     fn is_playing(&self) -> bool {
         matches!(self.current_state(), PlayState::Playing { .. })
     }
-    
+
     fn current_state(&self) -> &PlayState;
 }
 
@@ -215,18 +219,23 @@ impl Playable for Player {
         if track_index >= self.playlist.len() {
             return Err(format!("Track index {} out of bounds", track_index));
         }
-        
+
         match &self.state {
             PlayState::Stopped => {
                 self.state = PlayState::Playing { track_index };
                 println!("▶️  Playing: {}", self.playlist[track_index]);
             }
-            PlayState::Paused { track_index: idx, position_secs } => {
+            PlayState::Paused {
+                track_index: idx,
+                position_secs,
+            } => {
                 if *idx == track_index {
-                    println!("▶️  Resuming: {} from {}:{}", 
+                    println!(
+                        "▶️  Resuming: {} from {}:{}",
                         self.playlist[track_index],
                         position_secs / 60,
-                        position_secs % 60);
+                        position_secs % 60
+                    );
                     self.state = PlayState::Playing { track_index: *idx };
                 } else {
                     self.state = PlayState::Playing { track_index };
@@ -239,24 +248,25 @@ impl Playable for Player {
         }
         Ok(())
     }
-    
+
     fn pause(&mut self) -> Result<(), String> {
         match &self.state {
             PlayState::Playing { track_index } => {
                 let pos = 30; // Simulate pausing at 30 seconds
-                self.state = PlayState::Paused { track_index: *track_index, position_secs: pos };
-                println!("⏸️  Paused at {}:{:02}", pos/60, pos%60);
+                self.state = PlayState::Paused {
+                    track_index: *track_index,
+                    position_secs: pos,
+                };
+                println!("⏸️  Paused at {}:{:02}", pos / 60, pos % 60);
                 Ok(())
             }
             PlayState::Stopped => {
                 Err("Cannot pause: Player is stopped. Use play() first.".to_string())
             }
-            PlayState::Paused { .. } => {
-                Err("Already paused.".to_string())
-            }
+            PlayState::Paused { .. } => Err("Already paused.".to_string()),
         }
     }
-    
+
     fn stop(&mut self) -> Result<(), String> {
         match &self.state {
             PlayState::Playing { .. } | PlayState::Paused { .. } => {
@@ -264,20 +274,18 @@ impl Playable for Player {
                 println!("⏹️  Stopped playback");
                 Ok(())
             }
-            PlayState::Stopped => {
-                Err("Already stopped.".to_string())
-            }
+            PlayState::Stopped => Err("Already stopped.".to_string()),
         }
     }
-    
+
     fn next(&mut self) -> Result<(), String> {
         match &self.state {
-            PlayState::Stopped => {
-                Err("Cannot go to next track: Player is stopped.".to_string())
-            }
+            PlayState::Stopped => Err("Cannot go to next track: Player is stopped.".to_string()),
             PlayState::Playing { track_index } | PlayState::Paused { track_index, .. } => {
                 if let Some(next_idx) = self.get_next_track_index(*track_index) {
-                    self.state = PlayState::Playing { track_index: next_idx };
+                    self.state = PlayState::Playing {
+                        track_index: next_idx,
+                    };
                     println!("⏭️  Next track: {}", self.playlist[next_idx]);
                     Ok(())
                 } else {
@@ -288,7 +296,7 @@ impl Playable for Player {
             }
         }
     }
-    
+
     fn previous(&mut self) -> Result<(), String> {
         match &self.state {
             PlayState::Stopped => {
@@ -297,7 +305,9 @@ impl Playable for Player {
             PlayState::Playing { track_index } | PlayState::Paused { track_index, .. } => {
                 if *track_index > 0 {
                     let prev_idx = track_index - 1;
-                    self.state = PlayState::Playing { track_index: prev_idx };
+                    self.state = PlayState::Playing {
+                        track_index: prev_idx,
+                    };
                     println!("⏮️  Previous track: {}", self.playlist[prev_idx]);
                     Ok(())
                 } else {
@@ -306,7 +316,7 @@ impl Playable for Player {
             }
         }
     }
-    
+
     fn current_state(&self) -> &PlayState {
         &self.state
     }
@@ -320,16 +330,27 @@ impl fmt::Display for Player {
             }
             PlayState::Playing { track_index } => {
                 let track = &self.playlist[*track_index];
-                write!(f, "Player State: ▶️  Playing - {} - {} [{}]", 
-                    track.artist, track.title, track.format_duration())
+                write!(
+                    f,
+                    "Player State: ▶️  Playing - {} - {} [{}]",
+                    track.artist,
+                    track.title,
+                    track.format_duration()
+                )
             }
-            PlayState::Paused { track_index, position_secs } => {
+            PlayState::Paused {
+                track_index,
+                position_secs,
+            } => {
                 let track = &self.playlist[*track_index];
-                write!(f, "Player State: ⏸️  Paused at {}:{:02} - {} - {}",
+                write!(
+                    f,
+                    "Player State: ⏸️  Paused at {}:{:02} - {} - {}",
                     position_secs / 60,
                     position_secs % 60,
-                    track.artist, 
-                    track.title)
+                    track.artist,
+                    track.title
+                )
             }
         }
     }
@@ -343,16 +364,16 @@ pub fn run_music_player() {
         Track::new("Imagine", "John Lennon", 183),
         Track::new("Hotel California", "Eagles", 390),
     ];
-    
+
     let mut player = Player::new(playlist);
-    
+
     // Print all tracks
     println!("📀 PLAYLIST:");
     for (i, track) in player.playlist.iter().enumerate() {
         println!("  {}. {}", i + 1, track);
     }
     println!();
-    
+
     // Test normal flow
     println!("=== NORMAL FLOW ===");
     println!("Current: {}", player);
@@ -365,14 +386,14 @@ pub fn run_music_player() {
     let _ = player.next();
     println!("{}", player);
     println!();
-    
+
     // Test repeat modes
     println!("=== REPEAT MODES ===");
     player.set_repeat_mode(RepeatMode::One);
     println!("Current track will repeat when next is pressed");
     let _ = player.next(); // Should play same track
     println!("{}", player);
-    
+
     player.set_repeat_mode(RepeatMode::All);
     println!("Will loop through all tracks");
     for _ in 0..6 {
@@ -380,34 +401,43 @@ pub fn run_music_player() {
         println!("{}", player);
     }
     println!();
-    
+
     // Test illegal operations
     println!("=== ILLEGAL OPERATIONS ===");
     let _ = player.stop();
     println!("After stop: {}", player);
-    
+
     match player.pause() {
         Ok(_) => println!("Pause succeeded"),
         Err(e) => println!("❌ Error: {}", e),
     }
-    
+
     match player.next() {
         Ok(_) => println!("Next succeeded"),
         Err(e) => println!("❌ Error: {}", e),
     }
-    
+
     match player.previous() {
         Ok(_) => println!("Previous succeeded"),
         Err(e) => println!("❌ Error: {}", e),
     }
     println!();
-    
+
     // Test is_playing method
     println!("=== IS PLAYING CHECK ===");
     let _ = player.play(2);
-    println!("Is playing? {}", if player.is_playing() { "Yes" } else { "No" });
+    println!(
+        "Is playing? {}",
+        if player.is_playing() { "Yes" } else { "No" }
+    );
     let _ = player.pause();
-    println!("Is playing? {}", if player.is_playing() { "Yes" } else { "No" });
+    println!(
+        "Is playing? {}",
+        if player.is_playing() { "Yes" } else { "No" }
+    );
     let _ = player.stop();
-    println!("Is playing? {}", if player.is_playing() { "Yes" } else { "No" });
+    println!(
+        "Is playing? {}",
+        if player.is_playing() { "Yes" } else { "No" }
+    );
 }

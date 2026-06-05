@@ -11,7 +11,7 @@ impl PositiveNonzeroInteger {
     fn new(value: i64) -> Result<Self, CreationError> {
         // TODO: This function shouldn't always return an `Ok`.
         // Read the tests below to clarify what should be returned.
-        
+
         // match value {
         //     0=>Err(CreationError::Zero),
         //     1..=100=> Ok(Self(value as u64)),
@@ -23,7 +23,6 @@ impl PositiveNonzeroInteger {
         //     _ => Err(CreationError::Negative),  // 所有负数
         // }
 
-        
         // 方法	类型	失败时	使用场景
         // as	强制转换	静默溢出/截断	确定安全时
         // into()	自动转换	编译错误	总是成功的转换

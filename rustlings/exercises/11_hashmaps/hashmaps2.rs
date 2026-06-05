@@ -34,8 +34,8 @@ fn fruit_basket(basket: &mut HashMap<Fruit, u32>) {
     for fruit in fruit_kinds {
         basket.entry(fruit).or_insert(1);
         // if !basket.contains_key(&fruit) {
-            // 第 1 次查找
-            // basket.insert(fruit, 1); // 第 2 次查找
+        // 第 1 次查找
+        // basket.insert(fruit, 1); // 第 2 次查找
         // }
     }
 }

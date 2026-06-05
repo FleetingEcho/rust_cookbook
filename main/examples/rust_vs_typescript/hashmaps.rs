@@ -31,7 +31,7 @@
 // [...new Set(arr)]           // 数组去重
 // ============================================================
 
-use std::collections::{HashMap, HashSet, BTreeMap};
+use std::collections::{BTreeMap, HashMap, HashSet};
 
 fn main() {
     // ============================================================
@@ -43,8 +43,8 @@ fn main() {
 
     // 插入
     // TS: map.set("Alice", 90)
-    scores.insert(String::from("Alice"),   90);
-    scores.insert(String::from("Bob"),     85);
+    scores.insert(String::from("Alice"), 90);
+    scores.insert(String::from("Bob"), 85);
     scores.insert(String::from("Charlie"), 92);
     println!("HashMap: {:?}", scores);
 
@@ -63,14 +63,14 @@ fn main() {
     println!("Dave（默认）: {dave_score}");
 
     // 判断 key 是否存在
-    println!("有 Bob 吗: {}", scores.contains_key("Bob"));  // TS: map.has("Bob")
+    println!("有 Bob 吗: {}", scores.contains_key("Bob")); // TS: map.has("Bob")
 
     // 删除
-    scores.remove("Bob");  // TS: map.delete("Bob")
+    scores.remove("Bob"); // TS: map.delete("Bob")
     println!("删除 Bob 后: {:?}", scores);
 
     // 大小
-    println!("大小: {}", scores.len());  // TS: map.size
+    println!("大小: {}", scores.len()); // TS: map.size
     println!("是否为空: {}", scores.is_empty());
 
     // --- 遍历 ---
@@ -80,12 +80,12 @@ fn main() {
     }
 
     // 只遍历键
-    let mut names: Vec<&String> = scores.keys().collect();  // TS: [...map.keys()]
+    let mut names: Vec<&String> = scores.keys().collect(); // TS: [...map.keys()]
     names.sort();
     println!("键: {:?}", names);
 
     // 只遍历值
-    let vals: Vec<&i32> = scores.values().collect();  // TS: [...map.values()]
+    let vals: Vec<&i32> = scores.values().collect(); // TS: [...map.values()]
     println!("值: {:?}", vals);
 
     // --- entry API：核心用法，TS 没有直接对应 ---
@@ -104,7 +104,7 @@ fn main() {
     let text = "hello world hello rust rust rust world";
     let mut word_count: HashMap<&str, i32> = HashMap::new();
     for word in text.split_whitespace() {
-        *word_count.entry(word).or_insert(0) += 1;  // 不存在就插入 0，然后 +1
+        *word_count.entry(word).or_insert(0) += 1; // 不存在就插入 0，然后 +1
     }
     println!("词频: {:?}", word_count);
 
@@ -147,16 +147,16 @@ fn main() {
     // TS 对应：Set<T>
     // ============================================================
     let mut set: HashSet<i32> = HashSet::new();
-    set.insert(1);   // TS: set.add(1)
+    set.insert(1); // TS: set.add(1)
     set.insert(2);
     set.insert(3);
-    set.insert(2);   // 重复插入无效，set 保证元素唯一
+    set.insert(2); // 重复插入无效，set 保证元素唯一
     println!("\nHashSet: {:?}", set);
 
-    println!("包含 3: {}", set.contains(&3));  // TS: set.has(3)
-    set.remove(&2);                             // TS: set.delete(2)
+    println!("包含 3: {}", set.contains(&3)); // TS: set.has(3)
+    set.remove(&2); // TS: set.delete(2)
     println!("删除 2 后: {:?}", set);
-    println!("大小: {}", set.len());            // TS: set.size
+    println!("大小: {}", set.len()); // TS: set.size
 
     // 遍历
     for val in &set {
@@ -198,7 +198,11 @@ fn main() {
     // --- 数组去重 ---
     // TS: [...new Set(arr)]
     let with_dups = vec![1, 2, 2, 3, 3, 3, 4];
-    let mut deduped: Vec<i32> = with_dups.into_iter().collect::<HashSet<_>>().into_iter().collect();
+    let mut deduped: Vec<i32> = with_dups
+        .into_iter()
+        .collect::<HashSet<_>>()
+        .into_iter()
+        .collect();
     deduped.sort();
     println!("去重: {:?}", deduped);
 }

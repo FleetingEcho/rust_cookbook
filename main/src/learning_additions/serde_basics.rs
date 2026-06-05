@@ -49,7 +49,10 @@ pub struct ApiResponse {
 }
 
 pub fn show_rename_all() {
-    let r = ApiResponse { user_id: 1, created_at: "2024-01-01".into() };
+    let r = ApiResponse {
+        user_id: 1,
+        created_at: "2024-01-01".into(),
+    };
     let json = serde_json::to_string(&r).unwrap();
     println!("rename_all: {json}");
     // {"userId":1,"createdAt":"2024-01-01"}
@@ -59,7 +62,7 @@ pub fn show_rename_all() {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Issue {
     pub id: u64,
-    #[serde(rename = "issueType")]  // JSON 键名是 issueType
+    #[serde(rename = "issueType")] // JSON 键名是 issueType
     pub issue_type: String,
     #[serde(rename = "createdAt")]
     pub created_at: String,
@@ -81,7 +84,7 @@ pub fn show_rename() {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
     pub host: String,
-    #[serde(skip)]          // 序列化和反序列化都跳过这个字段
+    #[serde(skip)] // 序列化和反序列化都跳过这个字段
     pub internal_cache: u32,
     #[serde(skip_serializing_if = "Option::is_none")] // None 时不输出这个键
     pub description: Option<String>,
@@ -103,7 +106,7 @@ pub fn show_skip() {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Settings {
     pub name: String,
-    #[serde(default)]               // 反序列化时 JSON 中缺失则用 Default::default()
+    #[serde(default)] // 反序列化时 JSON 中缺失则用 Default::default()
     pub timeout: u64,
     #[serde(default = "default_retries")] // 用自定义函数提供默认值
     pub retries: u32,
@@ -176,7 +179,11 @@ mod tests {
 
     #[test]
     fn roundtrip_user() {
-        let user = User { id: 1, name: "A".into(), email: "a@b.com".into() };
+        let user = User {
+            id: 1,
+            name: "A".into(),
+            email: "a@b.com".into(),
+        };
         let json = serde_json::to_string(&user).unwrap();
         let back: User = serde_json::from_str(&json).unwrap();
         assert_eq!(back.id, 1);
@@ -192,7 +199,11 @@ mod tests {
 
     #[test]
     fn skip_none_option() {
-        let cfg = Config { host: "h".into(), internal_cache: 0, description: None };
+        let cfg = Config {
+            host: "h".into(),
+            internal_cache: 0,
+            description: None,
+        };
         let json = serde_json::to_string(&cfg).unwrap();
         assert!(!json.contains("description"));
         assert!(!json.contains("internal_cache"));

@@ -7,7 +7,7 @@ fn compose_me(input: &str) -> String {
     // TODO: Add " world!" to the string! There are multiple ways to do this.
     // format!("{input} world!")
     // input.to_string() + " world!"
-    format!("{text} world!", text=input)
+    format!("{text} world!", text = input)
 }
 
 fn replace_me(input: &str) -> String {

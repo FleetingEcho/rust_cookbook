@@ -15,7 +15,7 @@ fn get_char(data: &str) -> char {
 //     println!("{data}");
 // }
 fn string_uppercase(data: &str) {
-    let upper = data.to_uppercase();   // 存到新变量，不覆盖 data
+    let upper = data.to_uppercase(); // 存到新变量，不覆盖 data
     println!("{upper}");
 }
 

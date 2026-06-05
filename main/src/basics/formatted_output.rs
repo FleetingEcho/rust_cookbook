@@ -23,7 +23,6 @@ fn main() {
 }
 */
 
-
 /*
 Debug 特征
 
@@ -50,7 +49,6 @@ fn main() {
 }
 
 */
-
 
 /*
 Display 特征
@@ -122,7 +120,6 @@ impl fmt::Display for Array {
     }
 }
 
-
 use std::ops::Deref;
 impl Deref for Array {
     type Target = Vec<i32>;
@@ -136,7 +133,6 @@ fn main() {
     println!("{}", arr); // 使用 `Display` 格式化输出
     println!("{}", arr.len()); // 访问 Vec<i32> 的方法
 }
-
 
 /*
 位置参数
@@ -189,7 +185,6 @@ fn example_string_fill() {
     // 使用参数5为参数x指定宽度，同时在结尾输出参数5 => Hello x    !5
     println!("Hello {:1$}!{}", "x", 5);
 }
-
 
 // 数字填充:符号和 0
 // 数字格式化默认也是使用空格进行填充，但与字符串左对齐不同的是，数字是右对齐。
@@ -256,7 +251,6 @@ fn main() {
 }
 */
 
-
 /*
 进制
 可以使用 # 号来控制数字的进制输出：
@@ -292,9 +286,9 @@ fn main() {
 */
 
 // 指针地址
-fn example_pointer_addr(){
-  let v= vec![1, 2, 3];
-  println!("{:p}", v.as_ptr()) // => 0x600002324050
+fn example_pointer_addr() {
+    let v = vec![1, 2, 3];
+    println!("{:p}", v.as_ptr()) // => 0x600002324050
 }
 
 /*
@@ -312,8 +306,6 @@ fn main() {
     // println!(" \{ Hello \} ")
 }
 */
-
-
 
 /*
 自动捕获变量
@@ -353,11 +345,3 @@ width$ 会从作用域中查找 width 变量，并替换到 {} 里的 宽度 部
 
 
 */
-
-
-
-
-
-
-
-

@@ -5,9 +5,9 @@ fn picky_eater(food: &str) -> &str {
     //     "potato"| "others"=> "I guess I can eat that.",
     //      _=>"No thanks!",
     // };
-    if food=="strawberry"{
+    if food == "strawberry" {
         return "Yummy!";
-    }else if food=="potato"{
+    } else if food == "potato" {
         return "I guess I can eat that.";
     }
     "No thanks!"

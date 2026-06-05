@@ -1,6 +1,6 @@
 fn array_and_vec() -> ([i32; 4], Vec<i32>) {
     let a = [10, 20, 30, 40]; // Array
-    let v: Vec<i32> = a.to_vec(); 
+    let v: Vec<i32> = a.to_vec();
     // let v: Vec<i32>= vec![10,20,30,40];
 
     (a, v)

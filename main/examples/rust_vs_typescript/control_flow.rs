@@ -64,7 +64,9 @@ fn main() {
     let mut i = 0;
     loop {
         i += 1;
-        if i >= 3 { break; }
+        if i >= 3 {
+            break;
+        }
     }
     println!("loop 后 i = {i}");
 
@@ -73,10 +75,10 @@ fn main() {
     let result = loop {
         counter += 1;
         if counter == 5 {
-            break counter * 2;  // break 携带返回值
+            break counter * 2; // break 携带返回值
         }
     };
-    println!("loop 返回值: {result}");  // 10
+    println!("loop 返回值: {result}"); // 10
 
     // ============================================================
     // 三、while
@@ -90,7 +92,8 @@ fn main() {
 
     // while let（模式匹配循环，TS 没有对应）
     let mut stack = vec![1_i32, 2, 3];
-    while let Some(top) = stack.pop() {  // 弹出直到空
+    while let Some(top) = stack.pop() {
+        // 弹出直到空
         println!("while let: {top}");
     }
 
@@ -102,18 +105,21 @@ fn main() {
 
     // 遍历数组（TS: for (const x of arr)）
     let arr = [10, 20, 30, 40, 50];
-    for val in &arr {               // &arr 借用，不消耗
+    for val in &arr {
+        // &arr 借用，不消耗
         print!("{val} ");
     }
     println!();
 
     // 范围（TS: for (let i=0; i<5; i++)）
-    for i in 0..5 {                 // 0,1,2,3,4（不含5）
+    for i in 0..5 {
+        // 0,1,2,3,4（不含5）
         print!("{i} ");
     }
     println!();
 
-    for i in 0..=5 {                // 0,1,2,3,4,5（含5）
+    for i in 0..=5 {
+        // 0,1,2,3,4,5（含5）
         print!("{i} ");
     }
     println!();
@@ -143,7 +149,7 @@ fn main() {
         for j in 0..4 {
             if i == 2 && j == 2 {
                 println!("跳出外层循环 at ({i},{j})");
-                break 'outer;       // TS: break outer;（语法不同）
+                break 'outer; // TS: break outer;（语法不同）
             }
             print!("({i},{j}) ");
         }
@@ -154,7 +160,7 @@ fn main() {
     'outer2: for i in 0..3 {
         for j in 0..3 {
             if j == 1 {
-                continue 'outer2;  // 跳过内层剩余，继续外层下一次迭代
+                continue 'outer2; // 跳过内层剩余，继续外层下一次迭代
             }
             print!("({i},{j}) ");
         }
@@ -168,9 +174,9 @@ fn main() {
     let num = 3_i32;
     match num {
         1 => println!("一"),
-        2 | 3 => println!("二或三"),        // 多个值（TS: case 2: case 3:）
-        4..=6 => println!("四到六"),         // 范围（TS: 没有直接对应）
-        _ => println!("其他"),              // 默认（TS: default:）
+        2 | 3 => println!("二或三"), // 多个值（TS: case 2: case 3:）
+        4..=6 => println!("四到六"), // 范围（TS: 没有直接对应）
+        _ => println!("其他"),       // 默认（TS: default:）
     }
 
     // match 作为表达式（TS: switch 不能直接作为表达式）
@@ -194,17 +200,17 @@ fn main() {
     // Rust match 表达式：
     let day_type = match x % 7 {
         0 | 6 => "周末",
-        _     => "工作日",
+        _ => "工作日",
     };
     println!("day_type: {day_type}");
 
     // ============================================================
     // 八、范围类型
     // ============================================================
-    let range = 1..=10;           // 闭区间范围，可以用于 for、match、contains 等
+    let range = 1..=10; // 闭区间范围，可以用于 for、match、contains 等
     println!("5 在范围内: {}", range.contains(&5));
 
     // 范围可以用于 Vec 切片
     let v = vec![1, 2, 3, 4, 5];
-    println!("v[1..3] = {:?}", &v[1..3]);  // [2, 3]
+    println!("v[1..3] = {:?}", &v[1..3]); // [2, 3]
 }

@@ -55,8 +55,12 @@ pub struct IssueQueryParams {
     pub offset: i64,
 }
 
-fn default_limit() -> i64 { 5 }
-fn default_offset() -> i64 { 0 }
+fn default_limit() -> i64 {
+    5
+}
+fn default_offset() -> i64 {
+    0
+}
 
 /// CreateComment 请求 DTO
 #[derive(Debug, Deserialize, Validate)]

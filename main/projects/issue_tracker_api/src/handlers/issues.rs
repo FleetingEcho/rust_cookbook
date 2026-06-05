@@ -8,8 +8,8 @@ use validator::Validate;
 
 use crate::{
     dto::{
-        CreateIssueRequest, IssueDetailResponse, IssueQueryParams, IssueSummary,
-        PaginatedResponse, UpdateIssueRequest,
+        CreateIssueRequest, IssueDetailResponse, IssueQueryParams, IssueSummary, PaginatedResponse,
+        UpdateIssueRequest,
     },
     error::{AppError, AppResult},
     models::Issue,
@@ -34,7 +34,9 @@ pub async fn list_issues(
         count_builder.push(" AND priority = ").push_bind(priority);
     }
     if let Some(ref issue_type) = query.issue_type {
-        count_builder.push(" AND issue_type = ").push_bind(issue_type);
+        count_builder
+            .push(" AND issue_type = ")
+            .push_bind(issue_type);
     }
     if let Some(label_id) = query.label_id {
         count_builder
@@ -110,7 +112,9 @@ pub async fn create_issue(
     State(state): State<AppState>,
     Json(input): Json<CreateIssueRequest>,
 ) -> AppResult<Json<IssueDetailResponse>> {
-    input.validate().map_err(|e| AppError::BadRequest(e.to_string()))?;
+    input
+        .validate()
+        .map_err(|e| AppError::BadRequest(e.to_string()))?;
     let mut tx = state.db.begin().await?;
     let id = sqlx::query(
         "INSERT INTO issues (title, description, priority, issue_type, assignee, created_by) VALUES (?, ?, ?, ?, ?, ?) RETURNING id",

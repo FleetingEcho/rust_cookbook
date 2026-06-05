@@ -1,10 +1,10 @@
-#[derive(PartialEq)] 
+#[derive(PartialEq)]
 struct Point {
     x: u64,
     y: u64,
 }
 
-#[derive(PartialEq)]  
+#[derive(PartialEq)]
 enum Message {
     Resize { width: u64, height: u64 },
     Move(Point),

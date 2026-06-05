@@ -46,8 +46,8 @@ fn main() {
 
     // 基本闭包（编译器可以推断参数和返回类型）
     // TS: const double = (x: number) => x * 2
-    let double  = |x: i32| x * 2;
-    let add     = |a: i32, b: i32| a + b;
+    let double = |x: i32| x * 2;
+    let add = |a: i32, b: i32| a + b;
     let is_even = |x: i32| x % 2 == 0;
     println!("double(5): {}", double(5));
     println!("add(3,4): {}", add(3, 4));
@@ -57,7 +57,7 @@ fn main() {
     // TS: const complex = (x: number) => { const d = x * 2; return d + 1; }
     let complex = |x: i32| {
         let doubled = x * 2;
-        doubled + 1   // 最后一个表达式是返回值，不需要 return
+        doubled + 1 // 最后一个表达式是返回值，不需要 return
     };
     println!("complex(5): {}", complex(5));
 
@@ -68,7 +68,7 @@ fn main() {
 
     // 默认：按引用捕获（最常见，不转移所有权）
     let multiplier = 3_i32;
-    let multiply = |x| x * multiplier;   // 自动捕获 multiplier 的引用
+    let multiply = |x| x * multiplier; // 自动捕获 multiplier 的引用
     println!("multiply(5): {}", multiply(5));
     println!("multiplier 还能用: {multiplier}"); // 未被移走，还可以用
 
@@ -89,12 +89,15 @@ fn main() {
     fn apply_twice<F: Fn(i32) -> i32>(f: F, x: i32) -> i32 {
         f(f(x))
     }
-    println!("Fn apply_twice: {}", apply_twice(|x| x + 3, 7));  // 13
+    println!("Fn apply_twice: {}", apply_twice(|x| x + 3, 7)); // 13
 
     // FnMut：可以多次调用，可变捕获
     // TS: 闭包内修改外部变量（TS 没有明确区分）
     let mut count = 0;
-    let mut increment = || { count += 1; count };
+    let mut increment = || {
+        count += 1;
+        count
+    };
     println!("FnMut: {}", increment()); // 1
     println!("FnMut: {}", increment()); // 2
     println!("FnMut: {}", increment()); // 3
@@ -114,17 +117,17 @@ fn main() {
     // TS: function makeAdder(n: number) { return (x: number) => x + n; }
     // ============================================================
     fn make_adder(n: i32) -> impl Fn(i32) -> i32 {
-        move |x| x + n   // move 把 n 的所有权移入闭包
+        move |x| x + n // move 把 n 的所有权移入闭包
     }
 
     fn make_multiplier(n: i32) -> impl Fn(i32) -> i32 {
         move |x| x * n
     }
 
-    let add5   = make_adder(5);
+    let add5 = make_adder(5);
     let triple = make_multiplier(3);
-    println!("add5(10): {}", add5(10));       // 15
-    println!("triple(7): {}", triple(7));     // 21
+    println!("add5(10): {}", add5(10)); // 15
+    println!("triple(7): {}", triple(7)); // 21
 
     // ============================================================
     // 五、迭代器链
@@ -135,11 +138,12 @@ fn main() {
 
     // filter + map + sum
     // TS: numbers.filter(x => x % 2 === 0).map(x => x * x).reduce((a,b) => a+b, 0)
-    let result: i32 = numbers.iter()
-        .filter(|&&x| x % 2 == 0)   // 偶数
-        .map(|&x| x * x)            // 平方
-        .sum();                      // 求和
-    println!("偶数平方和: {result}");  // 4+16+36+64+100 = 220
+    let result: i32 = numbers
+        .iter()
+        .filter(|&&x| x % 2 == 0) // 偶数
+        .map(|&x| x * x) // 平方
+        .sum(); // 求和
+    println!("偶数平方和: {result}"); // 4+16+36+64+100 = 220
 
     // map（TS: map()）
     let doubled: Vec<i32> = numbers.iter().map(|&x| x * 2).collect();
@@ -155,17 +159,17 @@ fn main() {
     println!("fold sum: {sum}");
 
     // --- 聚合方法 ---
-    println!("sum: {}", numbers.iter().sum::<i32>());     // TS: reduce((a,b)=>a+b,0)
+    println!("sum: {}", numbers.iter().sum::<i32>()); // TS: reduce((a,b)=>a+b,0)
     println!("product: {}", numbers.iter().product::<i32>());
-    println!("min: {:?}", numbers.iter().min());           // TS: Math.min(...arr)
-    println!("max: {:?}", numbers.iter().max());           // TS: Math.max(...arr)
-    println!("count: {}", numbers.iter().count());         // TS: arr.length
+    println!("min: {:?}", numbers.iter().min()); // TS: Math.min(...arr)
+    println!("max: {:?}", numbers.iter().max()); // TS: Math.max(...arr)
+    println!("count: {}", numbers.iter().count()); // TS: arr.length
 
     // --- 查找 ---
     let first_even = numbers.iter().find(|&&x| x % 2 == 0); // TS: find()
     println!("find: {:?}", first_even);
 
-    let pos = numbers.iter().position(|&x| x > 5);          // TS: findIndex()
+    let pos = numbers.iter().position(|&x| x > 5); // TS: findIndex()
     println!("position: {:?}", pos);
 
     // --- 判断 ---
@@ -173,20 +177,21 @@ fn main() {
     println!("all >0: {}", numbers.iter().all(|&x| x > 0)); // TS: every()
 
     // --- take / skip（TS: slice）---
-    let first3: Vec<_> = numbers.iter().take(3).collect();   // TS: slice(0, 3)
-    let rest: Vec<_>   = numbers.iter().skip(3).collect();   // TS: slice(3)
+    let first3: Vec<_> = numbers.iter().take(3).collect(); // TS: slice(0, 3)
+    let rest: Vec<_> = numbers.iter().skip(3).collect(); // TS: slice(3)
     println!("take(3): {:?}", first3);
     println!("skip(3): {:?}", rest);
 
     // --- enumerate（TS: entries() 或 forEach 的 index 参数）---
     for (i, val) in numbers.iter().enumerate().take(3) {
-        println!("  [{i}] = {val}");  // TS: arr.forEach((v, i) => ...)
+        println!("  [{i}] = {val}"); // TS: arr.forEach((v, i) => ...)
     }
 
     // --- flat_map（TS: flatMap）---
     // TS: ["hello world", "rust"].flatMap(s => s.split(" "))
     let sentences = vec!["hello world", "rust is great"];
-    let words: Vec<&str> = sentences.iter()
+    let words: Vec<&str> = sentences
+        .iter()
         .flat_map(|s| s.split_whitespace())
         .collect();
     println!("flat_map: {:?}", words);
@@ -194,9 +199,9 @@ fn main() {
     // --- zip（TS 需要手动实现）---
     // TS: a.map((v, i) => [v, b[i]])
     let letters = vec!['a', 'b', 'c'];
-    let digits  = vec![1_i32, 2, 3];
+    let digits = vec![1_i32, 2, 3];
     let zipped: Vec<_> = letters.iter().zip(digits.iter()).collect();
-    println!("zip: {:?}", zipped);  // [('a', 1), ('b', 2), ('c', 3)]
+    println!("zip: {:?}", zipped); // [('a', 1), ('b', 2), ('c', 3)]
 
     // --- chain（TS: concat 或展开 [...a, ...b]）---
     let a = vec![1_i32, 2, 3];
@@ -210,7 +215,8 @@ fn main() {
 
     // --- 字符串收集 ---
     // TS: numbers.map(String).join(", ")
-    let joined = numbers.iter()
+    let joined = numbers
+        .iter()
         .map(|x| x.to_string())
         .collect::<Vec<_>>()
         .join(", ");

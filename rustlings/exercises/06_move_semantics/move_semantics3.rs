@@ -1,6 +1,6 @@
 // TODO: Fix the compiler error in the function without adding any new line.
 fn fill_vec(vec: &[i32]) -> Vec<i32> {
-    let mut new_vec = vec.to_vec();   // 内部克隆，调用方看不见
+    let mut new_vec = vec.to_vec(); // 内部克隆，调用方看不见
     new_vec.push(88);
     new_vec
 }

@@ -12,7 +12,7 @@ pub struct Point {
 
 pub fn show_debug() {
     let p = Point { x: 1.0, y: 2.5 };
-    println!("{p:?}");  // Point { x: 1.0, y: 2.5 }
+    println!("{p:?}"); // Point { x: 1.0, y: 2.5 }
     println!("{p:#?}"); // 带缩进的多行格式
 }
 
@@ -42,7 +42,10 @@ pub struct Name {
 }
 
 pub fn show_clone() {
-    let n = Name { first: "Rust".into(), last: "Lang".into() };
+    let n = Name {
+        first: "Rust".into(),
+        last: "Lang".into(),
+    };
     let n2 = n.clone(); // 显式深拷贝
     println!("{} {}", n.first, n2.first); // 两个都能用
 }
@@ -78,9 +81,21 @@ pub struct Version {
 
 pub fn show_ord() {
     let mut versions = vec![
-        Version { major: 1, minor: 2, patch: 0 },
-        Version { major: 0, minor: 9, patch: 5 },
-        Version { major: 1, minor: 0, patch: 3 },
+        Version {
+            major: 1,
+            minor: 2,
+            patch: 0,
+        },
+        Version {
+            major: 0,
+            minor: 9,
+            patch: 5,
+        },
+        Version {
+            major: 1,
+            minor: 0,
+            patch: 3,
+        },
     ];
     versions.sort();
     for v in &versions {
@@ -115,10 +130,10 @@ pub fn show_hash() {
 
 #[derive(Debug, Default)]
 pub struct Config {
-    pub timeout_secs: u64,    // 默认 0
-    pub retries: u32,          // 默认 0
-    pub verbose: bool,         // 默认 false
-    pub endpoint: String,      // 默认 ""
+    pub timeout_secs: u64, // 默认 0
+    pub retries: u32,      // 默认 0
+    pub verbose: bool,     // 默认 false
+    pub endpoint: String,  // 默认 ""
 }
 
 pub fn show_default() {
@@ -148,8 +163,16 @@ mod tests {
 
     #[test]
     fn ord_sorts_versions() {
-        let v1 = Version { major: 1, minor: 0, patch: 0 };
-        let v2 = Version { major: 2, minor: 0, patch: 0 };
+        let v1 = Version {
+            major: 1,
+            minor: 0,
+            patch: 0,
+        };
+        let v2 = Version {
+            major: 2,
+            minor: 0,
+            patch: 0,
+        };
         assert!(v1 < v2);
     }
 

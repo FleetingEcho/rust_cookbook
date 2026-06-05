@@ -33,20 +33,20 @@ fn main() {
     // 一、整数类型
     // TS 只有 number，Rust 区分有符号/无符号、位宽
     // ============================================================
-    let a: i8  = -128;             // 有符号 8 位：-128 ~ 127
-    let b: i32 = -100_000;         // 有符号 32 位：最常用，下划线增加可读性（TS 也支持）
-    let c: i64 = 9_000_000_000;    // 有符号 64 位
-    let d: u8  = 255;              // 无符号 8 位：0 ~ 255
-    let e: u32 = 100_000;          // 无符号 32 位：0 ~ 2^32-1
-    let f: usize = 42;             // 平台相关（64位系统=u64），用于索引和长度
+    let a: i8 = -128; // 有符号 8 位：-128 ~ 127
+    let b: i32 = -100_000; // 有符号 32 位：最常用，下划线增加可读性（TS 也支持）
+    let c: i64 = 9_000_000_000; // 有符号 64 位
+    let d: u8 = 255; // 无符号 8 位：0 ~ 255
+    let e: u32 = 100_000; // 无符号 32 位：0 ~ 2^32-1
+    let f: usize = 42; // 平台相关（64位系统=u64），用于索引和长度
     println!("i8:{a}, i32:{b}, i64:{c}, u8:{d}, u32:{e}, usize:{f}");
 
     // ============================================================
     // 二、浮点类型
     // TS 的 number 默认是 64 位浮点，Rust 需要显式选择
     // ============================================================
-    let f32_val: f32 = 3.14;               // 单精度，约 7 位有效数字
-    let f64_val: f64 = 3.141592653589793;  // 双精度，对应 TS 的 number
+    let f32_val: f32 = 3.14; // 单精度，约 7 位有效数字
+    let f64_val: f64 = 3.141592653589793; // 双精度，对应 TS 的 number
     println!("f32:{f32_val}, f64:{f64_val}");
 
     // ============================================================
@@ -63,7 +63,7 @@ fn main() {
     // TS 用 string[0] 取单字符，Rust 用 char 字面量
     // ============================================================
     let letter: char = 'A';
-    let emoji:  char = '🦀';
+    let emoji: char = '🦀';
     let chinese: char = '锈';
     println!("char: {letter}, {emoji}, {chinese}");
     println!("char 是字母吗: {}", letter.is_alphabetic()); // TS 没有直接等价
@@ -75,8 +75,8 @@ fn main() {
     // ============================================================
     let x: i32 = 10;
     let y: i32 = 3;
-    println!("整除: {x}/{y} = {}", x / y);   // Rust: 3；TS: 3.333...
-    println!("取余: {x}%{y} = {}", x % y);   // 两者一致: 1
+    println!("整除: {x}/{y} = {}", x / y); // Rust: 3；TS: 3.333...
+    println!("取余: {x}%{y} = {}", x % y); // 两者一致: 1
     println!("幂: 2^10 = {}", i32::pow(2, 10)); // TS: 2 ** 10
 
     // 溢出：debug 模式会 panic，release 模式会环绕
@@ -89,10 +89,10 @@ fn main() {
     // TS: Math.abs / Math.ceil / Math.floor / Math.round / Math.sqrt
     // ============================================================
     let n: f64 = -3.7;
-    println!("abs:   {}", n.abs());    // TS: Math.abs(n)
-    println!("ceil:  {}", n.ceil());   // TS: Math.ceil(n)
-    println!("floor: {}", n.floor());  // TS: Math.floor(n)
-    println!("round: {}", n.round());  // TS: Math.round(n)
+    println!("abs:   {}", n.abs()); // TS: Math.abs(n)
+    println!("ceil:  {}", n.ceil()); // TS: Math.ceil(n)
+    println!("floor: {}", n.floor()); // TS: Math.floor(n)
+    println!("round: {}", n.round()); // TS: Math.round(n)
     println!("sqrt(16): {}", 16_f64.sqrt()); // TS: Math.sqrt(16)
     println!("min(3,5): {}", f64::min(3.0, 5.0)); // TS: Math.min(3, 5)
     println!("max(3,5): {}", f64::max(3.0, 5.0)); // TS: Math.max(3, 5)
@@ -102,23 +102,23 @@ fn main() {
     // TS 用 Number(), parseInt() 等；Rust 用 as 关键字
     // ============================================================
     let int_val: i32 = 42;
-    let as_f64: f64 = int_val as f64;   // i32 → f64
+    let as_f64: f64 = int_val as f64; // i32 → f64
     let truncated: i32 = 3.99_f64 as i32; // f64 → i32，截断（不是四舍五入！）
-    let as_u8: u8 = 300_i32 as u8;      // 超出范围时会截断位，300 % 256 = 44
+    let as_u8: u8 = 300_i32 as u8; // 超出范围时会截断位，300 % 256 = 44
     println!("i32 as f64: {as_f64}");
     println!("f64 as i32 (截断): {truncated}"); // 3，不是 4
-    println!("300_i32 as u8 (截断): {as_u8}");  // 44
+    println!("300_i32 as u8 (截断): {as_u8}"); // 44
 
     // ============================================================
     // 八、字符串 ↔ 数字
     // TS: parseInt("42") / parseFloat("3.14") / String(42) / (3.14).toFixed(2)
     // ============================================================
-    let parsed_int: i32  = "42".parse().unwrap();    // TS: parseInt("42")
-    let parsed_f64: f64  = "3.14".parse().unwrap();  // TS: parseFloat("3.14")
+    let parsed_int: i32 = "42".parse().unwrap(); // TS: parseInt("42")
+    let parsed_f64: f64 = "3.14".parse().unwrap(); // TS: parseFloat("3.14")
     println!("解析: {parsed_int}, {parsed_f64}");
 
-    let to_str = 42.to_string();                     // TS: String(42)
-    let formatted = format!("{:.2}", 3.14159);       // TS: (3.14159).toFixed(2)
+    let to_str = 42.to_string(); // TS: String(42)
+    let formatted = format!("{:.2}", 3.14159); // TS: (3.14159).toFixed(2)
     println!("转字符串: {to_str}, 格式化: {formatted}");
 
     // ============================================================
@@ -127,7 +127,7 @@ fn main() {
     // Rust 每种类型有自己的 MIN/MAX
     // ============================================================
     println!("i32 范围: {} ~ {}", i32::MIN, i32::MAX);
-    println!("u8  范围: {} ~ {}", u8::MIN,  u8::MAX);
+    println!("u8  范围: {} ~ {}", u8::MIN, u8::MAX);
     println!("f64 无穷大: {}", f64::INFINITY);
     println!("f64 NaN 检查: {}", f64::NAN.is_nan()); // TS: isNaN(NaN)
 

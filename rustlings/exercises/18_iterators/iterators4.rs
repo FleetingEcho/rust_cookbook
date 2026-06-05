@@ -11,7 +11,6 @@ fn factorial(num: u64) -> u64 {
     // For an extra challenge, don't use:
     // - recursion
     (1..=num).reduce(|acc, x| acc * x).unwrap_or(1)
-    
 }
 
 fn main() {

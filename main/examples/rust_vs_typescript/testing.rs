@@ -59,7 +59,11 @@ pub fn divide(a: i32, b: i32) -> Result<i32, String> {
 
 /// 查找最长的字符串
 pub fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
-    if x.len() >= y.len() { x } else { y }
+    if x.len() >= y.len() {
+        x
+    } else {
+        y
+    }
 }
 
 /// 斐波那契数列
@@ -113,10 +117,7 @@ mod tests {
     fn test_divide_by_zero() {
         // TS: expect(() => divide(10, 0)).toThrow("除数不能为零")
         assert!(divide(10, 0).is_err());
-        assert_eq!(
-            divide(10, 0).unwrap_err(),
-            String::from("除数不能为零")
-        );
+        assert_eq!(divide(10, 0).unwrap_err(), String::from("除数不能为零"));
     }
 
     #[test]
@@ -183,9 +184,9 @@ mod tests {
     fn test_divide_with_result_type() -> Result<(), String> {
         // 返回 Result，测试失败时返回 Err
         // TS: 测试函数返回 void，用 expect 断言
-        assert_eq!(divide(10, 2)?, 5);  // ? 如果 Err 则测试失败
+        assert_eq!(divide(10, 2)?, 5); // ? 如果 Err 则测试失败
         assert_eq!(divide(9, 3)?, 3);
-        Ok(())  // 测试通过
+        Ok(()) // 测试通过
     }
 
     // ============================================================
@@ -267,10 +268,10 @@ mod tests {
 
         #[test]
         fn test_validate_email_edge_cases() {
-            assert!(!validate_email(""));  // 空字符串
+            assert!(!validate_email("")); // 空字符串
             assert!(!validate_email("@.")); // 只有特殊字符
-            // 有效的 email 必须有 @ 和 .
-            assert!(validate_email("a@b.c"));    // 最小有效格式
+                                            // 有效的 email 必须有 @ 和 .
+            assert!(validate_email("a@b.c")); // 最小有效格式
             assert!(validate_email("test@test.co.uk"));
         }
     }

@@ -65,7 +65,7 @@ mod math {
     pub mod geometry {
         // 子模块可以访问父模块的私有内容（通过 super::）
         pub fn circle_area(r: f64) -> f64 {
-            super::PI * r * r   // super:: 访问父模块（TS: 没有对应，通常直接访问）
+            super::PI * r * r // super:: 访问父模块（TS: 没有对应，通常直接访问）
         }
 
         pub fn rectangle_area(w: f64, h: f64) -> f64 {
@@ -81,10 +81,10 @@ mod math {
 // ============================================================
 mod visibility_demo {
     pub struct PublicStruct {
-        pub public_field: i32,      // 任何地方都可访问
+        pub public_field: i32,       // 任何地方都可访问
         pub(crate) crate_field: i32, // 只在当前 crate 内可访问（TS 没有对应）
-        super_field: i32,           // 只有父模块可访问（TS 类似 protected）
-        private_field: i32,         // 只在本模块内（TS: private）
+        super_field: i32,            // 只有父模块可访问（TS 类似 protected）
+        private_field: i32,          // 只在本模块内（TS: private）
     }
 
     impl PublicStruct {
@@ -99,7 +99,7 @@ mod visibility_demo {
         }
 
         pub fn get_private(&self) -> i32 {
-            self.private_field   // 通过公开方法暴露私有字段
+            self.private_field // 通过公开方法暴露私有字段
         }
     }
 }
@@ -109,23 +109,23 @@ mod visibility_demo {
 // ============================================================
 
 // 引入路径，避免每次写全名
-use math::geometry;     // TS: import { geometry } from "./math"
-use std::collections::HashMap;  // TS: import { HashMap } from "std/collections"
+use math::geometry; // TS: import { geometry } from "./math"
+use std::collections::HashMap; // TS: import { HashMap } from "std/collections"
 
 // 重命名（as）
-use math::PI as MATH_PI;  // TS: import { PI as MATH_PI } from "./math"
+use math::PI as MATH_PI; // TS: import { PI as MATH_PI } from "./math"
 
 // 引入多个（用 {} 组合）
-use std::fmt::{self, Display, Formatter};  // TS: import { Display, Formatter } from "std/fmt"
+use std::fmt::{self, Display, Formatter}; // TS: import { Display, Formatter } from "std/fmt"
 
 // ============================================================
 // 四、结构体的字段可见性
 // TS: class 字段用 private/public 修饰
 // ============================================================
 pub struct User {
-    pub name: String,      // 公开字段
+    pub name: String, // 公开字段
     pub age: u32,
-    password: String,      // 私有字段（TS: private password: string）
+    password: String, // 私有字段（TS: private password: string）
 }
 
 impl User {
@@ -147,8 +147,12 @@ impl User {
 // TS: export { greet } from "./utils" 或 export * from "./utils"
 // ============================================================
 mod shapes {
-    pub struct Circle { pub radius: f64 }
-    pub struct Square { pub side: f64 }
+    pub struct Circle {
+        pub radius: f64,
+    }
+    pub struct Square {
+        pub side: f64,
+    }
 }
 
 // 重导出，让外部可以直接 use crate::Circle
@@ -159,7 +163,10 @@ pub use shapes::Square;
 // ============================================================
 // 六、Display trait（类似 TS 的 toString()）
 // ============================================================
-struct Point { x: f64, y: f64 }
+struct Point {
+    x: f64,
+    y: f64,
+}
 
 impl Display for Point {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
@@ -207,7 +214,7 @@ fn main() {
 
     // Display trait
     let p = Point { x: 1.5, y: 2.5 };
-    println!("点: {p}");  // 自动调用 Display
+    println!("点: {p}"); // 自动调用 Display
 
     // ============================================================
     // 七、模块系统与文件系统的关系（说明，无法在单文件演示）

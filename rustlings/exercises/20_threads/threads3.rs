@@ -51,7 +51,7 @@ fn send_tx(q: Queue, tx: mpsc::Sender<u32>) {
     thread::spawn(move || {
         for val in q.first_half {
             println!("Sending {val:?}");
-            tx.send(val).unwrap();// 把数字扔进通道
+            tx.send(val).unwrap(); // 把数字扔进通道
             thread::sleep(Duration::from_millis(250));
         }
     });
@@ -59,7 +59,7 @@ fn send_tx(q: Queue, tx: mpsc::Sender<u32>) {
     thread::spawn(move || {
         for val in q.second_half {
             println!("Sending {val:?}");
-            tx2.send(val).unwrap();// 把数字扔进通道
+            tx2.send(val).unwrap(); // 把数字扔进通道
             thread::sleep(Duration::from_millis(250));
         }
     });
@@ -83,7 +83,7 @@ mod tests {
         let mut received = Vec::with_capacity(10);
         for value in rx {
             // rx 是迭代器，会自动等待新数据
-// 当所有 Sender 都销毁时，循环结束
+            // 当所有 Sender 都销毁时，循环结束
             received.push(value);
         }
 

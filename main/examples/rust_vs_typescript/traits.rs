@@ -46,7 +46,7 @@ trait Drawable {
 
     // 默认方法：TS interface 不支持，需要 abstract class
     fn label(&self) -> String {
-        String::from("可绘制图形")  // 子类可以覆盖
+        String::from("可绘制图形") // 子类可以覆盖
     }
 }
 
@@ -55,7 +55,7 @@ trait Area {
 
     // 默认方法可以调用同 trait 内的其他方法
     fn describe(&self) -> String {
-        format!("面积: {:.2}", self.area())  // TS: abstract class 的模板方法模式
+        format!("面积: {:.2}", self.area()) // TS: abstract class 的模板方法模式
     }
 }
 
@@ -68,12 +68,12 @@ struct Circle {
 }
 
 struct Rectangle {
-    width:  f64,
+    width: f64,
     height: f64,
 }
 
 struct Triangle {
-    base:   f64,
+    base: f64,
     height: f64,
 }
 
@@ -82,7 +82,7 @@ impl Drawable for Circle {
         println!("画圆，半径: {}", self.radius);
     }
     fn label(&self) -> String {
-        format!("圆形(r={})", self.radius)  // 覆盖默认实现
+        format!("圆形(r={})", self.radius) // 覆盖默认实现
     }
 }
 
@@ -159,7 +159,10 @@ fn make_shape(is_circle: bool) -> Box<dyn Area> {
     if is_circle {
         Box::new(Circle { radius: 3.0 })
     } else {
-        Box::new(Rectangle { width: 4.0, height: 5.0 })
+        Box::new(Rectangle {
+            width: 4.0,
+            height: 5.0,
+        })
     }
 }
 
@@ -185,15 +188,21 @@ impl Summary for i32 {
 }
 
 fn main() {
-    let c = Circle    { radius: 5.0 };
-    let r = Rectangle { width: 4.0, height: 6.0 };
-    let t = Triangle  { base: 3.0, height: 8.0 };
+    let c = Circle { radius: 5.0 };
+    let r = Rectangle {
+        width: 4.0,
+        height: 6.0,
+    };
+    let t = Triangle {
+        base: 3.0,
+        height: 8.0,
+    };
 
     // --- 直接调用 trait 方法 ---
     c.draw();
     r.draw();
     println!("{}", c.label());
-    println!("{}", r.label());  // 使用默认实现
+    println!("{}", r.label()); // 使用默认实现
 
     // --- 泛型函数 ---
     print_area(&c);
@@ -211,8 +220,11 @@ fn main() {
     // --- dyn Trait（运行时多态）---
     // TS: const shapes: Drawable[] = [new Circle(3), new Rectangle(4,5)]
     let shapes: Vec<Box<dyn Drawable>> = vec![
-        Box::new(Circle    { radius: 3.0 }),
-        Box::new(Rectangle { width: 4.0, height: 5.0 }),
+        Box::new(Circle { radius: 3.0 }),
+        Box::new(Rectangle {
+            width: 4.0,
+            height: 5.0,
+        }),
     ];
     draw_all(&shapes);
 
@@ -233,39 +245,54 @@ fn main() {
     // ============================================================
 
     // Display：自定义打印格式，对应 TS 的 toString()
-    struct Point { x: f64, y: f64 }
+    struct Point {
+        x: f64,
+        y: f64,
+    }
     impl std::fmt::Display for Point {
         fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
             write!(f, "({:.1}, {:.1})", self.x, self.y)
         }
     }
     let p = Point { x: 1.5, y: 2.5 };
-    println!("Display: {p}");              // 自动调用 Display::fmt
+    println!("Display: {p}"); // 自动调用 Display::fmt
 
     // From / Into：类型转换 trait，对应 TS 的隐式/显式转换
     // TS: Number(x) 或 String(x)
-    let s: String = String::from("hello");  // 使用 From
-    let _: String = "world".into();         // 使用 Into（自动推断）
+    let s: String = String::from("hello"); // 使用 From
+    let _: String = "world".into(); // 使用 Into（自动推断）
 
     // Clone：深拷贝，TS 的 {...obj} 是浅拷贝
     // 通过 #[derive(Clone)] 自动实现
     #[derive(Clone, Debug)]
-    struct Config { value: String }
-    let cfg1 = Config { value: String::from("test") };
-    let cfg2 = cfg1.clone();  // TS: { ...cfg1 }（浅拷贝），Rust clone 是深拷贝
+    struct Config {
+        value: String,
+    }
+    let cfg1 = Config {
+        value: String::from("test"),
+    };
+    let cfg2 = cfg1.clone(); // TS: { ...cfg1 }（浅拷贝），Rust clone 是深拷贝
     println!("Clone: {:?}", cfg2);
 
     // Default：默认值 trait，对应 TS 的默认参数或 ?? 操作符
     // TS: value ?? defaultValue
     #[derive(Debug, Default)]
-    struct Settings { timeout: u32, retries: u32 }
-    let settings = Settings::default();  // timeout: 0, retries: 0
+    struct Settings {
+        timeout: u32,
+        retries: u32,
+    }
+    let settings = Settings::default(); // timeout: 0, retries: 0
     println!("Default: {:?}", settings);
 
     // Iterator trait：实现后可以使用所有迭代器方法
-    struct Counter { count: u32, max: u32 }
+    struct Counter {
+        count: u32,
+        max: u32,
+    }
     impl Counter {
-        fn new(max: u32) -> Self { Counter { count: 0, max } }
+        fn new(max: u32) -> Self {
+            Counter { count: 0, max }
+        }
     }
     impl Iterator for Counter {
         type Item = u32;

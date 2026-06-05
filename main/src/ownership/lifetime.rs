@@ -23,7 +23,6 @@
 
 */
 
-
 /*
 函数中的生命周期
 
@@ -105,7 +104,6 @@ fn longest(x: &str, y: &str) -> String {
 
 */
 
-
 /*
 fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
     if x.len() > y.len() {
@@ -158,10 +156,6 @@ fn main() {
 
 */
 
-
-
-
-
 /*
 函数的返回值如果是一个引用类型，那么它的生命周期只会来源于：
 
@@ -186,7 +180,6 @@ fn main() {
 
 
 */
-
 
 /*
 结构体中的生命周期
@@ -244,7 +237,6 @@ fn main() {
 
 */
 
-
 //生命周期消除
 
 fn first_word(s: &str) -> &str {
@@ -267,7 +259,6 @@ s 是 &str 类型的 输入引用。
 
 
 */
-
 
 /*
 Rust 的生命周期消除规则
@@ -314,7 +305,6 @@ Rust 通过 生命周期消除，避免 不必要的手写生命周期，但在 
 
 */
 
-
 /*
 方法中的生命周期
 
@@ -336,7 +326,6 @@ impl<'a: 'b, 'b> ImportantExcerpt<'a> {
 announcement: &'b str 传入的是一个 短生命周期的字符串引用（可能只是一个临时字符串）。
 由于 self.part 来自 self，所以 self 不能比 announcement 早被释放，否则 self.part 可能指向一个已经无效的值。
 */
-
 
 /*
 静态生命周期
@@ -401,16 +390,12 @@ Rust 不能保证 x 或 y 会一直活着，所以编译器会报错。
 
 */
 
-
 // Rust 生命周期+泛型+特征约束的组合使用！
 
 use std::fmt::Display;
 
-fn longest_with_an_announcement<'a, T>(
-    x: &'a str,
-    y: &'a str,
-    ann: T,
-) -> &'a str // 避免悬垂引用，确保返回的 &str 在 x 和 y 失效前仍然有效。
+fn longest_with_an_announcement<'a, T>(x: &'a str, y: &'a str, ann: T) -> &'a str
+// 避免悬垂引用，确保返回的 &str 在 x 和 y 失效前仍然有效。
 where
     T: Display, // 特征约束， 必须实现Display
 {
@@ -421,7 +406,6 @@ where
         y
     }
 }
-
 
 fn main() {
     let s1 = String::from("short");
@@ -454,4 +438,3 @@ fn main() {
 // - 大多数情况下 Rust 编译器会自动推导（生命周期消除规则）
 //
 // 详细对照 → rust_vs_typescript.rs §8 "生命周期"
-

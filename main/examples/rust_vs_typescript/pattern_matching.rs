@@ -31,7 +31,10 @@ enum Shape {
 }
 
 #[derive(Debug)]
-struct Point { x: i32, y: i32 }
+struct Point {
+    x: i32,
+    y: i32,
+}
 
 fn main() {
     // ============================================================
@@ -44,15 +47,15 @@ fn main() {
         1 => println!("一"),
         2 => println!("二"),
         3 => println!("三"),
-        _ => println!("其他"),   // _ 是通配符，必须有（穷举）
+        _ => println!("其他"), // _ 是通配符，必须有（穷举）
     }
 
     // match 作为表达式（TS switch 不能直接作为表达式）
     let desc = match x {
-        1 | 2 => "小",           // 多个值（TS: case 1: case 2:）
-        3..=6 => "中",           // 范围（TS: 没有直接对应！）
+        1 | 2 => "小", // 多个值（TS: case 1: case 2:）
+        3..=6 => "中", // 范围（TS: 没有直接对应！）
         7..=9 => "大",
-        _     => "其他",
+        _ => "其他",
     };
     println!("desc: {desc}");
 
@@ -62,8 +65,8 @@ fn main() {
     // ============================================================
     let pair = (1_i32, true);
     match pair {
-        (0, _)     => println!("第一个是0"),
-        (x, true)  => println!("第一个是{x}，第二个是true"),
+        (0, _) => println!("第一个是0"),
+        (x, true) => println!("第一个是{x}，第二个是true"),
         (x, false) => println!("第一个是{x}，第二个是false"),
     }
 
@@ -73,17 +76,17 @@ fn main() {
     // ============================================================
     let p = Point { x: 3, y: -5 };
     match p {
-        Point { x: 0, y }  => println!("在Y轴上，y={y}"),
-        Point { x, y: 0 }  => println!("在X轴上，x={x}"),
-        Point { x, y }     => println!("其他位置: ({x},{y})"),
+        Point { x: 0, y } => println!("在Y轴上，y={y}"),
+        Point { x, y: 0 } => println!("在X轴上，x={x}"),
+        Point { x, y } => println!("其他位置: ({x},{y})"),
     }
 
     // 直接解构（不用 match）
-    let Point { x, y } = p;  // TS: const { x, y } = p
+    let Point { x, y } = p; // TS: const { x, y } = p
     println!("解构: x={x}, y={y}");
 
     // 重命名字段
-    let Point { x: px, y: py } = p;  // TS: const { x: px, y: py } = p
+    let Point { x: px, y: py } = p; // TS: const { x: px, y: py } = p
     println!("重命名: px={px}, py={py}");
 
     // ============================================================
@@ -92,18 +95,21 @@ fn main() {
     // ============================================================
     let shapes = vec![
         Shape::Circle { radius: 5.0 },
-        Shape::Rectangle { width: 4.0, height: 3.0 },
+        Shape::Rectangle {
+            width: 4.0,
+            height: 3.0,
+        },
         Shape::Triangle(3.0, 4.0, 5.0),
     ];
 
     for shape in &shapes {
         let area = match shape {
-            Shape::Circle { radius }                   => std::f64::consts::PI * radius * radius,
-            Shape::Rectangle { width, height }         => width * height,
-            Shape::Triangle(a, b, c)                   => {
+            Shape::Circle { radius } => std::f64::consts::PI * radius * radius,
+            Shape::Rectangle { width, height } => width * height,
+            Shape::Triangle(a, b, c) => {
                 // 海伦公式
                 let s = (a + b + c) / 2.0;
-                (s * (s-a) * (s-b) * (s-c)).sqrt()
+                (s * (s - a) * (s - b) * (s - c)).sqrt()
             }
         };
         println!("{:?} → 面积: {area:.2}", shape);
@@ -116,18 +122,18 @@ fn main() {
     // ============================================================
     let num = 7_i32;
     match num {
-        n if n < 0  => println!("{n} 是负数"),
+        n if n < 0 => println!("{n} 是负数"),
         n if n == 0 => println!("是零"),
         n if n % 2 == 0 => println!("{n} 是正偶数"),
-        n           => println!("{n} 是正奇数"),
+        n => println!("{n} 是正奇数"),
     }
 
     // 守卫也可以用在解构中
     let pair = (2_i32, -2_i32);
     match pair {
-        (x, y) if x == y     => println!("相等: {x}"),
+        (x, y) if x == y => println!("相等: {x}"),
         (x, y) if x + y == 0 => println!("互为相反数: {x}, {y}"),
-        (x, _)               => println!("其他: {x}"),
+        (x, _) => println!("其他: {x}"),
     }
 
     // ============================================================
@@ -137,10 +143,10 @@ fn main() {
     let age = 15_u32;
     match age {
         // @ 同时测试值是否在范围内，并把值绑定到变量
-        n @ 0..=12  => println!("儿童，{n}岁"),    // TS 需要: case x: if (x <= 12) 然后用 x
+        n @ 0..=12 => println!("儿童，{n}岁"), // TS 需要: case x: if (x <= 12) 然后用 x
         n @ 13..=17 => println!("青少年，{n}岁"),
         n @ 18..=65 => println!("成年人，{n}岁"),
-        n           => println!("老年人，{n}岁"),
+        n => println!("老年人，{n}岁"),
     }
 
     // ============================================================
@@ -163,7 +169,7 @@ fn main() {
     };
 
     // 只关心部分字段，.. 忽略其余
-    let Config { host, port, .. } = cfg;  // TS: const { host, port } = cfg
+    let Config { host, port, .. } = cfg; // TS: const { host, port } = cfg
     println!("连接: {host}:{port}");
 
     // ============================================================
@@ -176,9 +182,13 @@ fn main() {
         Color(u8, u8, u8),
     }
 
-    let msg = Message::Move { point: Point { x: 10, y: 20 } };
+    let msg = Message::Move {
+        point: Point { x: 10, y: 20 },
+    };
     match msg {
-        Message::Move { point: Point { x, y } } => {
+        Message::Move {
+            point: Point { x, y },
+        } => {
             // 嵌套解构，TS: const { point: { x, y } } = msg（如果 kind 是 "Move"）
             println!("移动到 ({x},{y})");
         }
@@ -221,7 +231,7 @@ fn main() {
             // TS: if (input === null) return 0;
             return 0;
         };
-        value * 2  // 这里 value 一定有效
+        value * 2 // 这里 value 一定有效
     }
     println!("process(Some(5)): {}", process(Some(5)));
     println!("process(None): {}", process(None));
@@ -236,9 +246,15 @@ fn main() {
 
     let shapes2 = vec![
         Shape::Circle { radius: 1.0 },
-        Shape::Rectangle { width: 2.0, height: 3.0 },
+        Shape::Rectangle {
+            width: 2.0,
+            height: 3.0,
+        },
         Shape::Circle { radius: 4.0 },
     ];
-    let circle_count = shapes2.iter().filter(|s| matches!(s, Shape::Circle { .. })).count();
+    let circle_count = shapes2
+        .iter()
+        .filter(|s| matches!(s, Shape::Circle { .. }))
+        .count();
     println!("圆形数量: {circle_count}");
 }

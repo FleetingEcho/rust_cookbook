@@ -21,12 +21,10 @@ pub fn test() {
     let char_list = vec!['y', 'm', 'a', 'q'];
 
     let result = largest(&char_list);
-    println!("The largest char is {}", result);//y
+    println!("The largest char is {}", result); //y
 
     create_and_print::<i64>();
 }
-
-
 
 /*
 T 需要实现 PartialOrd
@@ -43,7 +41,6 @@ T: Copy → 确保 T 是小数据类型（如 i32、char），直接复制，不
 
 */
 
-
 /*
 T: From<i32> → T 必须能够从 i32 类型转换（即 T 必须实现 From<i32> trait）。
 T: Display → T 必须实现 Display trait，这样才能在 println! 中格式化输出。
@@ -51,7 +48,9 @@ T: Display → T 必须实现 Display trait，这样才能在 println! 中格式
 100.into()：into() 是 From<T> trait 的方法，它会调用 T::from(100) 将 100 转换成 T 类型。
 */
 fn create_and_print<T>()
-where T: From<i32> + Display {
+where
+    T: From<i32> + Display,
+{
     let a: T = 100.into(); // 创建了类型为 T 的变量 a，它的初始值由 100 转换而来
     println!("a is: {}", a);
 }
@@ -80,12 +79,12 @@ create_and_print::<i64>() → 100.into() 变成 100i64，然后打印 a is: 100�
 // }
 
 // 不同类型
-struct Point<T,U> {
+struct Point<T, U> {
     x: T,
     y: U,
 }
 fn main() {
-    let p = Point{x: 1, y :1.1};
+    let p = Point { x: 1, y: 1.1 };
 }
 
 /*
@@ -123,7 +122,6 @@ fn main() {
 
 */
 
-
 impl<T, U> Point<T, U> {
     fn mixup<V, W>(self, other: Point<V, W>) -> Point<T, W> {
         Point {
@@ -138,10 +136,9 @@ impl<T, U> Point<T, U> {
 //     }
 // }
 
-
 fn generic_test() {
     let p1 = Point { x: 5, y: 10.4 };
-    let p2 = Point { x: "Hello", y: 'c'};
+    let p2 = Point { x: "Hello", y: 'c' };
 
     let p3 = p1.mixup(p2);
 
@@ -149,7 +146,6 @@ fn generic_test() {
 }
 
 // [i32; 3] 和 [i32; 2] 确实是两个完全不同的类型，因此无法用同一个函数调用。
-
 
 // 让 display_array 能打印任意长度的 i32 数组：
 // fn display_array(arr: &[i32]) {
@@ -163,7 +159,6 @@ fn generic_test() {
 //     display_array(&arr);
 // }
 
-
 //将 i32 改成所有类型的数组：
 // fn display_array<T: std::fmt::Debug>(arr: &[T]) {
 //     println!("{:?}", arr);
@@ -175,7 +170,6 @@ fn generic_test() {
 //     let arr: [i32; 2] = [1, 2];
 //     display_array(&arr);
 // }
-
 
 /*
 const 泛型

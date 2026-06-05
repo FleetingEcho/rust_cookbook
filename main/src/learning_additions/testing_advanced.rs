@@ -31,7 +31,7 @@
 pub fn capitalize(s: &str) -> String {
     let mut chars = s.chars();
     match chars.next() {
-        None    => String::new(),
+        None => String::new(),
         Some(c) => c.to_uppercase().to_string() + chars.as_str(),
     }
 }
@@ -46,7 +46,11 @@ pub fn capitalize(s: &str) -> String {
 /// assert_eq!(safe_div(7, 0),  None);
 /// ```
 pub fn safe_div(a: i32, b: i32) -> Option<i32> {
-    if b == 0 { None } else { Some(a / b) }
+    if b == 0 {
+        None
+    } else {
+        Some(a / b)
+    }
 }
 
 // ── 普通测试模块 ──────────────────────────────────────────────────────────────
@@ -126,12 +130,7 @@ mod tests {
 
     #[test]
     fn capitalize_various_inputs() {
-        let cases = [
-            ("hello", "Hello"),
-            ("rust",  "Rust"),
-            ("",      ""),
-            ("a",     "A"),
-        ];
+        let cases = [("hello", "Hello"), ("rust", "Rust"), ("", ""), ("a", "A")];
         for (input, expected) in cases {
             assert_eq!(
                 capitalize(input),

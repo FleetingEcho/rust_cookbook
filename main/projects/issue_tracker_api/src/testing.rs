@@ -11,11 +11,7 @@ use serde::Serialize;
 use sqlx::SqlitePool;
 use tower::ServiceExt;
 
-use crate::{
-    app,
-    config::Config,
-    state::AppState,
-};
+use crate::{app, config::Config, state::AppState};
 
 /// 用 `:memory:` 数据库创建一个测试 App，返回 (router, pool)。
 /// pool 保持连接存活直到测试结束。
@@ -126,7 +122,8 @@ mod tests {
         }
 
         // 列表
-        let (status, body) = send_request::<()>(&mut router, Method::GET, "/api/issues", None).await;
+        let (status, body) =
+            send_request::<()>(&mut router, Method::GET, "/api/issues", None).await;
         assert_eq!(status, 200);
         let json: serde_json::Value = serde_json::from_slice(&body).unwrap();
         assert_eq!(json["items"].as_array().unwrap().len(), 3);
@@ -230,8 +227,13 @@ mod tests {
         let created: serde_json::Value = serde_json::from_slice(&body).unwrap();
         let id = created["id"].as_i64().unwrap();
 
-        let (status, body) =
-            send_request::<()>(&mut router, Method::GET, &format!("/api/issues/{}", id), None).await;
+        let (status, body) = send_request::<()>(
+            &mut router,
+            Method::GET,
+            &format!("/api/issues/{}", id),
+            None,
+        )
+        .await;
         assert_eq!(status, 200);
         let json: serde_json::Value = serde_json::from_slice(&body).unwrap();
         assert_eq!(json["title"], "My Issue");
