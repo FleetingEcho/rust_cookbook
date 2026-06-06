@@ -30,9 +30,16 @@ pub fn server(receiver: Receiver<Command>) {
 #[cfg(test)]
 mod tests {
     use crate::{launch, Command};
-    #[test] fn a_thread_is_spawned() {
+    #[test]
+    fn a_thread_is_spawned() {
         let sender = launch();
-        sender.send(Command::Insert("test".into())).expect("Channel closed!");
+        sender
+            .send(Command::Insert("test".into()))
+            .expect("Channel closed!");
     }
-    #[test] fn ready() { let move_forward = true; assert!(move_forward); }
+    #[test]
+    fn ready() {
+        let move_forward = true;
+        assert!(move_forward);
+    }
 }

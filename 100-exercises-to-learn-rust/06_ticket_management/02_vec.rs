@@ -13,7 +13,7 @@
 // 🔑 要点：使用 Vec 作为动态数组实现记忆化
 // 逐次 push 构建序列，避免递归重复计算
 pub fn fibonacci(n: u32) -> u32 {
-    let mut memo = vec![0, 1];  // fib(0)=0, fib(1)=1
+    let mut memo = vec![0, 1]; // fib(0)=0, fib(1)=1
     for i in 2..=n {
         let next = memo[i as usize - 1] + memo[i as usize - 2];
         memo.push(next);

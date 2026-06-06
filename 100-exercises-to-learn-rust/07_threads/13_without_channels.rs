@@ -4,7 +4,9 @@
 use std::sync::{Arc, RwLock};
 
 // 共享的 TicketStore
-pub struct TicketStore { tickets: Vec<String> }
+pub struct TicketStore {
+    tickets: Vec<String>,
+}
 
 impl TicketStore {
     pub fn add_ticket(&mut self, draft: String) -> u64 {
@@ -16,15 +18,18 @@ impl TicketStore {
     }
 }
 
-#[test] fn works() {
+#[test]
+fn works() {
     use std::thread::spawn;
-    let store = Arc::new(RwLock::new(TicketStore { tickets: Vec::new() }));
+    let store = Arc::new(RwLock::new(TicketStore {
+        tickets: Vec::new(),
+    }));
 
     let store1 = store.clone();
-    let t1 = spawn(move || { store1.write().unwrap().add_ticket("hello".into()) });
+    let t1 = spawn(move || store1.write().unwrap().add_ticket("hello".into()));
 
     let store2 = store.clone();
-    let t2 = spawn(move || { store2.write().unwrap().add_ticket("world".into()) });
+    let t2 = spawn(move || store2.write().unwrap().add_ticket("world".into()));
 
     let id1 = t1.join().unwrap();
     let id2 = t2.join().unwrap();

@@ -12,8 +12,20 @@ fn sum(values: &[u32]) -> u32 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    #[test] fn empty() { assert_eq!(sum(&[]), 0); }
-    #[test] fn one_element() { assert_eq!(sum(&[1]), 1); }
-    #[test] fn multiple_elements() { assert_eq!(sum(&[1, 2, 3, 4, 5]), 15); }
-    #[test] fn array_slice() { assert_eq!(sum(&[1, 2, 3, 4, 5]), 15); }
+    #[test]
+    fn empty() {
+        assert_eq!(sum(&[]), 0);
+    }
+    #[test]
+    fn one_element() {
+        assert_eq!(sum(&[1]), 1);
+    }
+    #[test]
+    fn multiple_elements() {
+        assert_eq!(sum(&[1, 2, 3, 4, 5]), 15);
+    }
+    #[test]
+    fn array_slice() {
+        assert_eq!(sum(&[1, 2, 3, 4, 5]), 15);
+    }
 }

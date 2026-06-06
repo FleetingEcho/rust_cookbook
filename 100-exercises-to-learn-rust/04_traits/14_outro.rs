@@ -21,7 +21,9 @@ impl From<u16> for SaturatingU16 {
 // From<u8>
 impl From<u8> for SaturatingU16 {
     fn from(value: u8) -> Self {
-        SaturatingU16 { value: value as u16 }
+        SaturatingU16 {
+            value: value as u16,
+        }
     }
 }
 
@@ -35,7 +37,9 @@ impl From<&u16> for SaturatingU16 {
 // From<&u8>
 impl From<&u8> for SaturatingU16 {
     fn from(value: &u8) -> Self {
-        SaturatingU16 { value: *value as u16 }
+        SaturatingU16 {
+            value: *value as u16,
+        }
     }
 }
 

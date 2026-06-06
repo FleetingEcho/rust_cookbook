@@ -16,7 +16,19 @@ pub fn sum(slice: &'static [i32]) -> i32 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    #[test] fn empty() { static ARRAY: [i32; 0] = []; assert_eq!(sum(&ARRAY), 0); }
-    #[test] fn one() { static ARRAY: [i32; 1] = [1]; assert_eq!(sum(&ARRAY), 1); }
-    #[test] fn five() { static ARRAY: [i32; 5] = [1,2,3,4,5]; assert_eq!(sum(&ARRAY), 15); }
+    #[test]
+    fn empty() {
+        static ARRAY: [i32; 0] = [];
+        assert_eq!(sum(&ARRAY), 0);
+    }
+    #[test]
+    fn one() {
+        static ARRAY: [i32; 1] = [1];
+        assert_eq!(sum(&ARRAY), 1);
+    }
+    #[test]
+    fn five() {
+        static ARRAY: [i32; 5] = [1, 2, 3, 4, 5];
+        assert_eq!(sum(&ARRAY), 15);
+    }
 }

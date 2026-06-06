@@ -2,10 +2,18 @@
 // 成功时提取 Ok 值，失败时 panic
 // 这里标题无效时 panic，描述无效时用默认值
 
-fn overly_long_description() -> String { "x".repeat(501) }
-fn overly_long_title() -> String { "A title that's definitely longer than what should be allowed in a development ticket".into() }
-fn valid_title() -> String { "A title".into() }
-fn valid_description() -> String { "A description".into() }
+fn overly_long_description() -> String {
+    "x".repeat(501)
+}
+fn overly_long_title() -> String {
+    "A title that's definitely longer than what should be allowed in a development ticket".into()
+}
+fn valid_title() -> String {
+    "A title".into()
+}
+fn valid_description() -> String {
+    "A description".into()
+}
 
 fn easy_ticket(title: String, description: String, status: Status) -> Ticket {
     // 先检查标题是否有效——无效则直接 panic
@@ -28,18 +36,38 @@ fn easy_ticket(title: String, description: String, status: Status) -> Ticket {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-struct Ticket { title: String, description: String, status: Status, }
+struct Ticket {
+    title: String,
+    description: String,
+    status: Status,
+}
 
 #[derive(Debug, PartialEq, Clone)]
-enum Status { ToDo, InProgress { assigned_to: String }, Done, }
+enum Status {
+    ToDo,
+    InProgress { assigned_to: String },
+    Done,
+}
 
 impl Ticket {
     pub fn new(title: String, description: String, status: Status) -> Result<Ticket, String> {
-        if title.is_empty() { return Err("Title cannot be empty".to_string()); }
-        if title.len() > 50 { return Err("Title cannot be longer than 50 bytes".to_string()); }
-        if description.is_empty() { return Err("Description cannot be empty".to_string()); }
-        if description.len() > 500 { return Err("Description cannot be longer than 500 bytes".to_string()); }
-        Ok(Ticket { title, description, status })
+        if title.is_empty() {
+            return Err("Title cannot be empty".to_string());
+        }
+        if title.len() > 50 {
+            return Err("Title cannot be longer than 50 bytes".to_string());
+        }
+        if description.is_empty() {
+            return Err("Description cannot be empty".to_string());
+        }
+        if description.len() > 500 {
+            return Err("Description cannot be longer than 500 bytes".to_string());
+        }
+        Ok(Ticket {
+            title,
+            description,
+            status,
+        })
     }
 }
 
@@ -49,7 +77,9 @@ mod tests {
 
     #[test]
     #[should_panic(expected = "Title cannot be empty")]
-    fn title_cannot_be_empty() { easy_ticket("".into(), valid_description(), Status::ToDo); }
+    fn title_cannot_be_empty() {
+        easy_ticket("".into(), valid_description(), Status::ToDo);
+    }
 
     #[test]
     fn template_description_is_used_if_empty() {

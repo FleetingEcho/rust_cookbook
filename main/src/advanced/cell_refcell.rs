@@ -1,8 +1,6 @@
 // Cell 与 RefCell 简要总结
 // Rust 通过严格的所有权和借用规则保证安全性，但有时会限制灵活性。因此，Cell 和 RefCell 提供了内部可变性，让不可变引用的数据也能修改。
 
-
-
 // Cell
 // 特点：
 
@@ -46,8 +44,6 @@ fn main() {
 // let s1 = s.borrow(); // 不可变借用
 // let s2 = s.borrow_mut(); // ❌ 运行时 panic
 
-
-
 // Cell vs RefCell
 // 特性	Cell<T>	RefCell<T>
 // 适用数据类型	T: Copy	引用类型
@@ -63,7 +59,6 @@ fn main() {
 
 use std::cell::RefCell;
 use std::rc::Rc;
-
 
 fn main() {
     let s = Rc::new(RefCell::new("我很善变，还拥有多个主人".to_string()));
@@ -95,19 +90,16 @@ fn main() {
 // RefCell<T>	低	有	适用于引用类型，少量借用
 // Rc<T> + RefCell<T>	较高	有	共享可变数据，但非线程安全
 
-
 // 建议：
 
 // 能用 Cell<T> 就不要用 RefCell<T>。
 // 需要多个所有者，且数据可变时，使用 Rc<T> + RefCell<T>。
 // 性能敏感代码需进行 benchmark 评估。
 
-
 // 总结
 // Cell<T> 适用于 Copy 类型，修改值不会 panic。
 // RefCell<T> 适用于引用类型，借用规则检查在运行时。
 // Rc<T> + RefCell<T> 适用于多个所有者共享可变数据，但要小心 panic。
-
 
 // 在 Rust 中，内部可变性是一个强大但需要谨慎使用的特性，合理选择 Cell 或 RefCell，才能既保证安全性，又提高代码的灵活性！
 

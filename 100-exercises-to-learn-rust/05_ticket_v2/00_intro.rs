@@ -5,5 +5,7 @@ fn intro() -> &'static str {
 mod tests {
     use crate::intro;
     #[test]
-    fn test_intro() { assert_eq!(intro(), "I'm ready to refine the `Ticket` type!"); }
+    fn test_intro() {
+        assert_eq!(intro(), "I'm ready to refine the `Ticket` type!");
+    }
 }

@@ -25,15 +25,19 @@ impl<T> Drop for DropTracker<T> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    #[test] fn it_works() {
+    #[test]
+    fn it_works() {
         let counter = Rc::new(RefCell::new(0));
         let _ = DropTracker::new((), Rc::clone(&counter));
         assert_eq!(*counter.borrow(), 1);
     }
-    #[test] fn multiple() {
+    #[test]
+    fn multiple() {
         let counter = Rc::new(RefCell::new(0));
-        { let _a = DropTracker::new(5, Rc::clone(&counter));
-          let _b = DropTracker::new(6, Rc::clone(&counter)); }
+        {
+            let _a = DropTracker::new(5, Rc::clone(&counter));
+            let _b = DropTracker::new(6, Rc::clone(&counter));
+        }
         assert_eq!(*counter.borrow(), 2);
     }
 }

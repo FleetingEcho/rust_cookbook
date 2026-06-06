@@ -36,13 +36,18 @@ impl TryFrom<&str> for Status {
 mod tests {
     use super::*;
 
-    #[test] fn test_try_from_string() {
+    #[test]
+    fn test_try_from_string() {
         assert_eq!(Status::try_from("ToDO".to_string()).unwrap(), Status::ToDo);
-        assert_eq!(Status::try_from("inproGress".to_string()).unwrap(), Status::InProgress);
+        assert_eq!(
+            Status::try_from("inproGress".to_string()).unwrap(),
+            Status::InProgress
+        );
         assert_eq!(Status::try_from("Done".to_string()).unwrap(), Status::Done);
     }
 
-    #[test] fn test_try_from_str() {
+    #[test]
+    fn test_try_from_str() {
         assert_eq!(Status::try_from("todo").unwrap(), Status::ToDo);
         assert_eq!(Status::try_from("inprogress").unwrap(), Status::InProgress);
         assert_eq!(Status::try_from("done").unwrap(), Status::Done);

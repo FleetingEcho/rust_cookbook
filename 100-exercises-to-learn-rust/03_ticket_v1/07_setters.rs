@@ -30,18 +30,30 @@ impl Ticket {
         Self::validate_description(&description);
         Self::validate_status(&status);
 
-        Ticket { title, description, status }
+        Ticket {
+            title,
+            description,
+            status,
+        }
     }
 
     // 私有辅助方法：使用 static 方法（关联函数）
     fn validate_title(title: &str) {
-        if title.is_empty() { panic!("Title cannot be empty"); }
-        if title.len() > 50 { panic!("Title cannot be longer than 50 bytes"); }
+        if title.is_empty() {
+            panic!("Title cannot be empty");
+        }
+        if title.len() > 50 {
+            panic!("Title cannot be longer than 50 bytes");
+        }
     }
 
     fn validate_description(description: &str) {
-        if description.is_empty() { panic!("Description cannot be empty"); }
-        if description.len() > 500 { panic!("Description cannot be longer than 500 bytes"); }
+        if description.is_empty() {
+            panic!("Description cannot be empty");
+        }
+        if description.len() > 500 {
+            panic!("Description cannot be longer than 500 bytes");
+        }
     }
 
     fn validate_status(status: &str) {
@@ -50,9 +62,15 @@ impl Ticket {
         }
     }
 
-    pub fn title(&self) -> &String { &self.title }
-    pub fn description(&self) -> &String { &self.description }
-    pub fn status(&self) -> &String { &self.status }
+    pub fn title(&self) -> &String {
+        &self.title
+    }
+    pub fn description(&self) -> &String {
+        &self.description
+    }
+    pub fn status(&self) -> &String {
+        &self.status
+    }
 
     // TODO: 添加 &mut setter 方法，重用上面的验证逻辑
     pub fn set_title(&mut self, title: String) {

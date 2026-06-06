@@ -40,7 +40,12 @@ mod tests {
         let (listener, addr) = bind_random().await;
         tokio::spawn(echo(listener));
 
-        let requests = vec!["hello here we go with a long message", "world", "foo", "bar"];
+        let requests = vec![
+            "hello here we go with a long message",
+            "world",
+            "foo",
+            "bar",
+        ];
         let mut join_set = JoinSet::new();
 
         for request in requests {

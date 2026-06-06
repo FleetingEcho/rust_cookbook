@@ -20,7 +20,7 @@ mod tests {
 
     #[test]
     fn first() {
-        assert_eq!(factorial(0), 1);   // 空范围：循环体不会执行
+        assert_eq!(factorial(0), 1); // 空范围：循环体不会执行
     }
 
     #[test]

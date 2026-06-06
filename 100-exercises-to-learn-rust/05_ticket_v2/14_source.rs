@@ -5,14 +5,24 @@ mod status {
     use std::convert::TryFrom;
 
     #[derive(Debug, PartialEq, Clone)]
-    pub enum Status { ToDo, InProgress, Done }
+    pub enum Status {
+        ToDo,
+        InProgress,
+        Done,
+    }
 
     #[derive(Debug)]
-    pub struct ParseStatusError { pub invalid_status: String }
+    pub struct ParseStatusError {
+        pub invalid_status: String,
+    }
 
     impl std::fmt::Display for ParseStatusError {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            write!(f, "`{}` is not a valid status. Use one of: ToDo, InProgress, Done", self.invalid_status)
+            write!(
+                f,
+                "`{}` is not a valid status. Use one of: ToDo, InProgress, Done",
+                self.invalid_status
+            )
         }
     }
     impl std::error::Error for ParseStatusError {}
@@ -24,15 +34,17 @@ mod status {
                 "todo" => Ok(Status::ToDo),
                 "inprogress" => Ok(Status::InProgress),
                 "done" => Ok(Status::Done),
-                _ => Err(ParseStatusError { invalid_status: value }),
+                _ => Err(ParseStatusError {
+                    invalid_status: value,
+                }),
             }
         }
     }
 }
 
+use status::Status;
 use std::error::Error;
 use std::fmt;
-use status::Status;
 
 #[derive(Debug)]
 pub enum TicketNewError {
@@ -40,7 +52,7 @@ pub enum TicketNewError {
     TitleTooLong,
     DescriptionCannotBeEmpty,
     DescriptionTooLong,
-    InvalidStatus(Box<dyn Error + Send + Sync>),  // 包含 source
+    InvalidStatus(Box<dyn Error + Send + Sync>), // 包含 source
 }
 
 impl fmt::Display for TicketNewError {
@@ -64,22 +76,46 @@ impl Error for TicketNewError {
     }
 }
 
-fn valid_title() -> String { "A title".into() }
-fn valid_description() -> String { "A description".into() }
+fn valid_title() -> String {
+    "A title".into()
+}
+fn valid_description() -> String {
+    "A description".into()
+}
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct Ticket { title: String, description: String, status: Status, }
+pub struct Ticket {
+    title: String,
+    description: String,
+    status: Status,
+}
 
 impl Ticket {
-    pub fn new(title: String, description: String, status_str: String) -> Result<Self, TicketNewError> {
-        if title.is_empty() { return Err(TicketNewError::TitleCannotBeEmpty); }
-        if title.len() > 50 { return Err(TicketNewError::TitleTooLong); }
-        if description.is_empty() { return Err(TicketNewError::DescriptionCannotBeEmpty); }
-        if description.len() > 500 { return Err(TicketNewError::DescriptionTooLong); }
+    pub fn new(
+        title: String,
+        description: String,
+        status_str: String,
+    ) -> Result<Self, TicketNewError> {
+        if title.is_empty() {
+            return Err(TicketNewError::TitleCannotBeEmpty);
+        }
+        if title.len() > 50 {
+            return Err(TicketNewError::TitleTooLong);
+        }
+        if description.is_empty() {
+            return Err(TicketNewError::DescriptionCannotBeEmpty);
+        }
+        if description.len() > 500 {
+            return Err(TicketNewError::DescriptionTooLong);
+        }
         // 解析状态字符串
-        let status = Status::try_from(status_str)
-            .map_err(|e| TicketNewError::InvalidStatus(Box::new(e)))?;
-        Ok(Ticket { title, description, status })
+        let status =
+            Status::try_from(status_str).map_err(|e| TicketNewError::InvalidStatus(Box::new(e)))?;
+        Ok(Ticket {
+            title,
+            description,
+            status,
+        })
     }
 }
 

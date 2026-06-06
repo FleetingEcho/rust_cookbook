@@ -2,7 +2,7 @@
 // 通过 match 将枚举转换为数组索引
 
 pub struct WeekTemperatures {
-    temperatures: [Option<i32>; 7],  // 7 天，每天一个温度
+    temperatures: [Option<i32>; 7], // 7 天，每天一个温度
 }
 
 pub enum Weekday {
@@ -31,7 +31,9 @@ impl Weekday {
 
 impl WeekTemperatures {
     pub fn new() -> Self {
-        WeekTemperatures { temperatures: [None; 7] }
+        WeekTemperatures {
+            temperatures: [None; 7],
+        }
     }
 
     pub fn get_temperature(&self, day: Weekday) -> Option<i32> {

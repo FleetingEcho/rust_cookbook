@@ -3,13 +3,13 @@
 
 // 使用 while 循环实现阶乘
 pub fn factorial(n: u32) -> u32 {
-    let mut result = 1;    // 用 mut 声明可变变量
-    let mut i = 1;         // 计数器
+    let mut result = 1; // 用 mut 声明可变变量
+    let mut i = 1; // 计数器
 
     // while 循环：当条件为真时持续执行
     while i <= n {
         result *= i;
-        i += 1;            // 注意：Rust 没有 i++ 运算符
+        i += 1; // 注意：Rust 没有 i++ 运算符
     }
 
     result
@@ -21,7 +21,7 @@ mod tests {
 
     #[test]
     fn first() {
-        assert_eq!(factorial(0), 1);   // 循环不会执行，result 保持为 1
+        assert_eq!(factorial(0), 1); // 循环不会执行，result 保持为 1
     }
 
     #[test]

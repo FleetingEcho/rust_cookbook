@@ -37,6 +37,10 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_rectangle() {
-        let _ = Shape::Rectangle { width: 1.0, height: 2.0 }.radius();
+        let _ = Shape::Rectangle {
+            width: 1.0,
+            height: 2.0,
+        }
+        .radius();
     }
 }

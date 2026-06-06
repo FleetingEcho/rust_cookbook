@@ -5,7 +5,7 @@
 fn compute(a: u32, b: u32) -> u32 {
     // 🐛 修改前：`let multiplier: u8 = 4;` → 不能将 u8 与 u32 相加
     // ✅ 改为 u32 或使用 as 转换：`multiplier as u32`
-    let multiplier: u32 = 4;  // 保持与 a, b 相同的类型
+    let multiplier: u32 = 4; // 保持与 a, b 相同的类型
     a + b * multiplier
 }
 

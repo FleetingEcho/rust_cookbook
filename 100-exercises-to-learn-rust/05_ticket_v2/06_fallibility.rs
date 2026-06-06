@@ -2,10 +2,19 @@
 // Ok(T) → 成功；Err(E) → 失败及错误信息
 // 调用方可以通过 ? 或 match 处理错误
 
-fn overly_long_description() -> String { /* ... */ "x".repeat(501) }
-fn overly_long_title() -> String { "A title that's definitely longer than what should be allowed in a development ticket".into() }
-fn valid_title() -> String { "A title".into() }
-fn valid_description() -> String { "A description".into() }
+fn overly_long_description() -> String {
+    /* ... */
+    "x".repeat(501)
+}
+fn overly_long_title() -> String {
+    "A title that's definitely longer than what should be allowed in a development ticket".into()
+}
+fn valid_title() -> String {
+    "A title".into()
+}
+fn valid_description() -> String {
+    "A description".into()
+}
 
 #[derive(Debug, PartialEq)]
 struct Ticket {
@@ -24,11 +33,23 @@ enum Status {
 impl Ticket {
     // 返回 Result 而非 panic
     pub fn new(title: String, description: String, status: Status) -> Result<Ticket, String> {
-        if title.is_empty() { return Err("Title cannot be empty".to_string()); }
-        if title.len() > 50 { return Err("Title cannot be longer than 50 bytes".to_string()); }
-        if description.is_empty() { return Err("Description cannot be empty".to_string()); }
-        if description.len() > 500 { return Err("Description cannot be longer than 500 bytes".to_string()); }
-        Ok(Ticket { title, description, status })
+        if title.is_empty() {
+            return Err("Title cannot be empty".to_string());
+        }
+        if title.len() > 50 {
+            return Err("Title cannot be longer than 50 bytes".to_string());
+        }
+        if description.is_empty() {
+            return Err("Description cannot be empty".to_string());
+        }
+        if description.len() > 500 {
+            return Err("Description cannot be longer than 500 bytes".to_string());
+        }
+        Ok(Ticket {
+            title,
+            description,
+            status,
+        })
     }
 }
 

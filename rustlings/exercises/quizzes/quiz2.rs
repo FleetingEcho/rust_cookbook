@@ -56,8 +56,8 @@ fn main() {
 #[cfg(test)]
 mod tests {
     // TODO: What do we need to import to have `transformer` in scope?
-    use super::Command;
     use super::my_module::transformer;
+    use super::Command;
 
     #[test]
     fn it_works() {

@@ -2,8 +2,12 @@
 // InProgress { assigned_to: String } 是一个带命名字段的变体
 // match 时可以通过模式匹配提取这些数据
 
-fn valid_title() -> String { "A title".into() }
-fn valid_description() -> String { "A description".into() }
+fn valid_title() -> String {
+    "A title".into()
+}
+fn valid_description() -> String {
+    "A description".into()
+}
 
 #[derive(Debug, PartialEq)]
 struct Ticket {
@@ -15,17 +19,29 @@ struct Ticket {
 #[derive(Debug, PartialEq)]
 enum Status {
     ToDo,
-    InProgress { assigned_to: String },   // 携带指派人的名字
+    InProgress { assigned_to: String }, // 携带指派人的名字
     Done,
 }
 
 impl Ticket {
     pub fn new(title: String, description: String, status: Status) -> Ticket {
-        if title.is_empty() { panic!("Title cannot be empty"); }
-        if title.len() > 50 { panic!("Title cannot be longer than 50 bytes"); }
-        if description.is_empty() { panic!("Description cannot be empty"); }
-        if description.len() > 500 { panic!("Description cannot be longer than 500 bytes"); }
-        Ticket { title, description, status }
+        if title.is_empty() {
+            panic!("Title cannot be empty");
+        }
+        if title.len() > 50 {
+            panic!("Title cannot be longer than 50 bytes");
+        }
+        if description.is_empty() {
+            panic!("Description cannot be empty");
+        }
+        if description.len() > 500 {
+            panic!("Description cannot be longer than 500 bytes");
+        }
+        Ticket {
+            title,
+            description,
+            status,
+        }
     }
 
     pub fn assigned_to(&self) -> &str {
@@ -55,8 +71,13 @@ mod tests {
 
     #[test]
     fn test_in_progress() {
-        let ticket = Ticket::new(valid_title(), valid_description(),
-            Status::InProgress { assigned_to: "Alice".to_string() });
+        let ticket = Ticket::new(
+            valid_title(),
+            valid_description(),
+            Status::InProgress {
+                assigned_to: "Alice".to_string(),
+            },
+        );
         assert_eq!(ticket.assigned_to(), "Alice");
     }
 }

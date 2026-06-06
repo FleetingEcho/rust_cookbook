@@ -9,5 +9,8 @@ fn outro() -> &'static str {
 #[cfg(test)]
 mod tests {
     use crate::outro;
-    #[test] fn test_outro() { assert_eq!(outro(), "I have a good understanding of Send and Sync!"); }
+    #[test]
+    fn test_outro() {
+        assert_eq!(outro(), "I have a good understanding of Send and Sync!");
+    }
 }

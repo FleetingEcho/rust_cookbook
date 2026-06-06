@@ -9,7 +9,6 @@
 // [dependencies]
 // futures = "0.3"
 
-
 // 3. async 关键字
 // 异步函数的返回值是 Future，直接调用不会执行：
 
@@ -38,7 +37,6 @@ fn main() {
 // 运行结果：
 // hello, world!
 
-
 // 5. await 关键字
 // await 用于在 async 函数中等待 Future 任务完成：
 
@@ -58,11 +56,9 @@ fn main() {
 }
 // 运行结果：
 
-
 // hello, kitty!
 // hello, world!
 // .await 不会阻塞线程，而是异步等待 Future 任务完成，同时让出线程的执行权。
-
 
 // 6. async/.await 并发执行
 // 假设有 学歌、唱歌 和 跳舞 任务：
@@ -83,7 +79,10 @@ async fn learn_song() -> Song {
 }
 
 async fn sing_song(song: Song) {
-    println!("给大家献上一首{}的{} ~ {}", song.author, song.name, "菊花残，满地伤~ ~");
+    println!(
+        "给大家献上一首{}的{} ~ {}",
+        song.author, song.name, "菊花残，满地伤~ ~"
+    );
 }
 
 async fn dance() {
@@ -113,7 +112,10 @@ async fn learn_song() -> Song {
 }
 
 async fn sing_song(song: Song) {
-    println!("给大家献上一首{}的{} ~ {}", song.author, song.name, "你存在我深深的脑海里~ ~");
+    println!(
+        "给大家献上一首{}的{} ~ {}",
+        song.author, song.name, "你存在我深深的脑海里~ ~"
+    );
 }
 
 async fn dance() {
@@ -138,7 +140,6 @@ fn main() {
 }
 // 运行结果：
 
-
 // 唱到情深处，身体不由自主的动了起来~ ~
 // 给大家献上一首曲婉婷的《我的歌声里》 ~ 你存在我深深的脑海里~ ~
 // 分析：
@@ -147,8 +148,6 @@ fn main() {
 // learn_and_sing 内部 await 了 learn_song()，但线程仍然可用于 dance()。
 
 // 学歌和跳舞可以同时进行，不会相互阻塞，提高了程序的并发性。
-
-
 
 // 7. 结论
 // async/.await 允许在 Rust 中编写异步代码，同时保持同步代码的可读性。
