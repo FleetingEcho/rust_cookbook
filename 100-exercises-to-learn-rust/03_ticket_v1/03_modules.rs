@@ -1,6 +1,7 @@
 // 🔑 要点：Rust 的模块系统用 mod 声明子模块
 // 子模块可以通过 `super::` 前缀访问父模块中的项
 
+#[allow(dead_code)]
 mod helpers {
     // 使用 super:: 访问父模块（当前文件）中的 Ticket
     use super::Ticket;
@@ -10,12 +11,14 @@ mod helpers {
     }
 }
 
+#[allow(dead_code)]
 struct Ticket {
     title: String,
     description: String,
     status: String,
 }
 
+#[allow(dead_code)]
 impl Ticket {
     fn new(title: String, description: String, status: String) -> Ticket {
         if title.is_empty() {

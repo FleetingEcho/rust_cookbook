@@ -2,7 +2,6 @@
 // IntoIterator for &TicketStore → 按 TicketId 顺序遍历
 
 use std::collections::BTreeMap;
-use std::convert::TryFrom;
 use std::ops::{Index, IndexMut};
 
 type TicketTitle = String;

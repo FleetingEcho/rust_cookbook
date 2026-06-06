@@ -2,6 +2,7 @@
 // 使用 impl 块为 struct 添加方法
 // 方法的第一个参数是 self（或 &self、&mut self）
 
+#[allow(dead_code)]
 struct Order {
     price: u32,
     quantity: u32,
@@ -14,6 +15,7 @@ impl Order {
     }
 }
 
+#[allow(dead_code)]
 #[cfg(test)]
 mod tests {
     use super::*;

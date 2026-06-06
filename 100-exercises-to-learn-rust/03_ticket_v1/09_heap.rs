@@ -3,6 +3,7 @@
 // 实际字符串数据存在堆上
 // Ticket 包含 3 个 String，所以 24 * 3 = 72 字节
 
+#[allow(dead_code)]
 pub struct Ticket {
     title: String,
     description: String,

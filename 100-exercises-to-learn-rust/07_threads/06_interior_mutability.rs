@@ -5,6 +5,7 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
+#[allow(dead_code)]
 pub struct DropTracker<T> {
     value: T,
     counter: Rc<RefCell<usize>>,

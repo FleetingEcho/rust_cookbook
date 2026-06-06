@@ -1,6 +1,7 @@
 // 🔑 要点：构造函数模式——通过 new 方法确保数据有效性
 // String 的常用方法：is_empty(), len(), as_str() 等
 
+#[allow(dead_code)]
 struct Ticket {
     title: String,
     description: String,
@@ -55,6 +56,7 @@ fn valid_description() -> String {
     "A description".into()
 }
 
+#[allow(dead_code)]
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -3,10 +3,10 @@
 // 共享数据用 Arc<Mutex<T>> 或 Arc<RwLock<T>>
 // Requires: tokio (with "full" features), anyhow
 
-// TODO: Implement the `fixed_reply` function. It should accept two `TcpListener` instances,
-//  accept connections on both of them concurrently, and always reply to clients by sending
-//  the `Display` representation of the `reply` argument as a response.
+// 实现 fixed_reply 函数，同时监听两个端口
+// 收到连接后始终回复 reply 参数的 Display 表示
 use std::fmt::Display;
+use std::sync::Arc;
 use tokio::io::AsyncWriteExt;
 use tokio::net::TcpListener;
 
@@ -14,7 +14,27 @@ pub async fn fixed_reply<T>(first: TcpListener, second: TcpListener, reply: T)
 where
     T: Display + Send + Sync + 'static,
 {
-    todo!()
+    let reply = Arc::new(reply);
+    loop {
+        tokio::select! {
+            r = first.accept() => {
+                let (mut stream, _) = r.unwrap();
+                let reply = Arc::clone(&reply);
+                tokio::spawn(async move {
+                    let msg = format!("{}", reply);
+                    stream.write_all(msg.as_bytes()).await.unwrap();
+                });
+            }
+            r = second.accept() => {
+                let (mut stream, _) = r.unwrap();
+                let reply = Arc::clone(&reply);
+                tokio::spawn(async move {
+                    let msg = format!("{}", reply);
+                    stream.write_all(msg.as_bytes()).await.unwrap();
+                });
+            }
+        }
+    }
 }
 
 #[cfg(test)]

@@ -17,6 +17,7 @@ fn valid_description() -> String {
 
 // 自定义错误类型：两个变体分别表示标题错误和描述错误
 #[derive(Debug)]
+#[allow(dead_code)]
 enum TicketNewError {
     TitleError(String),
     DescriptionError(String),
@@ -45,6 +46,7 @@ struct Ticket {
 }
 
 #[derive(Debug, PartialEq, Clone)]
+#[allow(dead_code)]
 enum Status {
     ToDo,
     InProgress { assigned_to: String },

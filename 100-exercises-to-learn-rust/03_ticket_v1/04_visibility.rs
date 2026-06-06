@@ -4,6 +4,7 @@
 // - pub(crate) 对当前 crate 公开
 // - super 引用父模块
 
+#[allow(dead_code)]
 mod ticket {
     pub struct Ticket {
         pub title: String, // pub 以使测试模块可以访问

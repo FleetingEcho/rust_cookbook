@@ -17,12 +17,14 @@ struct Ticket {
 }
 
 #[derive(Debug, PartialEq)]
+#[allow(dead_code)]
 enum Status {
     ToDo,
     InProgress,
     Done,
 }
 
+#[allow(dead_code)]
 impl Ticket {
     pub fn new(title: String, description: String, status: Status) -> Ticket {
         if title.is_empty() {

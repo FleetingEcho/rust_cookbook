@@ -4,11 +4,27 @@
 
 use tokio::net::TcpListener;
 
-// TODO: write an echo server that accepts TCP connections on two listeners, concurrently.
-//  Multiple connections (on the same listeners) should be processed concurrently.
-//  The received data should be echoed back to the client.
+// 同时监听两个端口，所有连接并发处理，数据原样返回
 pub async fn echoes(first: TcpListener, second: TcpListener) -> Result<(), anyhow::Error> {
-    todo!()
+    // 用 tokio::select! 同时 accept 两个 listener
+    loop {
+        tokio::select! {
+            r = first.accept() => {
+                let (mut stream, _) = r?;
+                tokio::spawn(async move {
+                    let (mut reader, mut writer) = stream.split();
+                    tokio::io::copy(&mut reader, &mut writer).await.unwrap();
+                });
+            }
+            r = second.accept() => {
+                let (mut stream, _) = r?;
+                tokio::spawn(async move {
+                    let (mut reader, mut writer) = stream.split();
+                    tokio::io::copy(&mut reader, &mut writer).await.unwrap();
+                });
+            }
+        }
+    }
 }
 
 #[cfg(test)]

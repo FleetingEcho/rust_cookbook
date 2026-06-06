@@ -2,6 +2,7 @@
 // trim() 是在 str 上定义的，不是 String
 // 通过 Deref 强制转换，String 自动获取 str 的方法
 
+#[allow(dead_code)]
 pub struct Ticket {
     title: String,
     description: String,

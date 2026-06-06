@@ -24,6 +24,7 @@ struct Ticket {
 }
 
 #[derive(Debug, PartialEq)]
+#[allow(dead_code)]
 enum Status {
     ToDo,
     InProgress { assigned_to: String },

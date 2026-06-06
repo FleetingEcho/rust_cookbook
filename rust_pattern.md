@@ -1574,6 +1574,30 @@ created: chrono::DateTime<Utc>,
 
 ### 类型转换速查
 
+
+```rs
+let a: u32 = 42;
+let b: u64 = a as u64;        // u32 → u64（安全，不会丢失）
+let c: u8 = a as u8;           // u32 → u8（可能截断：42 % 256 = 42）
+let d: i32 = a as i32;         // u32 → i32（可能溢出符号）
+
+// 浮点数转换
+let x = 3.14_f64;
+let y = x as f32;               // f64 → f32（可能精度损失）
+let z = x as i32;               // f64 → i32（截断小数：3）
+
+
+// From：类型明确转换（不会失败）
+let a: u32 = 42;
+let b: u64 = u64::from(a);      // u32 → u64
+let c: i32 = i32::from(a);      // 编译错误！u32 可能超过 i32 范围
+
+// Into：自动推导（通常配合类型标注）
+let b: u64 = a.into();           // 自动推导为 u64::from(a)
+let c: u128 = a.into();          // 自动推导为 u128::from(a)
+
+```
+
 ```rust
 // 数字转换
 let f = 3.14_f64;

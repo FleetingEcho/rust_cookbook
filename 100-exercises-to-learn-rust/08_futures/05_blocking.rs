@@ -13,11 +13,17 @@ use tokio::net::TcpListener;
 pub async fn echo(listener: TcpListener) -> Result<(), anyhow::Error> {
     loop {
         let (socket, _) = listener.accept().await?;
-        let mut socket = socket.into_std()?;
-        socket.set_nonblocking(false)?;
-        let mut buffer = Vec::new();
-        socket.read_to_end(&mut buffer)?;
-        socket.write_all(&buffer)?;
+        // 用 spawn_blocking 把同步 IO 移到专用线程池
+        tokio::task::spawn_blocking(move || {
+            let mut socket = socket.into_std()?;
+            socket.set_nonblocking(false)?;
+            let mut buffer = Vec::new();
+            socket.read_to_end(&mut buffer)?;
+            socket.write_all(&buffer)?;
+            Ok::<_, anyhow::Error>(())
+        })
+        .await
+        .unwrap()?;
     }
 }
 

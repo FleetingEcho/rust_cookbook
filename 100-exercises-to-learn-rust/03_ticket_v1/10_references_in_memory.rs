@@ -2,6 +2,7 @@
 // 无论引用的是什么类型，引用本身的大小都是固定的
 // &T、&mut T 和 &Ticket 在 64 位系统上都是 8 字节
 
+#[allow(dead_code)]
 pub struct Ticket {
     title: String,
     description: String,

@@ -2,6 +2,7 @@
 // 适合只关心一个变体、忽略其余的情况
 // 这里只关心 Circle 变体才能获取半径
 
+#[allow(dead_code)]
 enum Shape {
     Circle { radius: f64 },
     Square { border: f64 },

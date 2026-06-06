@@ -31,7 +31,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_drop_bomb() {
-        let bomb = DropBomb::new();
+        let _bomb = DropBomb::new();
         // 没有 defuse，drop 时会 panic
     }
 

@@ -2,7 +2,6 @@
 // TicketId 需要实现 Hash + Eq 才能作为 HashMap 的键
 
 use std::collections::HashMap;
-use std::convert::TryFrom;
 use std::ops::{Index, IndexMut};
 
 // 使用简化内联类型
