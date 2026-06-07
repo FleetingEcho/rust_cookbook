@@ -1406,6 +1406,14 @@ type    → 透明别名，不产生新类型，适合简化复杂签名/语义�
 
 > 编译器在类型不匹配时自动插入 `*`（解引用），可连续多次，直到类型匹配。
 
+
+用 as_ref 获得 &T，用 as_deref 获得进一步解引用后的 &U（比如 &str），两者都不移动所有权。
+具体对应关系：
+想要 Option<&String> → 用 as_ref
+想要 Option<&str> → 用 as_deref
+两者都不会动原 Option 的所有权，原变量之后还能用。
+
+
 ```rust
 // 常见的自动 deref 链：
 // &String  →  &str     （String 实现了 Deref<Target=str>）
