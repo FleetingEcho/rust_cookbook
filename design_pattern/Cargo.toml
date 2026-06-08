@@ -1,0 +1,58 @@
+[workspace]
+
+[package]
+name = "design_patterns"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "builder"
+path = "builder.rs"
+
+[[bin]]
+name = "singleton"
+path = "singleton.rs"
+
+[[bin]]
+name = "factory"
+path = "factory.rs"
+
+[[bin]]
+name = "newtype"
+path = "newtype.rs"
+
+[[bin]]
+name = "decorator"
+path = "decorator.rs"
+
+[[bin]]
+name = "adapter"
+path = "adapter.rs"
+
+[[bin]]
+name = "strategy"
+path = "strategy.rs"
+
+[[bin]]
+name = "observer"
+path = "observer.rs"
+
+[[bin]]
+name = "state"
+path = "state.rs"
+
+[[bin]]
+name = "iterator"
+path = "iterator.rs"
+
+[[bin]]
+name = "command"
+path = "command.rs"
+
+[[bin]]
+name = "raii"
+path = "raii.rs"
+
+[[bin]]
+name = "typestate"
+path = "typestate.rs"
