@@ -1,0 +1,244 @@
+# cookbook-api REST Client 测试文件
+# VS Code 插件: REST Client (Huachao Mao)
+# 启动服务: cargo run --bin cookbook-api
+
+@base = http://localhost:8080
+@v1   = {{base}}/api/v1
+
+# ─────────────────────────────────────────────────────────
+# 健康检查
+# ─────────────────────────────────────────────────────────
+
+### Health check
+GET {{base}}/health
+
+
+# ─────────────────────────────────────────────────────────
+# 菜谱列表 GET /api/v1/recipes
+# ─────────────────────────────────────────────────────────
+
+### 默认分页 (page=1, per_page=20)
+GET {{v1}}/recipes
+
+### 指定分页
+GET {{v1}}/recipes?page=2&per_page=5
+
+### 按分类过滤
+GET {{v1}}/recipes?category=水产
+
+### 按难度过滤
+GET {{v1}}/recipes?difficulty_min=1&difficulty_max=2
+
+### 按热量过滤
+GET {{v1}}/recipes?max_calories=300&sort_by=calories&order=asc
+
+### 多条件组合过滤
+GET {{v1}}/recipes?category=水产&difficulty_max=2&sort_by=calories
+
+### 按来源过滤
+GET {{v1}}/recipes?source=HowToCook&per_page=5
+
+### 按名称排序
+GET {{v1}}/recipes?sort_by=name&order=asc&per_page=10
+
+### validation error: per_page 超出上限
+GET {{v1}}/recipes?per_page=999
+
+
+# ─────────────────────────────────────────────────────────
+# 菜谱详情 GET /api/v1/recipes/:id
+# ─────────────────────────────────────────────────────────
+
+### 获取 id=1 的菜谱详情（含食材、步骤、营养、标签）
+GET {{v1}}/recipes/1
+
+### 获取 id=42
+GET {{v1}}/recipes/42
+
+### 404: 不存在的 id
+GET {{v1}}/recipes/99999
+
+
+# ─────────────────────────────────────────────────────────
+# 随机菜谱 GET /api/v1/recipes/random
+# ─────────────────────────────────────────────────────────
+
+### 完全随机
+GET {{v1}}/recipes/random
+
+### 随机早餐
+GET {{v1}}/recipes/random?category=早餐
+
+### 随机低卡菜谱
+GET {{v1}}/recipes/random?max_calories=300
+
+### 随机早餐且低卡
+GET {{v1}}/recipes/random?category=早餐&max_calories=400
+
+
+# ─────────────────────────────────────────────────────────
+# 相似菜谱 GET /api/v1/recipes/:id/similar
+# ─────────────────────────────────────────────────────────
+
+### 获取 id=1 的相似菜谱（默认 5 条）
+GET {{v1}}/recipes/1/similar
+
+### 获取 3 条相似菜谱
+GET {{v1}}/recipes/1/similar?limit=3
+
+### 404: 不存在的菜谱的相似推荐
+GET {{v1}}/recipes/99999/similar
+
+
+# ─────────────────────────────────────────────────────────
+# 全文搜索 GET /api/v1/recipes/search
+# ─────────────────────────────────────────────────────────
+
+### 搜索 "红烧"（2字，LIKE fallback）
+GET {{v1}}/recipes/search?q=红烧
+
+### 搜索 "红烧肉"（3字，FTS5 trigram）
+GET {{v1}}/recipes/search?q=红烧肉
+
+### 搜索 "清蒸"（2字，LIKE fallback）
+GET {{v1}}/recipes/search?q=清蒸
+
+### 搜索 "豆腐"（食材/菜名均覆盖）
+GET {{v1}}/recipes/search?q=豆腐
+
+### 搜索分页
+GET {{v1}}/recipes/search?q=鸡肉&page=1&per_page=5
+
+### validation error: 缺少 q
+GET {{v1}}/recipes/search
+
+
+# ─────────────────────────────────────────────────────────
+# 按食材反查 GET /api/v1/recipes/by-ingredients
+# ─────────────────────────────────────────────────────────
+
+### 含"豆腐"的菜谱（any，默认）
+GET {{v1}}/recipes/by-ingredients?ingredients=豆腐
+
+### 同时含"豆腐"和"鸡蛋"（all）
+GET {{v1}}/recipes/by-ingredients?ingredients=豆腐,鸡蛋&match=all
+
+### 含"豆腐"或"茄子"任意一种（any）
+GET {{v1}}/recipes/by-ingredients?ingredients=豆腐,茄子&match=any
+
+### 分页
+GET {{v1}}/recipes/by-ingredients?ingredients=盐&match=any&per_page=5&page=2
+
+### validation error: 缺少 ingredients
+GET {{v1}}/recipes/by-ingredients
+
+
+# ─────────────────────────────────────────────────────────
+# 食材 GET /api/v1/ingredients
+# ─────────────────────────────────────────────────────────
+
+### 食材列表（按出现次数降序）
+GET {{v1}}/ingredients
+
+### 分页
+GET {{v1}}/ingredients?page=1&per_page=10
+
+### 食材名模糊搜索: 含"豆"
+GET {{v1}}/ingredients/suggest?q=豆
+
+### 食材名模糊搜索: 含"肉"，限制 5 条
+GET {{v1}}/ingredients/suggest?q=肉&limit=5
+
+### 空 q 返回空数组
+GET {{v1}}/ingredients/suggest
+
+
+# ─────────────────────────────────────────────────────────
+# 分类 GET /api/v1/categories
+# ─────────────────────────────────────────────────────────
+
+### 全部分类及菜谱数量
+GET {{v1}}/categories
+
+
+# ─────────────────────────────────────────────────────────
+# 统计 GET /api/v1/stats
+# ─────────────────────────────────────────────────────────
+
+### 全局统计
+GET {{v1}}/stats
+
+
+# ─────────────────────────────────────────────────────────
+# 餐单生成 POST /api/v1/meal-plan
+# ─────────────────────────────────────────────────────────
+
+### 默认 7 天餐单
+POST {{v1}}/meal-plan
+Content-Type: application/json
+
+{}
+
+### 3 天餐单
+POST {{v1}}/meal-plan
+Content-Type: application/json
+
+{
+  "days": 3,
+  "people": 4
+}
+
+### 限制难度 ≤ 2（新手友好）
+POST {{v1}}/meal-plan
+Content-Type: application/json
+
+{
+  "days": 2,
+  "max_difficulty": 2
+}
+
+### 限制热量（每道 ≤ 400 大卡）
+POST {{v1}}/meal-plan
+Content-Type: application/json
+
+{
+  "days": 2,
+  "max_calories_per_meal": 400
+}
+
+### 按标签过滤（低卡）
+POST {{v1}}/meal-plan
+Content-Type: application/json
+
+{
+  "days": 2,
+  "tags": ["低卡"]
+}
+
+### 按标签过滤（新手友好）
+POST {{v1}}/meal-plan
+Content-Type: application/json
+
+{
+  "days": 3,
+  "tags": ["新手友好"]
+}
+
+### 组合条件
+POST {{v1}}/meal-plan
+Content-Type: application/json
+
+{
+  "days": 5,
+  "people": 2,
+  "max_difficulty": 3,
+  "max_calories_per_meal": 600
+}
+
+### validation error: days 超出上限
+POST {{v1}}/meal-plan
+Content-Type: application/json
+
+{
+  "days": 99
+}

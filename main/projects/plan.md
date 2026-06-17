@@ -502,49 +502,51 @@ POST /api/v1/meal-plan
 - [x] 打印导入统计（700 条导入，0 条跳过）
 - [x] 预 seed 的 `data/cookbook.db` 已提交，他人无需自行 clone markdown 仓库
 
-### Step 4：核心 API 骨架
+### Step 4：核心 API 骨架 ✅
 
-- [ ] 实现 `AppState`（包含 `SqlitePool`）
-- [ ] 实现统一错误类型 `AppError`（NotFound / BadRequest / Internal）
-- [ ] 注册路由，各 handler 先返回占位符
-- [ ] 实现健康检查端点 `GET /health`
+- [x] 实现 `AppState`（包含 `SqlitePool`）
+- [x] 实现统一错误类型 `AppError`（NotFound / BadRequest / Internal）
+- [x] 注册路由，各 handler 先返回占位符
+- [x] 实现健康检查端点 `GET /health`
+- [x] 注：Windows 端口 2942-3041 被系统保留，默认端口改为 8080
 
-### Step 5：基础 CRUD 接口
+### Step 5：基础 CRUD 接口 ✅
 
-- [ ] `GET /api/v1/recipes`：分页列表 + 过滤（category / difficulty_min~max / calories / source）+ 排序（sort_by / order）
-- [ ] `GET /api/v1/recipes/:id`：详情（JOIN 三张表）
-- [ ] `GET /api/v1/recipes/:id/similar`：同分类、食材重合度排序
-- [ ] `GET /api/v1/recipes/random`：随机一条（可带分类/热量过滤）
-- [ ] `GET /api/v1/categories`：分类及菜谱数量
-- [ ] `GET /api/v1/stats`：全局统计数据
+- [x] `GET /api/v1/recipes`：分页列表 + 过滤（category / difficulty_min~max / calories / source）+ 排序（sort_by / order）
+- [x] `GET /api/v1/recipes/:id`：详情（JOIN 三张表）
+- [x] `GET /api/v1/recipes/:id/similar`：同分类、食材重合度排序
+- [x] `GET /api/v1/recipes/random`：随机一条（可带分类/热量过滤）
+- [x] `GET /api/v1/categories`：分类及菜谱数量
+- [x] `GET /api/v1/stats`：全局统计数据
+- [x] 注：`serde_urlencoded` 不支持 `#[serde(flatten)]`，查询参数结构体不使用 flatten
 
-### Step 6：搜索功能
+### Step 6：搜索功能 ✅
 
-- [ ] 实现 FTS5 搜索查询（`recipes_fts MATCH ?`，trigram 自动处理中文）
-- [ ] `GET /api/v1/recipes/search`：FTS5 全文搜索
-- [ ] `GET /api/v1/ingredients`：所有食材分页列表
-- [ ] `GET /api/v1/ingredients/suggest`：食材名模糊匹配
-- [ ] `GET /api/v1/recipes/by-ingredients`：按食材反查菜谱（any / all 模式）
+- [x] 实现 FTS5 搜索查询（`recipes_fts MATCH ?`，trigram 自动处理中文）
+- [x] `GET /api/v1/recipes/search`：FTS5 全文搜索；查询词 < 3 字符自动 fallback 到 LIKE
+- [x] `GET /api/v1/ingredients`：所有食材分页列表
+- [x] `GET /api/v1/ingredients/suggest`：食材名模糊匹配
+- [x] `GET /api/v1/recipes/by-ingredients`：按食材反查菜谱（any / all 模式）
 
-### Step 7：组合功能
+### Step 7：组合功能 ✅
 
-- [ ] `POST /api/v1/meal-plan`：按天数、人数、偏好生成食谱计划
-  - 早餐从 `早餐` 分类选，午/晚餐从其他分类各选 2-3 道
-  - 同一道菜在 7 天内不重复出现
-  - 偏好关键词（"不辣" / "低卡"）做标签或卡路里过滤
+- [x] `POST /api/v1/meal-plan`：按天数（1-14）、人数、偏好生成餐单
+  - 早餐从 `早餐` 分类选 1 道，午/晚餐各从荤菜/素菜/炒菜等选 2 道
+  - 全部从 ORDER BY RANDOM() 池中取，7 天内不重复
+  - 支持 `max_calories_per_meal`、`max_difficulty`、`tags` 过滤
 
 ### Step 8：测试
 
 - [ ] 单元测试：Markdown 解析器（覆盖各种边界情况）
 - [ ] 集成测试：用 `axum-test` 测试各接口（搜索、分页、详情）
-- [ ] 用 `httpie` 或 `curl` 手动验证所有接口
+- [x] 用 curl 手动验证所有接口
 
-### Step 9：完善
+### Step 9：完善 ✅
 
-- [ ] 添加请求日志中间件（`tracing`）
-- [ ] 添加 CORS 中间件（`tower-http`）
-- [ ] 添加请求超时中间件
-- [ ] 编写 `README.md`，含接口文档和启动说明
+- [x] 添加请求日志中间件（`TraceLayer`）
+- [x] 添加 CORS 中间件（`CorsLayer::permissive()`）
+- [x] 添加请求超时中间件（`TimeoutLayer` 30s）
+- [x] 编写 `README.md`，含接口文档和启动说明
 
 ---
 

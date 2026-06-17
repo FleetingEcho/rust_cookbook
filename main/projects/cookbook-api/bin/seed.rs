@@ -6,6 +6,25 @@ use std::str::FromStr;
 use std::path::{Path, PathBuf};
 use tracing::{info, warn};
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+/// Percent-encode non-ASCII characters (and spaces) in a URL path string.
+fn pct_encode(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    for ch in s.chars() {
+        if ch == ' ' {
+            out.push_str("%20");
+        } else if ch.is_ascii_alphanumeric() || "/-_.~".contains(ch) {
+            out.push(ch);
+        } else {
+            for byte in ch.to_string().as_bytes() {
+                out.push_str(&format!("%{:02X}", byte));
+            }
+        }
+    }
+    out
+}
+
 // ── Data structures ───────────────────────────────────────────────────────────
 
 #[derive(Debug, Default)]
@@ -220,9 +239,6 @@ fn parse_htc_file(path: &Path, repo_root: &Path) -> Option<RecipeData> {
         .map(|p| p.to_string_lossy().replace('\\', "/"))
         .unwrap_or_default();
 
-    const RAW_BASE: &str =
-        "https://raw.githubusercontent.com/Anduin2017/HowToCook/master";
-
     let re_diff =
         Regex::new(r"预估烹饪难度：(★+)").unwrap();
     let re_cal =
@@ -231,6 +247,9 @@ fn parse_htc_file(path: &Path, repo_root: &Path) -> Option<RecipeData> {
         Regex::new(r"^\d+\.\s*(.+)").unwrap();
     let re_img =
         Regex::new(r"!\[[^\]]*\]\(\./([^)]+)\)").unwrap();
+    // Matches any markdown image: ![alt](path) — used for stripping from text
+    let re_any_img =
+        Regex::new(r"!\[[^\]]*\]\([^)]*\)").unwrap();
 
     #[derive(PartialEq)]
     enum Sec { Header, Ingredients, Amounts, Steps, Other }
@@ -285,8 +304,22 @@ fn parse_htc_file(path: &Path, repo_root: &Path) -> Option<RecipeData> {
                     recipe.calories = cap[1].parse().ok();
                     continue;
                 }
+                // Extract first image in header as media.githubusercontent.com URL
+                if recipe.cover_image.is_none() {
+                    if let Some(cap) = re_img.captures(t) {
+                        let raw = format!("{}/{}", recipe_dir, &cap[1]);
+                        recipe.cover_image = Some(format!(
+                            "https://media.githubusercontent.com/media/Anduin2017/HowToCook/master/{}",
+                            pct_encode(&raw)
+                        ));
+                    }
+                }
                 if !t.is_empty() && !t.starts_with('#') && !t.starts_with("预估") {
-                    desc_lines.push(t.to_string());
+                    // Strip markdown images before storing as description
+                    let clean = re_any_img.replace_all(t, "").trim().to_string();
+                    if !clean.is_empty() {
+                        desc_lines.push(clean);
+                    }
                 }
             }
             Sec::Ingredients => {
@@ -307,23 +340,15 @@ fn parse_htc_file(path: &Path, repo_root: &Path) -> Option<RecipeData> {
                 if let Some(cap) = re_step.captures(t) {
                     step_order += 1;
                     let body = cap[1].trim();
-                    if let Some(img_cap) = re_img.captures(body) {
-                        let url =
-                            format!("{}/{}/{}", RAW_BASE, recipe_dir, &img_cap[1]);
-                        recipe.steps.push(StepData {
-                            order: step_order,
-                            content: None,
-                            image_url: Some(url),
-                        });
-                    } else {
-                        // Strip any inline image from the text
-                        let clean = re_img.replace_all(body, "").trim().to_string();
-                        recipe.steps.push(StepData {
-                            order: step_order,
-                            content: if clean.is_empty() { None } else { Some(clean) },
-                            image_url: None,
-                        });
-                    }
+                    // Step images not stored (would bloat DB)
+                    let image_url: Option<String> = None;
+                    // Strip image markdown from text, keep the remaining prose
+                    let clean = re_any_img.replace_all(body, "").trim().to_string();
+                    recipe.steps.push(StepData {
+                        order: step_order,
+                        content: if clean.is_empty() { None } else { Some(clean) },
+                        image_url,
+                    });
                 }
             }
             Sec::Other => {}
@@ -407,9 +432,6 @@ fn parse_clhoc_file(path: &Path, repo_root: &Path) -> Option<RecipeData> {
         .to_string_lossy()
         .to_string();
 
-    const RAW_BASE: &str =
-        "https://raw.githubusercontent.com/Gar-b-age/CookLikeHOC/main";
-
     let re_cover = Regex::new(r"!\[[^\]]*\]\(\.\./images/([^)]+)\)").unwrap();
     let re_step  = Regex::new(r"^-\s*\d+[.、。]\s*(.+)").unwrap();
     let re_nutr  = Regex::new(r"^\|\s*(.+?)\s*\|\s*([\d.]+)\s*\w*\s*\|").unwrap();
@@ -450,8 +472,10 @@ fn parse_clhoc_file(path: &Path, repo_root: &Path) -> Option<RecipeData> {
                 }
                 if recipe.cover_image.is_none() {
                     if let Some(cap) = re_cover.captures(t) {
-                        recipe.cover_image =
-                            Some(format!("{}/images/{}", RAW_BASE, &cap[1]));
+                        recipe.cover_image = Some(format!(
+                            "https://github.com/Gar-b-age/CookLikeHOC/blob/main/images/{}?raw=true",
+                            pct_encode(&cap[1])
+                        ));
                     }
                 }
             }
