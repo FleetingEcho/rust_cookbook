@@ -1,0 +1,5 @@
+CookLikeHOC/
+HowToCook/
+.env
+*.db-shm
+*.db-wal

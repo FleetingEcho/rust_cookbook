@@ -4,6 +4,9 @@ members = [
     "main/projects/hacker_news",
     "main/projects/issue_tracker_api",
     "main/projects/minigrep",
-    "main/projects/mini_web_server", "practice", "projects",
+    "main/projects/mini_web_server",
+    "main/projects/cookbook-api",
+    "practice",
+    "projects",
 ]
 resolver = "2"
