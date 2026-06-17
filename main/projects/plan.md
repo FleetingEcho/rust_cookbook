@@ -6,9 +6,10 @@
 
 **技术栈：**
 - Web 框架：`axum`
-- 数据库：SQLite（`sqlx` + 离线模式）
-- 中文分词：`jieba-rs`
-- Markdown 解析：`pulldown-cmark`
+- 数据库：SQLite（`sqlx` 0.8）
+- FTS5 中文搜索：trigram tokenizer（内置，无需 jieba-rs）
+- Markdown 解析：行解析（无需 pulldown-cmark）
+- 目录遍历：`walkdir`
 - 序列化：`serde` / `serde_json`
 - 错误处理：`thiserror` + `anyhow`
 - 日志：`tracing` + `tracing-subscriber`
@@ -68,14 +69,14 @@
 
 | 来源 | 菜谱数 |
 |------|--------|
-| HowToCook | 365 |
+| HowToCook | 364 |
 | CookLikeHOC | 336 |
-| **合计** | **701** |
+| **合计** | **700** |
 
 ### HowToCook 实际数据格式
 
 **格式高度统一：**
-- 所有 365 条菜谱都有 `预估烹饪难度` 和 `预估卡路里`，无需容错
+- 所有 364 条菜谱都有 `预估烹饪难度` 和 `预估卡路里`，无需容错
 - 难度分布：★(33) ★★(92) ★★★(131) ★★★★(89) ★★★★★(20)
 
 **食材用量情况：**
@@ -164,6 +165,7 @@ CREATE TABLE recipes (
     category    TEXT NOT NULL,           -- 标准化后的中文分类
     difficulty  INTEGER,                 -- 1-5，NULL 表示未知
     calories    REAL,                    -- 大卡，NULL 表示未知
+    cover_image TEXT,                    -- CookLikeHOC 菜品封面图 URL（HowToCook 为 NULL）
     source      TEXT NOT NULL,           -- "HowToCook" | "CookLikeHOC"
     source_path TEXT NOT NULL,           -- 原始文件路径（用于去重）
     created_at  TEXT NOT NULL DEFAULT (datetime('now')),
@@ -220,18 +222,19 @@ CREATE INDEX idx_ingredients_name   ON ingredients(name);
 CREATE INDEX idx_tags_tag           ON tags(tag);
 
 -- 全文搜索虚拟表（SQLite FTS5）
--- ingredients_text：seed 时由 jieba-rs 分词后以空格拼接存入
--- 同步策略：不用触发器，seed 完成后执行一次 rebuild
+-- trigram tokenizer 对中文字符做 n-gram 切割，无需 jieba-rs 分词
+-- 独立表（非 content= 方式），seed 完成后执行一次 DELETE + bulk INSERT
 CREATE VIRTUAL TABLE recipes_fts USING fts5(
+    recipe_id   UNINDEXED,
     name,
     description,
     ingredients_text,
-    content='recipes',
-    tokenize='unicode61'
+    tokenize = 'trigram'
 );
 
 -- seed 完成后执行（全量重建）：
--- INSERT INTO recipes_fts(recipes_fts) VALUES('rebuild');
+-- DELETE FROM recipes_fts;
+-- INSERT INTO recipes_fts SELECT id, name, description, ingredients_text FROM recipes;
 ```
 
 ### 分类映射（HowToCook 英文 → 中文标准化）
@@ -257,21 +260,16 @@ CREATE VIRTUAL TABLE recipes_fts USING fts5(
 ```
 cookbook-api/
 ├── Cargo.toml
-├── .env                        # DATABASE_URL=sqlite://data/cookbook.db
-├── .sqlx/                      # sqlx 离线查询缓存
+├── .env                        # DATABASE_URL=sqlite://data/cookbook.db（不提交）
 ├── migrations/
-│   ├── 0001_create_recipes.sql
-│   ├── 0002_create_ingredients.sql
-│   ├── 0003_create_steps.sql
-│   ├── 0004_create_nutrition.sql
-│   ├── 0005_create_tags.sql
-│   └── 0006_create_fts.sql
+│   └── 0001_init.sql           # 一个文件包含所有表 + 索引 + FTS5（已完成）
 ├── data/
-│   ├── cookbook.db             # SQLite 数据库文件
-│   ├── HowToCook/              # 克隆的仓库
-│   └── CookLikeHOC/            # 克隆的仓库
+│   ├── cookbook.db             # 预 seed 的数据库（已提交，700 条菜谱）
+│   ├── test_queries.sql        # SQL 验证测试（20 条查询）
+│   ├── HowToCook/              # 克隆的仓库（.gitignore 排除）
+│   └── CookLikeHOC/            # 克隆的仓库（.gitignore 排除）
 ├── src/
-│   ├── main.rs                 # 启动入口，路由注册，AppState
+│   ├── main.rs                 # 占位符（待实现 AppState、路由注册）
 │   ├── config.rs               # 配置（端口、数据库路径等）
 │   ├── error.rs                # 统一错误类型 AppError -> axum IntoResponse
 │   ├── router.rs               # 路由注册汇总
@@ -288,15 +286,13 @@ cookbook-api/
 │   │   ├── categories.rs       # list_categories
 │   │   ├── ingredients.rs      # suggest, by_ingredients
 │   │   └── meal_plan.rs        # generate_meal_plan
-│   ├── db/
-│   │   ├── mod.rs
-│   │   ├── recipes.rs          # DB 查询函数
-│   │   ├── ingredients.rs
-│   │   └── search.rs           # FTS5 搜索逻辑
-│   └── search/
-│       └── tokenizer.rs        # jieba-rs 分词，构建 FTS 索引
+│   └── db/
+│       ├── mod.rs
+│       ├── recipes.rs          # DB 查询函数
+│       ├── ingredients.rs
+│       └── search.rs           # FTS5 搜索逻辑
 └── bin/
-    └── seed.rs                 # 数据导入 CLI
+    └── seed.rs                 # 数据导入 CLI（已完成）
 ```
 
 ---
@@ -347,7 +343,7 @@ GET  /api/v1/stats
 
 ```
 GET  /api/v1/recipes/search
-     ?q=红烧肉                    # 查询词，jieba-rs 分词后 FTS5 查询
+     ?q=红烧肉                    # 查询词，FTS5 trigram 搜索
      ?page=1&per_page=20
      → PagedResult<RecipeSummary>
 
@@ -463,50 +459,48 @@ POST /api/v1/meal-plan
 
 ## 实现步骤
 
-### Step 1：项目初始化
+### Step 1：项目初始化 ✅
 
-- [ ] `cargo new cookbook-api`
-- [ ] 配置 `Cargo.toml` 依赖（axum、sqlx、serde、tokio、tracing 等）
-- [ ] 创建 `.env`，配置 `DATABASE_URL=sqlite://data/cookbook.db`
-- [ ] 创建 `data/` 目录
+- [x] `cargo new cookbook-api`
+- [x] 配置 `Cargo.toml` 依赖（sqlx 0.8、tokio、tracing、walkdir 等；axum 待 Step 4 加入）
+- [x] 创建 `.env`，配置 `DATABASE_URL=sqlite://data/cookbook.db`
+- [x] 创建 `data/` 目录
 
-### Step 2：数据库迁移
+### Step 2：数据库迁移 ✅
 
-- [ ] 安装 `sqlx-cli`：`cargo install sqlx-cli --no-default-features --features sqlite`
-- [ ] 编写 6 个 migration 文件
-- [ ] 运行 `sqlx migrate run`
-- [ ] 验证表结构正确
+- [x] 安装 `sqlx-cli`：`cargo install sqlx-cli --no-default-features --features sqlite`
+- [x] 编写单一 migration 文件 `migrations/0001_init.sql`（包含所有表 + 索引 + FTS5）
+- [x] 运行 `sqlx migrate run`
+- [x] 验证表结构正确
 
-### Step 3：数据导入（`bin/seed.rs`）
+### Step 3：数据导入（`bin/seed.rs`）✅
 
-- [ ] 浅克隆两个仓库（`--depth 1` 避免下载完整历史）：
+- [x] 浅克隆两个仓库（`--depth 1` 避免下载完整历史）：
   ```
   git clone --depth 1 https://github.com/Anduin2017/HowToCook data/HowToCook
   git clone --depth 1 https://github.com/Gar-b-age/CookLikeHOC data/CookLikeHOC
   ```
-  脚本检查目录已存在时跳过 clone（幂等）
-- [ ] 递归扫描 `.md` 文件，跳过 README 和模板文件
-- [ ] 实现 HowToCook Markdown 解析器：
-  - 菜名：取一级标题（`# 菜名`）
+  运行 seed 前手动 clone，脚本检查目录已存在时跳过
+- [x] 递归扫描 `.md` 文件，跳过 README 和模板文件
+- [x] 实现 HowToCook Markdown 解析器（行解析，非 pulldown-cmark）：
+  - 菜名：取一级标题，strip `的做法` 后缀
   - 描述：取标题后、`预估烹饪难度` 前的第一段正文
   - 难度：正则 `预估烹饪难度：(★+)` → 数 `★` 个数（1-5）
   - 卡路里：正则 `预估卡路里：(\d+(?:\.\d+)?) 大卡`
-  - 食材：合并解析 `## 必备原料和工具` 和 `## 计算` 两节，跳过 `### 工具`/`### 必备工具` 子节下的条目，其余 `### 子节` 正常解析
-  - 步骤：解析 `## 操作` 下有序列表，文字和图片行分别处理；图片 `./xxx.jpg` → `https://raw.githubusercontent.com/Anduin2017/HowToCook/master/dishes/{category}/{recipe_dir}/xxx.jpg`
-- [ ] 实现 CookLikeHOC Markdown 解析器：
-  - 菜名：取一级标题
+  - 食材：合并解析 `## 必备原料和工具` 和 `## 计算` 两节，跳过 `### 工具`/`### 必备工具` 子节下的条目
+  - 步骤：解析 `## 操作` 下有序列表；图片 `./xxx.jpg` → GitHub raw URL
+- [x] 实现 CookLikeHOC Markdown 解析器：
+  - 菜名：取一级标题，`resolve_links()` 去除 `[name](url)` 包装
   - 分类：从文件路径的父目录名取得
-  - 封面图：解析菜名标题后第一行的 `![](../images/xxx.png)` → `https://raw.githubusercontent.com/Gar-b-age/CookLikeHOC/main/images/xxx.png`
-  - 食材：识别 section（配料 / 原料 / 已知成分，含冒号和 tab 变体），提取 `- ` 列表项；内部链接 `[名称](路径)` 提取显示文本
-  - 步骤：识别 `## 步骤` 变体，去掉列表前缀 `- ` 后解析步骤文字
-  - 营养：`## 营养成分` 下的 Markdown 表格，解析热量/蛋白质/脂肪/碳水化合物/钠五行
-- [ ] 自动生成 tags（按规则：分类名 / 烹饪方式关键词 / 辣度 / 热量标签 / 难度标签）
-- [ ] 去重逻辑：使用 `INSERT OR IGNORE` 配合 `UNIQUE(source, source_path)` 实现幂等导入
-- [ ] 导入完成后全量重建 FTS5 索引：
-  ```sql
-  INSERT INTO recipes_fts(recipes_fts) VALUES('rebuild');
-  ```
-- [ ] 打印导入统计（共导入 N 条，跳过 M 条，失败 K 条）
+  - 封面图：解析菜名标题后第一行的 `![](../images/xxx.png)` → GitHub raw URL
+  - 食材：`clhoc_section()` 归一化识别 6 种 section 标题变体；内部链接提取显示文本
+  - 步骤：识别 `## 步骤` 变体，去掉列表前缀 `- `
+  - 营养：`## 营养成分` 下的 Markdown 表格，解析蛋白质/脂肪/碳水/钠四项
+- [x] 自动生成 tags（分类名 / 烹饪方式关键词 / 辣度 / 热量标签 / 难度标签）
+- [x] 去重逻辑：先检查 `(source, source_path)` 是否存在再 INSERT，幂等导入
+- [x] 导入完成后全量重建 FTS5 索引（DELETE + bulk INSERT，无需 rebuild 命令）
+- [x] 打印导入统计（700 条导入，0 条跳过）
+- [x] 预 seed 的 `data/cookbook.db` 已提交，他人无需自行 clone markdown 仓库
 
 ### Step 4：核心 API 骨架
 
@@ -526,9 +520,8 @@ POST /api/v1/meal-plan
 
 ### Step 6：搜索功能
 
-- [ ] 实现 FTS5 搜索查询（`recipes_fts MATCH ?`）
-- [ ] 集成 `jieba-rs` 对中文查询词分词
-- [ ] `GET /api/v1/recipes/search`：分词后 FTS5 全文搜索
+- [ ] 实现 FTS5 搜索查询（`recipes_fts MATCH ?`，trigram 自动处理中文）
+- [ ] `GET /api/v1/recipes/search`：FTS5 全文搜索
 - [ ] `GET /api/v1/ingredients`：所有食材分页列表
 - [ ] `GET /api/v1/ingredients/suggest`：食材名模糊匹配
 - [ ] `GET /api/v1/recipes/by-ingredients`：按食材反查菜谱（any / all 模式）
@@ -559,19 +552,21 @@ POST /api/v1/meal-plan
 
 ```toml
 [dependencies]
+# API 框架（Step 4 加入）
 axum            = { version = "0.7", features = ["macros"] }
 tokio           = { version = "1", features = ["full"] }
-sqlx            = { version = "0.7", features = ["runtime-tokio", "sqlite", "migrate", "macros"] }
 serde           = { version = "1", features = ["derive"] }
 serde_json      = "1"
 tower-http      = { version = "0.5", features = ["cors", "trace", "timeout"] }
+thiserror       = "1"
+
+# 数据库 + 工具（已有）
+sqlx            = { version = "0.8", features = ["runtime-tokio", "sqlite", "migrate"] }
+anyhow          = "1"
+regex           = "1"
+walkdir         = "2"
 tracing         = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-thiserror       = "1"
-anyhow          = "1"
-pulldown-cmark  = "0.11"
-jieba-rs        = "0.6"
-regex           = "1"
 dotenvy         = "0.15"
 
 [[bin]]
@@ -598,7 +593,7 @@ path = "bin/seed.rs"
        }))
        .connect(&database_url).await?;
    ```
-2. **FTS5 中文分词**：SQLite 内置的 `unicode61` tokenizer 不能做中文分词，但可以字符级分割。更精确的方案是 seed 时用 jieba-rs 预处理后存入 `ingredients_text` 字段（空格分隔词组），搜索时同样对查询词分词。
+2. **FTS5 中文搜索**：使用 `trigram` tokenizer，对字符串按 3 字符滑动窗口建立倒排索引，无需 jieba-rs 分词，支持任意子串匹配。查询时直接传入原始查询词即可，sqlx 内置的 sqlite 已包含 FTS5 支持（系统 sqlite3 CLI 可能没有）。
 3. **图片 URL**：HowToCook 中图片路径为相对路径（`./图片.jpg`），需在 seed 时拼接为 GitHub raw URL：`https://raw.githubusercontent.com/Anduin2017/HowToCook/master/dishes/{category}/{recipe}/{image}`。
 4. **解析容错**：两个仓库的 Markdown 格式并不完全统一，解析器要做容错处理，解析失败的字段记 `NULL` 而不是整条跳过。
 5. **去重**：两个仓库可能有相同菜名，用 `(source, source_path)` 联合唯一索引去重，不用菜名去重。
